@@ -15,7 +15,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 CURRENTVERSION=$(jq -r .version < ${SCRIPT_DIR}/../package.json)
-echo -e "\n########## Planet Payment CommerceTools connector - building package v${CURRENTVERSION} for Lambda function, starting now, at ${NOW}."
+echo -e "\n########## Planet Payment commercetools connector - building package v${CURRENTVERSION} for Lambda function, starting now, at ${NOW}."
 
 echo -e "\n##### Install DEV dependencies."
 npm ci
