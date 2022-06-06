@@ -1,0 +1,16 @@
+{
+  "name": "planet-commercetools-connector",
+  "version": "0.0.0",
+  "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Datatrans",
+    "CommerceTools",
+    "PlanetPayment"
+  ],
+  "author": "",
+  "license": "ISC"
+}
