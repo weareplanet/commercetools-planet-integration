@@ -1,0 +1,135 @@
+
+# API-Gateway parts are commented as the team discuss its usage
+# Change the Lambda env vars if needed.
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: commercetools Planet Connector - Lambda and extras for stack 'STACKNAME-STACKID'.
+
+Parameters:
+  lambdaFunctionName:
+    Type: "String"
+    AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
+    Description: Lambda function name.
+    Default: "STACKNAME-STACKID"
+  apiextensionIAMUser:
+    Type: "String"
+    AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
+    Description: IAM User for CommerceTools API Extension calls on STACKNAME-STACKID.
+    Default: "STACKNAME-STACKID-apiextension-user"
+
+
+Resources:
+
+##### Lambda
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          exports.handler = async function(event, context) {
+            return { statusCode: 200, body: 'Hello World, from STACKNAME-STACKID.' };
+          };
+      Description: Lambda function of commercetools Planet connector for STACKID.
+      FunctionName: !Ref "lambdaFunctionName"
+      Handler: "app/environment-specific-handlers/CT_HANDLER_PLACEHOLDER/index.allOperationsHandler"
+      MemorySize: 128
+      Role: !GetAtt LambdaIamRole.Arn
+      Runtime: nodejs16.x
+      Timeout: 150
+      Environment:
+        Variables:
+          CT_API_URL: "CT_API_URL_PLACEHOLDER" # as an URL from the CommerceTools project
+          CT_AUTH_URL: "CT_AUTH_URL_PLACEHOLDER" # as an URL from the CommerceTools project
+          CT_CLIENT_ID: "CT_CLIENT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_CLIENT_SECRET: "CT_CLIENT_SECRET_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          DT_CONNECTOR_WEBHOOK_URL: "DT_CONNECTOR_WEBHOOK_URL_PLACEHOLDER" # as an URL from AWS Lambda function itself
+          DT_MERCHANTS: 'DT_MERCHANTS_PLACEHOLDER' # as a stringified JSON containing id, password, environment and HMAC key, using single quotes to avoid issues with double-quotes within the JSON
+          LOG_LEVEL: "debug" # change to INFO after debugging whatever is needed
+
+  LambdaFunctionURL:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: "NONE"
+      TargetFunctionArn: !GetAtt LambdaFunction.Arn
+
+  LambdaIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Effect: "Allow"
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionName}:*"
+          PolicyName: !Join ["", [{"Ref": "AWS::StackName"}, "-lambda-log"]]
+
+  LambdaPermissionPublic:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: "NONE"
+
+  LambdaLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${lambdaFunctionName}"
+      RetentionInDays: 90
+
+  APIExtensionIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref "apiextensionIAMUser"
+      Policies:
+      - PolicyName: !Join ["", [{"Ref": "apiextensionIAMUser"}, "-inline-policy-lambda"]]
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - lambda:InvokeFunction
+            Resource:
+            #- !Sub "arn:aws:lambda:*:${AWS::AccountId}:function:*"
+            #- !Ref "apiextensionIAMUser"
+            - !GetAtt LambdaFunction.Arn
+
+  APIExtensionIAMUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref "apiextensionIAMUser"
+    DependsOn: APIExtensionIAMUser
+
+Outputs:
+
+  LambdaFunctionName:
+    Description: "STACKID Lambda function name"
+    Value: !Ref "lambdaFunctionName"
+
+  LambdaFunctionURL:
+    Description: "STACKID Lambda function URL"
+    Value: !GetAtt LambdaFunctionURL.FunctionUrl
+
+  AccessKeyforAPIExtensionIAMUserAccessKey:
+    Value:
+      !Ref APIExtensionIAMUserAccessKey
+  SecretKeyforAPIExtensionIAMUserAccessKey:
+    Value: !GetAtt APIExtensionIAMUserAccessKey.SecretAccessKey

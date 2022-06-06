@@ -1,0 +1,67 @@
+name: Bump and Release
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+
+jobs:
+  bump-and-release:
+    if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
+    name: Bump version and Release tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Bump 'patch' by default
+        run: echo "BUMP=patch" >> $GITHUB_ENV
+      - name: Check and set 'minor' release
+        if: ${{ contains( github.event.pull_request.labels.*.name, 'bump:minor') }}
+        run: echo "BUMP=minor" >> $GITHUB_ENV
+      - name: Check and set 'major' release
+        if: ${{ contains( github.event.pull_request.labels.*.name, 'bump:major') }}
+        run: echo "BUMP=major" >> $GITHUB_ENV
+      - name: Install semver-tool
+        # as standard ubuntu-latest doesn't have it
+        run: |
+          export DIR=$(mktemp -d)
+          cd $DIR
+          curl https://github.com/fsaintjacques/semver-tool/archive/3.2.0.tar.gz -L -o semver.tar.gz
+          tar -xvf semver.tar.gz
+          sudo cp semver-tool-3.2.0/src/semver /usr/local/bin
+      - name: Get the codebase from the git repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure the cloned repo
+        run: |
+          git config user.email "githubactions@planetpayment.com"
+          git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
+          git fetch
+      - name: Bump version
+        run: |
+          TAG=$(git tag --sort=-creatordate | head -n 1) && \
+          if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
+          export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
+          echo "The calculated new version is $NEW_VERSION"
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      - name: Modify CHANGELOG
+        run: |
+          if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
+      - name: Updating version on package.json and package-lock.json
+        run: |
+          npm version ${{ env.VERSION }}
+      - name: Commit and push changes
+        run: |
+          git push origin
+          
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: ${{ env.VERSION }}
+          #body_path: CHANGELOG.md
+          #draft: false
+          #prerelease: false
