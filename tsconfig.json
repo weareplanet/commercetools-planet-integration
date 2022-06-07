@@ -1,0 +1,15 @@
+{
+  "include": [ "src/**/*.ts" ],
+  "exclude": [ "/**/*.test.ts", "node_modules" ],
+  "compilerOptions": {
+    "target": "es2020",
+    "sourceMap": false,
+    "alwaysStrict": true,
+    "outDir": "dist",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "typeRoots": [ "./node_modules/@types"]
+  }
+}
