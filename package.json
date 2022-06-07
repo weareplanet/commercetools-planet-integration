@@ -4,12 +4,20 @@
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "transpile": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
+    "test:pure": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand",
+    "test": "cross-env LOG_LEVEL=silent npm run test:pure -- --verbose",
+    "build": "npm run clean && npm run transpile",
+    "test:local-dev:all": "npm run lint && cross-env npm run test:pure -- --silent=false --verbose",
+    "test:local-dev:file": "cross-env npm run test:pure -- --silent=false --verbose --coverage=false",
+    "start:local-dev": "source .env.local-dev && cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --runMode local --stage local-dev --region local-fake-region | pino-pretty -t HH:MM:ss"
   },
   "keywords": [
     "Datatrans",
     "CommerceTools",
-    "PlanetPayment"
+    "Planet Payment"
   ],
   "author": "",
   "license": "ISC",

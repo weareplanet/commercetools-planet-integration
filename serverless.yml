@@ -1,0 +1,19 @@
+service: planet-commercetools-connector
+
+plugins:
+  - serverless-offline
+
+package:
+  individually: true
+
+frameworkVersion: ">=2.11.1"
+
+functions:
+  multiPurposeHandler:
+    handler: src/handlers/aws/multipurpose/index.handler
+    timeout: 5
+    memorySize: 128
+    events:
+      - http:
+          method: post
+          path: planet-extension
