@@ -1,5 +1,9 @@
 service: planet-commercetools-connector
 
+provider:
+  name: aws
+  runtime: nodejs14.x
+
 plugins:
   - serverless-offline
 
@@ -10,7 +14,7 @@ frameworkVersion: ">=2.11.1"
 
 functions:
   multiPurposeHandler:
-    handler: src/handlers/aws/multipurpose/index.handler
+    handler: src/handlers/cloud/index.handler
     timeout: 5
     memorySize: 128
     events:

@@ -1,9 +1,12 @@
-export type EnvironmentAgnosticRequest = {
-  headers: object;
+export interface EnvironmentAgnosticRequest {
   body: string;
 }
 
-export type EnvironmentAgnosticResponse = {
-  headers: object;
+export interface EnvironmentAgnosticResponse {
+  statusCode: number;
   body: string;
+}
+
+export interface EnvironmentAgnosticHandler {
+  (req: EnvironmentAgnosticRequest): Promise<EnvironmentAgnosticResponse>;
 }

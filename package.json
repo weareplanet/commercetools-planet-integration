@@ -6,13 +6,13 @@
   "scripts": {
     "transpile": "tsc",
     "clean": "rm -rf dist",
+    "build": "npm run clean && npm run transpile",
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
     "test:pure": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand",
     "test": "cross-env LOG_LEVEL=silent npm run test:pure -- --verbose",
-    "build": "npm run clean && npm run transpile",
     "test:local-dev:all": "npm run lint && cross-env npm run test:pure -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:pure -- --silent=false --verbose --coverage=false",
-    "start:local-dev": "source .env.local-dev && cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --runMode local --stage local-dev --region local-fake-region | pino-pretty -t HH:MM:ss"
+    "start:local-dev": "cross-env TARGET_ENVIRONMENT=AWS_LAMBDA_BEHIND_API_GATEWAY SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1 | pino-pretty -t HH:MM:ss"
   },
   "keywords": [
     "Datatrans",
@@ -23,16 +23,19 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
+    "http-status-code-const-enum": "^1.0.2",
     "pino": "^8.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.99",
     "@types/jest": "^28.1.1",
     "@types/node": "^17.0.40",
     "@types/pino": "^7.0.5",
     "@types/yup": "^0.29.14",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
+    "aws-sdk": "^2.1150.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.17.0",
     "jest": "^28.1.0",

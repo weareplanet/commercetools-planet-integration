@@ -1,12 +1,15 @@
 import { EnvironmentAgnosticRequest, EnvironmentAgnosticResponse } from '../../interfaces';
-import { PaymentService } from '../../services/payment-service';
+import { HttpStatusCode } from 'http-status-code-const-enum';
+// import { PaymentService } from '../../services/payment-service';
 
 export default async function handler(req: EnvironmentAgnosticRequest): Promise<EnvironmentAgnosticResponse> {
   // TODO: Business logic (with use of Services)
-  const paymentService = new PaymentService();
+  // const paymentService = new PaymentService();
   // const result = await paymentService.initPayment();
 
-  let res: EnvironmentAgnosticResponse;
   // TODO: Fill res
-  return res;
+  return {
+    statusCode: HttpStatusCode.OK,
+    body: 'Fake response from create-payment handler'
+  };
 }

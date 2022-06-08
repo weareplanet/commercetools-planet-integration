@@ -2,6 +2,7 @@
   "include": [ "src/**/*.ts" ],
   "exclude": [ "/**/*.test.ts", "node_modules" ],
   "compilerOptions": {
+    "rootDir": ".",
     "target": "es2020",
     "sourceMap": false,
     "alwaysStrict": true,
