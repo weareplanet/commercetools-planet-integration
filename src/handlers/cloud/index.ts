@@ -11,7 +11,7 @@ export enum TargetEnvironment {
 
 let choosenHandler;
 
-switch(process.env[targetEnvVariableName]) {
+switch (process.env[targetEnvVariableName]) {
   case TargetEnvironment.AWS_LAMBDA_BEHIND_API_GATEWAY:
     choosenHandler = createApiGatewayHandler(envAgnosticMuptipurposeHandler);
     break;

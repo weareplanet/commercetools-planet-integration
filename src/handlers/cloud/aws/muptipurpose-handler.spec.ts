@@ -19,7 +19,7 @@ describe('muptipurposeHandler handler as AWS Lambda behind AWS API Gateway', () 
       const event: APIGatewayProxyEvent = {
         httpMethod: 'POST',
         headers: {},
-        body: JSON.stringify({ "test": true })
+        body: JSON.stringify({ 'test': true })
       } as APIGatewayProxyEvent;
 
       const response = await muptipurposeApiGatewayHandler(event, context);

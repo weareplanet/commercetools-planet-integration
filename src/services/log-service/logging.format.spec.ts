@@ -19,13 +19,14 @@ describe('Log line', () => {
     }
   });
 
-  // Suppressing of eslint and ts errors appear below to organize a very specific spying on the underlying pino stream
+  // Suppressing of eslint and ts errors appear below is due to a tricky spying on the underlying pino stream
   /* eslint-disable @typescript-eslint/no-explicit-any */
   let loggingStream: any;
   beforeEach(() => { // Spy on logger's underlying stream
     /* eslint-disable @typescript-eslint/no-var-requires */
     const { streamSym } = require('pino/lib/symbols');
-    // @ts-ignore
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
+    /* @ts-ignore */
     loggingStream = logger[streamSym];
     jest.spyOn(loggingStream, 'write');
   });

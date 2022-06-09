@@ -25,7 +25,7 @@ class AwsAdapter {
         'Content-Type': 'application/json'
       }
     };
-  };
+  }
 }
 
 function bodyParcingError(e: Error): boolean {
@@ -39,10 +39,10 @@ export const createApiGatewayHandler = (handler: AbstractRequestHandler) => {
       const agnosticRequest: AbstractRequest = awsAdapter.cloudRequestToAgnostic(event);
       const agnosticResponse = await handler(agnosticRequest);
       return awsAdapter.agnosticResponseToCloud(agnosticResponse);
-    } catch(err) {
+    } catch (err) {
       // TODO: Process err accurately to distinguish 4xx from 5xx etc.
 
-      if(bodyParcingError(err)) {
+      if (bodyParcingError(err)) {
         return awsAdapter.agnosticResponseToCloud({
           statusCode: HttpStatusCode.BAD_REQUEST,
           body: { message: `Error of body parsing: ${err.message}` }
@@ -54,5 +54,5 @@ export const createApiGatewayHandler = (handler: AbstractRequestHandler) => {
         body: {}
       });
     }
-  }
-}
+  };
+};
