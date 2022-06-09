@@ -1,12 +1,12 @@
-export interface EnvironmentAgnosticRequest {
-  body: string;
+export interface AbstractRequest {
+  body: Record<string, unknown>;
 }
 
-export interface EnvironmentAgnosticResponse {
+export interface AbstractResponse {
   statusCode: number;
-  body: string;
+  body: Record<string, unknown>;
 }
 
-export interface EnvironmentAgnosticHandler {
-  (req: EnvironmentAgnosticRequest): Promise<EnvironmentAgnosticResponse>;
+export interface AbstractRequestHandler {
+  (req: AbstractRequest): Promise<AbstractResponse>;
 }

@@ -1,4 +1,4 @@
-import { EnvironmentAgnosticRequest, EnvironmentAgnosticResponse } from '../../interfaces';
+import { AbstractRequest, AbstractResponse } from '../../interfaces';
 import createPaymentHandler from './create-payment';
 import { HttpStatusCode } from 'http-status-code-const-enum';
 
@@ -9,21 +9,24 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 // etc. (see https://github.com/southworks/multicloud/tree/dev-gcp-module for insights).
 // ---
 // In a monolith application (express-based for example) it can be used directly.
-export async function handler(req: EnvironmentAgnosticRequest): Promise<EnvironmentAgnosticResponse> {
+export async function muptipurposeHandler(req: AbstractRequest): Promise<AbstractResponse> {
+  try {
+    // Delegate the request to a proper handler depending on the req content
 
-  // Delegate the request to a proper handler depending on the req content
+    if (typeof req.body === 'object' /* TODO: condition for the call on a Payment creation */) {
+      return createPaymentHandler(req);
+    }
 
-  if (req.body /*some specific check*/) {
-    return createPaymentHandler(req);
+    // if (/* req.body TODO: condition for the call on a Payment refund */) {
+    //   return refundPaymentHandler(req);
+    // }
+
+    return {
+      statusCode: HttpStatusCode.BAD_REQUEST,
+      body: { message: 'No specific handler found for this request (incorrect request body?)' }
+    }
+  } catch(e) {
+    // TODO: process here all cloud-agnostic errors (which rather relate to the underlying business logic)
+    throw e;
   }
-
-  // if (/*req.body...*/) {
-  //   return refundPaymentHandler(req);
-  // }
-
-  return {
-    statusCode: HttpStatusCode.BAD_REQUEST,
-    body: 'No specific handler found for this request (incorrect request body?)'
-  }
-
 }

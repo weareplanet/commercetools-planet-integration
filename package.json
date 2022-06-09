@@ -8,10 +8,10 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
-    "test:pure": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand",
-    "test": "cross-env LOG_LEVEL=silent npm run test:pure -- --verbose",
-    "test:local-dev:all": "npm run lint && cross-env npm run test:pure -- --silent=false --verbose",
-    "test:local-dev:file": "cross-env npm run test:pure -- --silent=false --verbose --coverage=false",
+    "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand",
+    "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
+    "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
+    "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
     "start:local-dev": "cross-env TARGET_ENVIRONMENT=AWS_LAMBDA_BEHIND_API_GATEWAY SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1 | pino-pretty -t HH:MM:ss"
   },
   "keywords": [

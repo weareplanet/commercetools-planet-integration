@@ -14,7 +14,7 @@ frameworkVersion: ">=2.11.1"
 
 functions:
   multiPurposeHandler:
-    handler: src/handlers/cloud/index.handler
+    handler: src/handlers/cloud/index.muptipurposeHandler
     timeout: 5
     memorySize: 128
     events:

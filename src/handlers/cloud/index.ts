@@ -1,26 +1,26 @@
-import { handler as  agnosticHandler } from '../environment-agnostic/index';
+import { muptipurposeHandler as envAgnosticMuptipurposeHandler } from '../environment-agnostic/index';
 import { createApiGatewayHandler } from './aws/api-gateway-adapter';
 
 const targetEnvVariableName = 'TARGET_ENVIRONMENT';
 
-enum TargetEnvironment {
+export enum TargetEnvironment {
   AWS_LAMBDA_BEHIND_API_GATEWAY = 'AWS_LAMBDA_BEHIND_API_GATEWAY',
   // AWS_LAMBDA_DIRECTLY = 'AWS_LAMBDA_DIRECTLY',
-  GCP_FUNCTION = 'GCP_FUNCTION'
+  // GCP_FUNCTION = 'GCP_FUNCTION'
 }
 
-let resultHandler;
+let choosenHandler;
 
 switch(process.env[targetEnvVariableName]) {
   case TargetEnvironment.AWS_LAMBDA_BEHIND_API_GATEWAY:
-    resultHandler = createApiGatewayHandler(agnosticHandler);
+    choosenHandler = createApiGatewayHandler(envAgnosticMuptipurposeHandler);
     break;
   // case TargetEnvironment.GCP_FUNCTION:
-  //   resultHandler = createGoogleFunction(agnosticHandler);
+  //   choosenHandler = createGoogleFunction(envAgnosticHandler);
   //   break;
-  default:
-    resultHandler = agnosticHandler;
+  // default:
+  //   choosenHandler = envAgnosticHandler;
 
 }
 
-export const handler = resultHandler;
+export const muptipurposeHandler = choosenHandler;
