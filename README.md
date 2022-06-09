@@ -37,6 +37,16 @@ src
 test
 ```
 
+## Programming language
+
+The application is implemented on Typescript.
+
+## Checking the test quality
+
+The quality chack is performed with ESLint and typescript specific pluging.
+
+`npm run lint`
+
 ## Testing
 
 The repository contains unit and integration tests.
