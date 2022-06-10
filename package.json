@@ -8,7 +8,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
-    "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand",
+    "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand --coverage",
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",

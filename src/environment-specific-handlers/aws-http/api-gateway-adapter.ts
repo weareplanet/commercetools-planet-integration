@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import { AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../../interfaces';
+import { AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../interfaces';
 
 class AwsAdapter {
   cloudRequestToAbstract(event: APIGatewayEvent): AbstractRequest {

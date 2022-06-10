@@ -22,14 +22,17 @@ Also functions from `src/handlers/environment-agnostic` can be used directly in 
 Basic parts of the repository
 
 ```
-deploy
+deploy                                # all deployment/infrastructure stuff is here
 src
-  handlers
-    environment-agnostic   # functions which act as HTTP handlers (controllers) with abstract (environment-agnostic) request/response shapes
-    execution-environment  # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP etc.)
+  domain
+    environment-agnostic-handlers     # functions which act as HTTP handlers (controllers) with abstract (environment-agnostic) request/response shapes
+    services                          # all business logic is here
+  environment-specific-handlers       # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP
+  etc.)
+    aws-http
+    gcp-http
   interfaces
-  services  # all business logic is here
-test
+test                                  # some global test setup or integration tests which it's hard to relate to sime specific branch
 ```
 
 ## Programming language

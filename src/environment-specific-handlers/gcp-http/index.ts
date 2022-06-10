@@ -1,5 +1,5 @@
-import { multipurposeHandler as envAgnosticMuptipurposeHandler } from '../../environment-agnostic/index';
-import { createApiGatewayHandler } from './api-gateway-adapter';
+import { multipurposeHandler as envAgnosticMuptipurposeHandler } from '../../../domain/environment-agnostic-handlers/index';
+import { createApiGatewayHandler } from './adapter';
 
 export const multipurposeHandler = createApiGatewayHandler(envAgnosticMuptipurposeHandler);
 
