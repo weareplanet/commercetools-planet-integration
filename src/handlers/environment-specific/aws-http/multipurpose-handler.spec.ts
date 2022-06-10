@@ -1,11 +1,7 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
+import { multipurposeHandler as muptipurposeApiGatewayHandler } from './index';
 
-// Mimic 'AWS_LAMBDA_BEHIND_API_GATEWAY' target environment before the SUT is loaded
-// (It's too late to do this in beforeAll/Each - the SUT implementation is such)
-process.env.TARGET_ENVIRONMENT = 'AWS_LAMBDA_BEHIND_API_GATEWAY';
-import { muptipurposeHandler as muptipurposeApiGatewayHandler } from '../index';
-
-describe('muptipurposeHandler handler as AWS Lambda behind AWS API Gateway', () => {
+describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway', () => {
   afterAll(() => {
     delete process.env.TARGET_ENVIRONMENT;
   });

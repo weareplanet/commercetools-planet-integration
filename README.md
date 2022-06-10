@@ -8,19 +8,14 @@ A consumer just creates, updates and reads objetcs in/from CommerceTools - this 
 
 ## Target environments
 
-**The connector is designed to be usable in any environment.**
+**The connector is designed to be usable in different Node.js environments (AWS, GCP, on-premise etc.).**
 
 In order to do this it is implemented with the environment-agnostic interface (see `src/handlers/environment-agnostic`).
 
-**The repository contains a few ready-for-use adapters for some popular Cloud Providers - AWS, GCP.**
-If you provide (to the process running the connector) `TARGET_ENVIRONMENT` environment variable, the connector will act as a handler for the specified environment.
-Possible values for `TARGET_ENVIRONMENT` variable:
-- `AWS_LAMBDA_BEHIND_API_GATEWAY` - the connector will be adapted to the event structure and response format AWS API Gateway uses for AWS Lambda.
-- TODO: `AWS_LAMBDA_DIRECTLY` - the connector will be adapted to the event structure and response format of a direct AWS Lambda function invocation.
-- TODO: `GCP_FUNCTION_BEHIND_CLOUD_ENDPOINTS` - the connector will be adapted to the request/response structures Google Cloud Endpoints uses for a Google Cloud function.
-- TODO: `GCP_FUNCTION_DIRECTLY` - the connector will be adapted to the request/response structures of a Google Cloud function.
+`src/handlers/execution-environment` subfolders wrap functions exported from `src/handlers/environment-agnostic` to make them deployable to specific environments.
+For example, `src/handlers/execution-environment/aws-http` provides a Lambda function behind AWS API Gateway.
 
-Also functions from `src/handlers/environment-agnostic` can be used directly in some monolith application (express etc.) which can be deployed on-premise.
+Also functions from `src/handlers/environment-agnostic` can be used directly in youe own application of any nature (express etc.) which you deploy on-premise.
 
 ## Repository structure
 
@@ -30,8 +25,8 @@ Basic parts of the repository
 deploy
 src
   handlers
-    cloud   # adapters which make environment-agnostic function be deployable to specific environments (AWS, GCP etc.)
-    environment-agnostic  # functions which act as HTTP handlers (controllers) with a general (environment-agnostic) request/response format
+    environment-agnostic   # functions which act as HTTP handlers (controllers) with abstract (environment-agnostic) request/response shapes
+    execution-environment  # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP etc.)
   interfaces
   services  # all business logic is here
 test

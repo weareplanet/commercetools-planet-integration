@@ -14,7 +14,7 @@ frameworkVersion: ">=2.11.1"
 
 functions:
   multiPurposeHandler:
-    handler: src/handlers/cloud/index.muptipurposeHandler
+    handler: src/handlers/environment-specific/aws-http/index.multipurposeHandler
     timeout: 5
     memorySize: 128
     events:
