@@ -1,4 +1,4 @@
-import { AbstractRequestHandler } from '../../../interfaces';
+import { AbstractRequestHandler } from '../../interfaces';
 
 // class GcpAdapter {
 

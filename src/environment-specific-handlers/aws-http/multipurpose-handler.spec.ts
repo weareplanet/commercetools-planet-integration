@@ -10,7 +10,7 @@ describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway',
     functionName: 'muptipurposeApiGatewayHandler'
   } as Context;
 
-  describe('when some body is provided', () => {
+  describe('when some JSON body is provided', () => {
     it('responds with 200 and Hello World in the body', async () => {
       const event: APIGatewayProxyEvent = {
         httpMethod: 'POST',
@@ -28,7 +28,7 @@ describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway',
     });
   });
 
-  describe('when no body is provided', () => {
+  describe('when a body not parsable to JSON is provided', () => {
     it('responds with status 400', async () => {
       const event: APIGatewayProxyEvent = {
         httpMethod: 'POST',
