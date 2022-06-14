@@ -10,25 +10,24 @@ A consumer just creates, updates and reads objetcs in/from CommerceTools - this 
 
 **The connector is designed to be usable in different Node.js environments (AWS, GCP, on-premise etc.).**
 
-In order to do this it is implemented with the environment-agnostic interface (see `src/handlers/environment-agnostic`).
+In order to do this it is implemented with the environment-agnostic interface (see `app/handlers/environment-agnostic`).
 
-`src/handlers/execution-environment` subfolders wrap functions exported from `src/handlers/environment-agnostic` to make them deployable to specific environments.
-For example, `src/handlers/execution-environment/aws-http` provides a Lambda function behind AWS API Gateway.
+`app/handlers/execution-environment` subfolders wrap functions exported from `app/handlers/environment-agnostic` to make them deployable to specific environments.
+For example, `app/handlers/execution-environment/aws-http` provides a Lambda function behind AWS API Gateway.
 
-Also functions from `src/handlers/environment-agnostic` can be used directly in youe own application of any nature (express etc.) which you deploy on-premise.
+Also functions from `app/handlers/environment-agnostic` can be used directly in youe own application of any nature (express etc.) which you deploy on-premise.
 
 ## Repository structure
 
-Basic parts of the repository
+Basic parts of the repository:
 
 ```
 deploy                                # all deployment/infrastructure stuff is here
-src
+app
   domain
     environment-agnostic-handlers     # functions which act as HTTP handlers (controllers) with abstract (environment-agnostic) request/response shapes
     services                          # all business logic is here
-  environment-specific-handlers       # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP
-  etc.)
+  environment-specific-handlers       # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP etc.)
     aws-http
     gcp-http
   interfaces
@@ -56,19 +55,23 @@ The command to run them:
 
 ## Building
 
+The program is written in Typescript which is a "virtual language". **To be executable the program must be compiled to Javascript:**
+
 `npm run build`
 
 The buiuld result is saved into `dist` directory at the repository root.
-
-> TODO: deploy scripts should run this command and then use the `dist` content (together with `node_modules` and `serverless.yml`) to produce a deployment package.
+After the building the same structure as was before in `app` directory (already compiled to Javascript) will appear in `dist` directory. That will be the deployable program code.
 
 ## Deployment
 
-This repository uses [Serverless Framework](https://www.serverless.com/) as a multi-cloud deployment tool.
-If you like - you can use it (see `serverless.yml`).
+> TODO: deploy script should execute `npm install`, `npm run build` commands and then use the `dist` content (together with `node_modules` and maybe `serverless.yml`) to produce a deployment package.
+
+This repository uses [Serverless Framework](https://www.serverless.com/) at least for local development.
+
+It is also a good choice as a multi-cloud deployment tool. If you like - you can use it (see `serverless.yml`).
 > TODO: discuss, if we're really going to provide ready-for-use deploy scripts (there will be some challenge for DevOps)...
 
-If you prefer to use another deployment tool - you are free to ignore `serverless.yml` and deploy functions from `src/handlers/cloud/index` via your favorite tool.
+If you prefer to use another deployment tool - you are free to ignore `serverless.yml` and deploy functions from `app/handlers/cloud/index` via your favorite tool.
 
 ## Running
 

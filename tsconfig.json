@@ -1,5 +1,5 @@
 {
-  "include": [ "src/**/*.ts" ],
+  "include": [ "app/**/*.ts" ],
   "exclude": [ "/**/*.test.ts", "node_modules" ],
   "compilerOptions": {
     "rootDir": ".",
