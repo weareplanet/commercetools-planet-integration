@@ -1,34 +1,28 @@
-import { AbstractRequest, AbstractResponse } from '../../interfaces';
-import createPaymentHandler from './create-payment';
-import { HttpStatusCode } from 'http-status-code-const-enum';
+import { wrapHandlerToAcceptUntypedInput } from './input-validation';
 
-// For Cloud providers (AWS, GCP, Azure etc.) this handler
-// must be wrapped into a Cloud-specific adapter which will translate:
-// AWS Lambda event - into AbstractRequest and AbstractResponse - into AWS Lambda response,
-// GCP function event - into AbstractRequest and AbstractResponse - into GCP function response
-// etc. (see https://github.com/southworks/multicloud/tree/dev-gcp-module for insights).
-// ---
-// In a monolith application (express-based for example) it can be used directly.
-export async function multipurposeHandler(req: AbstractRequest): Promise<AbstractResponse> {
-  // try {
-  // Delegate the request to a proper handler depending on the req content
+// Import all possible operation handlers (alongside with their request shape declarations)
+import {
+  handler as anyOperationAbstractHandler,
+  RequestBodySchema as MultiPurposeRequestBodySchema,
+  RequestBodySchemaType as MultiPurposeRequestBodySchemaType
+} from './multipurpose-handler';
 
-  if (typeof req.body === 'object' /* TODO: condition for the call on a Payment creation */) {
-    return createPaymentHandler(req);
-  }
+/*
+For Cloud providers (AWS, GCP, Azure etc.) any handler exported from this file
+must be used (somewhere outside) via a Cloud-specific adapter would translate:
+- AWS Lambda event -> into AbstractRequest and AbstractResponse -> into AWS Lambda response,
+- GCP function request -> into AbstractRequest and AbstractResponse -> into GCP function response
+etc. (see app/environment-specific-handlers).
+---
+Also you can use any exported handler directly (that's up to you).
+---
+Initially only a single multi-purpose handler is exported (see the root README).
+Theoretically other, more specific-purpose handlers (like createPaymentHandler, for example), can be exported and deployed separately in case of necessity.
+*/
 
-  // if (/* req.body TODO: condition for the call on a Payment refund */) {
-  //   return refundPaymentHandler(req);
-  // }
-
-  return {
-    statusCode: HttpStatusCode.BAD_REQUEST,
-    body: { message: 'No specific handler found for this request (incorrect request body?)' }
-  };
-  // } catch (e) {
-  //   // TODO: process here all cloud-agnostic errors (which rather relate to the underlying business logic)
-  //   throw e;
-  // }
-}
-
-// Theoretically other (more specific-purpose ones, like createPaymentHandler) handlers can be exported here in case of necessity.
+///// WRAP ALL FUNCTIONS BEING EXPORTED SO THAT THEIR CONSUMER DOESN'T CARE ABOUT THE REQUEST SHAPE
+// (the underlying handler cares about that).
+export const multipurposeHandler = wrapHandlerToAcceptUntypedInput<MultiPurposeRequestBodySchemaType>(
+  anyOperationAbstractHandler,
+  MultiPurposeRequestBodySchema
+);

@@ -1,44 +1,67 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
-import { multipurposeHandler as muptipurposeApiGatewayHandler } from './index';
+import { multipurposeHandler as multipurposeApiGatewayHandler } from './index';
 
 describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway', () => {
-  afterAll(() => {
-    delete process.env.TARGET_ENVIRONMENT;
-  });
 
   const context: Context = {
-    functionName: 'muptipurposeApiGatewayHandler'
+    functionName: 'multipurposeApiGatewayHandler'
   } as Context;
 
-  describe('when some JSON body is provided', () => {
-    it('responds with 200 and Hello World in the body', async () => {
-      const event: APIGatewayProxyEvent = {
-        httpMethod: 'POST',
-        headers: {},
-        body: JSON.stringify({ 'test': true })
-      } as APIGatewayProxyEvent;
+  describe('cuccess cases', () => {
 
-      const response = await muptipurposeApiGatewayHandler(event, context);
+    describe('when the request body is a correct and acceptable JSON', () => {
+      it('responds with 200 and Hello World in the body', async () => {
+        const event: APIGatewayProxyEvent = {
+          httpMethod: 'POST',
+          headers: {},
+          body: JSON.stringify({
+            'n': 123,
+            's': 'some string value'
+          })
+        } as APIGatewayProxyEvent;
 
-      expect(response.statusCode).toEqual(200);
+        const response = await multipurposeApiGatewayHandler(event, context);
 
-      expect(JSON.parse(response.body)).toMatchObject({
-        message: 'Hello World from create-payment handler!'
+        expect(response.statusCode).toEqual(200);
+
+        expect(JSON.parse(response.body)).toMatchObject({
+          message: 'Hello World from create-payment handler!'
+        });
       });
     });
+
   });
 
-  describe('when a body not parsable to JSON is provided', () => {
-    it('responds with status 400', async () => {
-      const event: APIGatewayProxyEvent = {
-        httpMethod: 'POST',
-        headers: {},
-        body: 'unexpected payload'
-      } as APIGatewayProxyEvent;
+  describe('error cases', () => {
 
-      const response = await muptipurposeApiGatewayHandler(event, context);
+    describe('when the request body is not parsable to JSON', () => {
+      it('responds with status 400', async () => {
+        const event: APIGatewayProxyEvent = {
+          httpMethod: 'POST',
+          headers: {},
+          body: 'unexpected payload'
+        } as APIGatewayProxyEvent;
 
-      expect(response.statusCode).toEqual(400);
+        const response = await multipurposeApiGatewayHandler(event, context);
+
+        expect(response.statusCode).toEqual(400);
+      });
     });
+
+    describe('when the request body is parsable to JSON, but not acceptable', () => {
+      it('responds with status 400', async () => {
+        const event: APIGatewayProxyEvent = {
+          httpMethod: 'POST',
+          headers: {},
+          body: JSON.stringify({ x: 123 })
+        } as APIGatewayProxyEvent;
+
+        const response = await multipurposeApiGatewayHandler(event, context);
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+
   });
+
 });

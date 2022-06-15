@@ -4,10 +4,10 @@
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint 'app/**/*.ts' 'test/**/*.ts'",
     "transpile": "tsc",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
-    "lint": "eslint 'app/**/*.ts' 'test/**/*.ts'",
     "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand --coverage",
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
