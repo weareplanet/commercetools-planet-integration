@@ -14,7 +14,7 @@ import { InputValidationService } from '../services/input-validation-service';
 // ---
 // This function wraps a request shape-aware AbstractRequestHandlerWithTypedInput
 // into a shape-unaware AbstractRequestHandler suitable for higher-level consumers.
-export const wrapHandlerToAcceptUntypedInput = <TRequestBody>(lowLevelHandler: AbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): AbstractRequestHandler => {
+export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: AbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): AbstractRequestHandler => {
   return async (req: AbstractRequest): Promise<AbstractResponse> => {
     if (!inputSchema) {
       req.body = {}; // TODO: think more about correctness of this

@@ -1,4 +1,4 @@
-import { wrapHandlerToAcceptUntypedInput } from './input-validation';
+import { wrapHandlerToValidateInput } from './input-validation';
 
 // Import all possible operation handlers (alongside with their request shape declarations)
 import {
@@ -22,7 +22,7 @@ Theoretically other, more specific-purpose handlers (like createPaymentHandler, 
 
 ///// WRAP ALL FUNCTIONS BEING EXPORTED SO THAT THEIR CONSUMER DOESN'T CARE ABOUT THE REQUEST SHAPE
 // (the underlying handler cares about that).
-export const multipurposeHandler = wrapHandlerToAcceptUntypedInput<MultiPurposeRequestBodySchemaType>(
+export const multipurposeHandler = wrapHandlerToValidateInput<MultiPurposeRequestBodySchemaType>(
   anyOperationAbstractHandler,
   MultiPurposeRequestBodySchema
 );
