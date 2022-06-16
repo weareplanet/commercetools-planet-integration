@@ -18,5 +18,5 @@ jobs:
         run: npm run test
       - name: Run build
         run: npm run build
-      - name: Look at the build result (dist/src)
-        run: ls -la ./dist/src
+      - name: Look at the build result
+        run: find ./dist -name "*.js" -print
