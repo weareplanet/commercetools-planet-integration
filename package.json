@@ -12,7 +12,8 @@
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
-    "start:local-dev": "cross-env TARGET_ENVIRONMENT=AWS_LAMBDA_BEHIND_API_GATEWAY SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1 | pino-pretty -t HH:MM:ss",
+    "start:local-dev": "cross-env TARGET_ENVIRONMENT=AWS_LAMBDA_BEHIND_API_GATEWAY SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1",
+    "start:local-dev:formatted": "npm run start:local-dev | pino-pretty -t HH:MM:ss",
     "prepare": "husky install"
   },
   "keywords": [
