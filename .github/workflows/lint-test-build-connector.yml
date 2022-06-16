@@ -4,17 +4,19 @@ jobs:
   lint-test-build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Get the codebase from the git repo
+        uses: actions/checkout@v3
+      - name: Install nodejs
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
       - name: Install dependencies
         run: npm install
-      - name: Code linting
+      - name: Check code quality (ESLint)
         run: npm run lint
       - name: Run tests
         run: npm run test
       - name: Run build
         run: npm run build
-      - name: Look at the buuld result (dist/app)
-        run: ls -la ./dist/app
+      - name: Look at the build result (dist/src)
+        run: ls -la ./dist/src
