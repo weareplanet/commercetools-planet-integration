@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '.spec.ts$',
   collectCoverage: true,
-  collectCoverageFrom: [ 'src/**/*.ts', '!**/*spec.ts', '!**/*specs.ts' ],
+  collectCoverageFrom: [ 'app/**/*.ts', '!**/*spec.ts', '!**/*specs.ts' ],
   coverageReporters: [
     'json', 'html', 'text'
   ],

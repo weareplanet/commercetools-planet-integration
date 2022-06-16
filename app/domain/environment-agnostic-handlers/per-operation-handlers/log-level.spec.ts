@@ -1,11 +1,17 @@
-import { AbstractRequest } from '../../interfaces';
-import handler from './create-payment';
-import logger from '../services/log-service';
+import { AbstractRequestWithTypedBody } from '../../../interfaces';
+import { handler, RequestBodySchemaType } from './create-payment';
+import logger from '../../services/log-service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { streamSym } = require('pino/lib/symbols');
 
 describe('Log levels', () => {
+  const req = {
+    body: {
+      s: 's',
+      n: 1
+    }
+  };
   // Suppressing of eslint and ts errors appear below is due to a tricky spying on the underlying pino stream
   /* eslint-disable @typescript-eslint/no-explicit-any */
   let loggingStream: any;
@@ -21,7 +27,7 @@ describe('Log levels', () => {
     it('uses "trace" level and shows all logs', async () => {
       logger.level = 'trace';
 
-      await handler({} as AbstractRequest);
+      await handler(req as AbstractRequestWithTypedBody<RequestBodySchemaType>);
 
       expect(loggingStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
@@ -46,7 +52,7 @@ describe('Log levels', () => {
     it('uses "warn" level and shows only warn, error and fatal logs', async () => {
       logger.level = 'warn';
 
-      await handler({} as AbstractRequest);
+      await handler(req as AbstractRequestWithTypedBody<RequestBodySchemaType>);
 
       expect(loggingStream.write).not.toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
