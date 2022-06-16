@@ -27,6 +27,7 @@ const handler = async (req: AbstractRequestWithTypedBody<RequestBodySchemaType>)
   // const paymentService = new PaymentService();
   // const result = await paymentService.initPayment();
 
+  // NOTE: needed only for showing demo for story INC-39
   logger.trace('trace');
   logger.debug('debug');
   logger.info('info');

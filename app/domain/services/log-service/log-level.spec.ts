@@ -1,33 +1,38 @@
-import { AbstractRequestWithTypedBody } from '../../../interfaces';
-import { handler, RequestBodySchemaType } from './create-payment';
-import logger from '../../services/log-service';
+import pino from 'pino';
+let logger: pino.Logger;
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { streamSym } = require('pino/lib/symbols');
+function callAllLevelsOfLogs () {
+  logger.trace('trace');
+  logger.debug('debug');
+  logger.info('info');
+  logger.warn('warn');
+  logger.error('error');
+  logger.fatal('fatal');
+}
+
+async function prepeareLoggerForTesting() {
+  logger = (await import('.')).default;
+  /* eslint-disable @typescript-eslint/no-var-requires */
+  const { streamSym } = require('pino/lib/symbols');
+  /* eslint-disable @typescript-eslint/ban-ts-comment */
+  /* @ts-ignore */
+  const loggingStream = logger[streamSym];
+  jest.spyOn(loggingStream, 'write');
+
+  return loggingStream;
+}
 
 describe('Log levels', () => {
-  const req = {
-    body: {
-      s: 's',
-      n: 1
-    }
-  };
-  // Suppressing of eslint and ts errors appear below is due to a tricky spying on the underlying pino stream
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  let loggingStream: any;
-  beforeEach(() => { // Spy on logger's underlying stream
-    jest.resetModules();
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    /* @ts-ignore */
-    loggingStream = logger[streamSym];
-    jest.spyOn(loggingStream, 'write');
-  });
-
   describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
-    it('uses "trace" level and shows all logs', async () => {
-      logger.level = 'trace';
+    beforeEach(() => {
+      jest.resetModules();
+    });
 
-      await handler(req as AbstractRequestWithTypedBody<RequestBodySchemaType>);
+    it('uses "trace" level and shows all logs', async () => {
+      process.env.LOG_LEVEL = 'trace';
+      const loggingStream = await prepeareLoggerForTesting();
+
+      callAllLevelsOfLogs();
 
       expect(loggingStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
@@ -50,9 +55,10 @@ describe('Log levels', () => {
     });
 
     it('uses "warn" level and shows only warn, error and fatal logs', async () => {
-      logger.level = 'warn';
+      process.env.LOG_LEVEL = 'warn';
+      const loggingStream = await prepeareLoggerForTesting();
 
-      await handler(req as AbstractRequestWithTypedBody<RequestBodySchemaType>);
+      callAllLevelsOfLogs();
 
       expect(loggingStream.write).not.toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
