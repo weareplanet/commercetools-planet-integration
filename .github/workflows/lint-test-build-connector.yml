@@ -8,7 +8,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - run: npm install
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
+      - name: Install dependencies
+        run: npm install
+      - name: Code linting
+        run: npm run lint
+      - name: Run tests
+        run: npm run test
+      - name: Run build
+        run: npm run build
+      - name: Look at the buuld result (dist/app)
+        run: ls -la ./dist/app
