@@ -24,14 +24,14 @@ async function prepeareLoggerForTesting() {
 
 describe('Log levels', () => {
   describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
-    beforeEach(() => {
+    const resetToDefaultTestingState = () => {
       jest.resetModules();
-    });
-
-    afterAll(() => {
       // set default value
       process.env.LOG_LEVEL = 'info';
-    });
+    };
+
+    beforeEach(resetToDefaultTestingState);
+    afterAll(resetToDefaultTestingState);
 
     it('uses "trace" level and shows all logs', async () => {
       process.env.LOG_LEVEL = 'trace';
