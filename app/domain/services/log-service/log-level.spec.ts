@@ -23,15 +23,26 @@ async function prepeareLoggerForTesting() {
 }
 
 describe('Log levels', () => {
-  describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
-    const resetToDefaultTestingState = () => {
-      jest.resetModules();
-      // set default value
-      process.env.LOG_LEVEL = 'info';
-    };
+  let logLevel: string;
 
-    beforeEach(resetToDefaultTestingState);
-    afterAll(resetToDefaultTestingState);
+  beforeAll(() => {
+    logLevel = process.env.LOG_LEVEL;
+  });
+  afterAll(() => {
+    if (logLevel) {
+      process.env.LOG_LEVEL = logLevel;
+    } else {
+      delete process.env.LOG_LEVEL;
+    }
+
+    jest.resetModules();
+  });
+
+  describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
+    beforeEach(() => {
+      jest.resetModules();
+      process.env.LOG_LEVEL = logLevel;
+    });
 
     it('uses "trace" level and shows all logs', async () => {
       process.env.LOG_LEVEL = 'trace';
