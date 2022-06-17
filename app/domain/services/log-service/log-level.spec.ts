@@ -28,6 +28,11 @@ describe('Log levels', () => {
       jest.resetModules();
     });
 
+    afterAll(() => {
+      // set default value
+      process.env.LOG_LEVEL = 'info';
+    });
+
     it('uses "trace" level and shows all logs', async () => {
       process.env.LOG_LEVEL = 'trace';
       const loggingStream = await prepeareLoggerForTesting();
