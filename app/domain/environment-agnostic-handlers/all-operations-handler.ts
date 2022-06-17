@@ -30,9 +30,14 @@ const handler = async <TRequestBody>(req: AbstractRequestWithTypedBody<TRequestB
   };
 };
 
-// TODO: Combine request shapes for all handlers (from per-operation-handlers) covered by handler
+// TODO: Combine request shapes for all handlers (from per-operation-handlers) covered by `handler`.
 const RequestBodySchema = CreatePaymentRequestBodySchema; // | AnotherRequestBobySchema | YetAnotherRequestBobySchema
 type RequestBodySchemaType = CreatePaymentRequestBodySchemaType; // | AnotherRequestBobySchemaType | YetAnotherRequestBobySchemaType
+// Maybe it will be better to apply input-validation (like now ./index.ts does with anyOperationAbstractHandler)
+// to every of low-level handlers separately,
+// use them (already whapped) witin `handler`
+// and export `handler` as AbstractRequestHandler rather than AbstractRequestWithTypedBody (as it is now) -
+// in such a case we won't need to combine many request shapes into a single schema.
 
 export {
   handler,
