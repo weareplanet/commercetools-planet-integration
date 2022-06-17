@@ -58,7 +58,7 @@ _For the start (at least for MVP), this single function is considered enought fo
 
 > This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
 Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).
-Only if it is really needed, `app/domain/environment-agnostic-handlers/index.ts` can be corrected to re-export more cpecific handlers so that every one becomes accessible the same way as all-operations-handler is (via the index file). At the moment of the initial design it was considered redundant.
+In case of necessity, `app/domain/environment-agnostic-handlers/index.ts` can be corrected to re-export more cpecific handlers so that every one becomes accessible the same way as all-operations-handler is (via the index file). At the moment of the initial design it was considered redundant.
 
 ## Programming language
 

@@ -44,5 +44,5 @@ const handler = async (req: AbstractRequestWithTypedBody<RequestBodySchemaType>)
 export {
   handler,
   RequestBodySchema, // This is exported to perform the validation (where handler is leveraged)
-  RequestBodySchemaType // This is exported to parametrize the outer wrapper call - to make `req` structure controlled at the writing/compilation time
+  RequestBodySchemaType // This is exported to parametrize the outer wrapper call for compiler
 };
