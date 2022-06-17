@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: '16'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Check code quality (ESLint)
         run: npm run lint
       - name: Run tests
