@@ -13,8 +13,8 @@ package:
 frameworkVersion: ">=2.11.1"
 
 functions:
-  multiPurposeHandler:
-    handler: app/environment-specific-handlers/aws-http/index.multipurposeHandler
+  allOperationsHandler:
+    handler: app/environment-specific-handlers/aws-http/index.allOperationsHandler
     timeout: 5
     memorySize: 128
     events:
