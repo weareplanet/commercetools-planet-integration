@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
-import { multipurposeHandler as multipurposeApiGatewayHandler } from './index';
+import { allOperationsHandler as allOperationsApiGatewayHandler } from './index';
 
-describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway', () => {
+describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway', () => {
 
   const context: Context = {
-    functionName: 'multipurposeApiGatewayHandler'
+    functionName: 'allOperationsHandler'
   } as Context;
 
   describe('cuccess cases', () => {
@@ -20,7 +20,7 @@ describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway',
           })
         } as APIGatewayProxyEvent;
 
-        const response = await multipurposeApiGatewayHandler(event, context);
+        const response = await allOperationsApiGatewayHandler(event, context);
 
         expect(response.statusCode).toEqual(200);
 
@@ -42,7 +42,7 @@ describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway',
           body: 'unexpected payload'
         } as APIGatewayProxyEvent;
 
-        const response = await multipurposeApiGatewayHandler(event, context);
+        const response = await allOperationsApiGatewayHandler(event, context);
 
         expect(response.statusCode).toEqual(400);
       });
@@ -56,7 +56,7 @@ describe('multipurposeHandler as an AWS Lambda function behind AWS API Gateway',
           body: JSON.stringify({ x: 123 })
         } as APIGatewayProxyEvent;
 
-        const response = await multipurposeApiGatewayHandler(event, context);
+        const response = await allOperationsApiGatewayHandler(event, context);
 
         expect(response.statusCode).toEqual(400);
       });

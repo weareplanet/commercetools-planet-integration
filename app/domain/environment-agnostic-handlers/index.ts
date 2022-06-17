@@ -3,9 +3,9 @@ import { wrapHandlerToValidateInput } from './input-validation';
 // Import all possible operation handlers (alongside with their request shape declarations)
 import {
   handler as anyOperationAbstractHandler,
-  RequestBodySchema as MultiPurposeRequestBodySchema,
-  RequestBodySchemaType as MultiPurposeRequestBodySchemaType
-} from './multipurpose-handler';
+  RequestBodySchema as AnyOperationRequestBodySchema,
+  RequestBodySchemaType as AnyOperationRequestBodySchemaType
+} from './all-operations-handler';
 
 /*
 For Cloud providers (AWS, GCP, Azure etc.) any handler exported from this file
@@ -22,7 +22,7 @@ Theoretically other, more specific-purpose handlers (like createPaymentHandler, 
 
 ///// WRAP ALL FUNCTIONS BEING EXPORTED SO THAT THEIR CONSUMER DOESN'T CARE ABOUT THE REQUEST SHAPE
 // (the underlying handler cares about that).
-export const multipurposeHandler = wrapHandlerToValidateInput<MultiPurposeRequestBodySchemaType>(
+export const allOperationsHandler = wrapHandlerToValidateInput<AnyOperationRequestBodySchemaType>(
   anyOperationAbstractHandler,
-  MultiPurposeRequestBodySchema
+  AnyOperationRequestBodySchema
 );

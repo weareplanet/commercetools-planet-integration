@@ -25,9 +25,8 @@ Basic parts of the repository:
 deploy                                # all deployment/infrastructure stuff is here
 app
   domain
-    environment-agnostic-handlers     # functions which act as HTTP handlers (controllers) with abstract (environment-agnostic) request/
-    response shapes
-    services                          # all business logic is here
+    environment-agnostic-handlers     # functions which act as HTTP handlers with abstract (environment-agnostic) request/response shapes
+    services                          # most of business logic is here
   environment-specific-handlers       # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP etc.)
     aws-http
     gcp-http
@@ -55,7 +54,7 @@ but is not aware of the request body structure specific for every use case.
 
 Every file in `app/domain/environment-agnostic-handlers/per-operation-handlers` implements one specific business operation (one use case of the connector).
 
-`app/domain/environment-agnostic-handlers/multipurpose-handler.ts` combines all use cases into a single function - and thus provides a universal handler for all possible cases.
+`app/domain/environment-agnostic-handlers/all-operations-handler.ts` **combines all use cases into a single function** - and thus provides a universal handler for all possible cases.
 For the start (at least for MVP), only this single function is actually exported (accessible for the outer consumption).
 > This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
 Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).

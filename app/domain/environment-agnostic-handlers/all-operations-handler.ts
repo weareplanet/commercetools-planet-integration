@@ -30,7 +30,7 @@ const handler = async <TRequestBody>(req: AbstractRequestWithTypedBody<TRequestB
   };
 };
 
-// TODO: Combine all possible request shapes for multipurposeHandler
+// TODO: Combine request shapes for all handlers (from per-operation-handlers) covered by handler
 const RequestBodySchema = CreatePaymentRequestBodySchema; // | AnotherRequestBobySchema | YetAnotherRequestBobySchema
 type RequestBodySchemaType = CreatePaymentRequestBodySchemaType; // | AnotherRequestBobySchemaType | YetAnotherRequestBobySchemaType
 

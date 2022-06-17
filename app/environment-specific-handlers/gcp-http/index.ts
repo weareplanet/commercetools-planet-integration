@@ -1,8 +1,8 @@
 import { createApiGatewayHandler } from './adapter';
 import {
-  multipurposeHandler as envAgnosticmultipurposeHandler
+  allOperationsHandler as envAgnosticAllOpsHandler
 } from '../../domain/environment-agnostic-handlers/index';
 
-export const multipurposeHandler = createApiGatewayHandler(envAgnosticmultipurposeHandler);
+export const allOperationsHandler = createApiGatewayHandler(envAgnosticAllOpsHandler);
 
 // Theoretically other (more specific-purpose) handlers can be exported here in case of necessity.
