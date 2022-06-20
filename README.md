@@ -22,15 +22,15 @@ Also functions from `app/handlers/environment-agnostic` can be used directly in 
 Basic parts of the repository:
 
 ```
-deploy                                # all deployment/infrastructure stuff is here
 app
   domain
-    environment-agnostic-handlers     # functions which act as HTTP handlers with abstract (environment-agnostic) request/response shapes
-    services                          # most of business logic is here
-  environment-specific-handlers       # wrappers which make environment-agnostic functions be deployable to specific environments (AWS, GCP etc.)
+    environment-agnostic-handlers     # functions with abstract (environment-agnostic) request/response shapes
+    services                          # most of business logic (and some auxiliary facilities like logging) is here
+  environment-specific-handlers       # wrappers which make environment-agnostic handlers be deployable to specific environments (AWS, GCP etc.)
     aws-http
     gcp-http
-  interfaces
+  interfaces                          # some declarations to be used in a few sibling branches (whenever in app)
+deploy                                # all deployment/infrastructure stuff is here
 test                                  # some global test setup or integration tests which it's hard to relate to sime specific branch
 ```
 
@@ -44,21 +44,21 @@ Every such function is **aware of the expected request body structure** (specifi
 
 #### Environment-specific adapters
 
-For a few most popular execution environments (AWS Lambda, GCP function etc.)
-environment-specific adapters are provided (see `app/environment-specific-handlers`).
+For a few most popular execution environments (AWS Lambda, GCP function etc.) environment-specific adapters are implemented (see `app/environment-specific-handlers`).
 
-Every such adapter is, vise versa, **aware of the environment-specific request/response format** (for example, the adapter providede by `app/environment-specific-handlers/aws-http` is aware of the shape of AWS API Gateway event for AWS Lambda and the shape of the expected response for AWS API Gateway),
+Every such adapter is, vise versa, **aware of the environment-specific request/response format** (for example, the adapter implemented in `app/environment-specific-handlers/aws-http` is aware of the shape of AWS API Gateway event for AWS Lambda and the shape of the expected response for AWS API Gateway),
 but is not aware of the request body structure specific for every use case.
 
-##### More details (u)
+##### More details
 
-Every file in `app/domain/environment-agnostic-handlers/per-operation-handlers` implements one specific business operation (one use case of the connector).
+Every file in `app/domain/environment-agnostic-handlers/per-operation-handlers` implements a handler for **one specific business operation** (one use case of the connector).
 
-`app/domain/environment-agnostic-handlers/all-operations-handler.ts` **combines all use cases into a single function** - and thus provides a universal handler for all possible cases.
-For the start (at least for MVP), only this single function is actually exported (accessible for the outer consumption).
+`app/domain/environment-agnostic-handlers/all-operations-handler.ts` provides a higher-level handler for all possible cases - **it combines all lower-level handlers into a single function** which knows criteria when to use which of them for a real request processing.
+_For the start (at least for MVP), this single function is considered enought for the outer consumption and thus only it is actually exported from `app/domain/environment-agnostic-handlers/index.ts` (what is the standard directory entry point in nodejs)._
+
 > This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
 Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).
-Only if it is really needed, `app/domain/environment-agnostic-handlers/index.ts` can be corrected to re-export more cpecific handlers so that every one becomes deployable separately without any unnecessary codebase. At the moment of the initial design it was considered redundant.
+In case of necessity, `app/domain/environment-agnostic-handlers/index.ts` can be corrected to re-export more cpecific handlers so that every one becomes accessible the same way as all-operations-handler is (via the index file). At the moment of the initial design it was considered redundant.
 
 ## Programming language
 

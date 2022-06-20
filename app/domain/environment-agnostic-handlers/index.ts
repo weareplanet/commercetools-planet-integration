@@ -1,28 +1,20 @@
-import { wrapHandlerToValidateInput } from './input-validation';
-
-// Import all possible operation handlers (alongside with their request shape declarations)
-import {
-  handler as anyOperationAbstractHandler,
-  RequestBodySchema as AnyOperationRequestBodySchema,
-  RequestBodySchemaType as AnyOperationRequestBodySchemaType
-} from './all-operations-handler';
-
 /*
-For Cloud providers (AWS, GCP, Azure etc.) any handler exported from this file
-must be used (somewhere outside) via a Cloud-specific adapter would translate:
-- AWS Lambda event -> into AbstractRequest and AbstractResponse -> into AWS Lambda response,
-- GCP function request -> into AbstractRequest and AbstractResponse -> into GCP function response
-etc. (see app/environment-specific-handlers).
+This file must export handler(s) of type AbstractRequestHandler (not AbstractRequestHandlerWithTypedInput).
+SO THAT THEIR CONSUMER DOESN'T CARE ABOUT THE REQUEST BODY SHAPE
+(could pass any AbstractRequest and rely on that the handler will carry about the request shape validation).
 ---
-Also you can use any exported handler directly (that's up to you).
----
-Initially only a single multi-purpose handler is exported (see the root README).
-Theoretically other, more specific-purpose handlers (like createPaymentHandler, for example), can be exported and deployed separately in case of necessity.
+Initially only a single `all-operations-handler` handler is re-exported here (it already provides AbstractRequestHandler).
+If you decide to re-export here some lower-level handler (directly from `per-operation-handlers`),
+please apply `input-validation` module to it (see how `all-operations-handler` does that).
 */
 
-///// WRAP ALL FUNCTIONS BEING EXPORTED SO THAT THEIR CONSUMER DOESN'T CARE ABOUT THE REQUEST SHAPE
-// (the underlying handler cares about that).
-export const allOperationsHandler = wrapHandlerToValidateInput<AnyOperationRequestBodySchemaType>(
-  anyOperationAbstractHandler,
-  AnyOperationRequestBodySchema
-);
+/*
+WHAT A CONSUMER SHOULD CARE ABOUT is about how to use AbstractRequestHandler
+in some specific environment, i.e. how to convert:
+- AWS Lambda event -> into AbstractRequest and AbstractResponse -> into AWS Lambda response,
+- GCP function request -> into AbstractRequest and AbstractResponse -> into GCP function response
+etc.
+For this purpose some wrapper from app/environment-specific-handlers can be used.
+*/
+
+export { handler as allOperationsHandler } from './all-operations-handler';
