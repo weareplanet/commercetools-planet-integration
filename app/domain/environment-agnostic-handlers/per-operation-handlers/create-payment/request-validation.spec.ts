@@ -12,7 +12,7 @@ describe('createPayment handler', () => {
 
   describe('cuccess cases', () => {
 
-    describe('when the request body is a correct and acceptable JSON', () => {
+    describe('when the request body has a CORRECT STRUCTURE', () => {
       it('responds with 200 and Hello World in the body', async () => {
         const req = {
           body: {
@@ -34,7 +34,7 @@ describe('createPayment handler', () => {
 
   describe('error cases', () => {
 
-    describe('when the request body is not acceptable by structure', () => {
+    describe('when the request body has an INCORRECT STRUCTURE', () => {
       it('responds with status 400', async () => {
         const req = {
           body: { x: 123 }
