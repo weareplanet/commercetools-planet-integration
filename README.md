@@ -51,7 +51,7 @@ but is not aware of the request body structure specific for every use case.
 
 ##### More details
 
-Every file in `app/domain/environment-agnostic-handlers/per-operation-handlers` implements a handler for **one specific business operation** (one use case of the connector).
+Every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` implements a handler for **one specific business operation** (one use case of the Connector).
 
 `app/domain/environment-agnostic-handlers/all-operations-handler.ts` provides a higher-level handler for all possible cases - **it combines all lower-level handlers into a single function** which knows criteria when to use which of them for a real request processing.
 _For the start (at least for MVP), this single function is considered enought for the outer consumption and thus only it is actually exported from `app/domain/environment-agnostic-handlers/index.ts` (what is the standard directory entry point in nodejs)._
@@ -122,8 +122,23 @@ The command to run them:
 
 [Yup](https://github.com/jquense/yup) is used as a tool for the request shape validation.
 
-Every file in `app/domain/environment-agnostic-handlers` exports both the **handler** and the the expected **request body schema** (declared in the [Yup schema format](https://github.com/jquense/yup#object)).
+### Validation of requests in handlers
 
-The idea is that, regardless to which final (enviromnent-specific) adapter (or no any one) will be used, every low-level handler provides the information about the expected request body shape.
+Every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` has the following structure:
 
-See also: "Repository structure" section above.
+```
+request-schema.ts
+handler.ts
+index.ts
+handler.spec.ts
+```
+
+- `request-schema.ts` exports the expected **request body schema** (declared in the [Yup schema format](https://github.com/jquense/yup#object)) for this handler.
+- `handler.ts` exports the handler function (`AbstractRequestHandlerWithTypedInput`). The handler is provided the request schema, thus it relies on the scheme to access the request body internals. But it does not know how to validate the input against that schema.
+- `index.ts` takes the exports of both `request-schema.ts` and `handler.ts` and wraps the imported `AbstractRequestHandlerWithTypedInput` handler into `AbstractRequestHandler` which **internally** cares about request shape validation.
+- `handler.spec.ts` file contains unit tests which check the handler logic including schema-related aspects (i.e. what happens when the request shape is as expected, what if not etc.).
+
+Eventually every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` exports **`AbstractRequestHandler` which allows the consumer to not carry about the input validation.**
+
+
+`app/domain/environment-agnostic-handlers/all-operations-handler` is a kind of such consumer - it just orchestrates lower-level handlers (exported from `app/domain/environment-agnostic-handlers/per-operation-handlers`) and does not carry about the input validation - thus it does not need its own request schema declaration.

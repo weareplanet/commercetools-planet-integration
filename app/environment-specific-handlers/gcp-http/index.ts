@@ -1,7 +1,5 @@
 import { createApiGatewayHandler } from './adapter';
-import {
-  allOperationsHandler as envAgnosticAllOpsHandler
-} from '../../domain/environment-agnostic-handlers/index';
+import { default as envAgnosticAllOpsHandler } from '../../domain/environment-agnostic-handlers/all-operations-handler';
 
 export const allOperationsHandler = createApiGatewayHandler(envAgnosticAllOpsHandler);
 
