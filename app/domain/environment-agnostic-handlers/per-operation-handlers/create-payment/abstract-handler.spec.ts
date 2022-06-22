@@ -1,6 +1,6 @@
 import handler  from '.';
 
-jest.mock('../../../services/configs/index', () => ({
+jest.mock('../../../services/config-service/index', () => ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getConfig: () => ({}),
 }));

@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { allOperationsHandler as allOperationsApiGatewayHandler } from './index';
 
-jest.mock('../../domain/services/configs', () => ({
+jest.mock('../../domain/services/config-service/index', () => ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getConfig: () => ({}),
 }));
