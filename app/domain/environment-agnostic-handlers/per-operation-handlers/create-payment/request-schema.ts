@@ -6,11 +6,11 @@ const RequestBodySchema = yup.object({
     .optional(),
   custom: yup.object({
     fields: yup.object({
-      merchantId: yup.string().required('Custom field MerchantId is missing in Payment'),
+      merchantId: yup.string().required('Custom field merchantId is missing in Payment'), // TODO: try to use ${path}
       successUrl: yup.string().required('Custom field successUrl is missing in Payment'),
       errorUrl: yup.string().required('Custom field errorUrl is missing in Payment'),
       cancelUrl: yup.string().required('Custom field cancelUrl is missing in Payment'),
-      // savePaymentMethod: yup.boolean().optional(),
+      savePaymentMethod: yup.boolean().optional(),
       //   .when('savedPaymentMethodAlias', {
       //     is: (value: string) => !!value,
       //     then: (thisField) => thisField.test(
@@ -24,7 +24,7 @@ const RequestBodySchema = yup.object({
       //     then: (thisField) => thisField.required()
       //   }),
       savedPaymentMethodAlias: yup.string().optional(),
-      initRequest: yup.string().optional() // TODO: custom validation which deserializes initRequest from JSON and then performs checks...
+      initRequest: yup.string().optional() // TODO: custom validation which deserializes initRequest from JSON and then performs checks... See .transform
       // //  “Values [attributeName] specified in initRequest are duplicated” if also present in the <root> or `<root>.custom`
       // //  autoSettle          // “Feature autoSettle not supported” if false    <-- strange
       // //  authneticationOnly  // “Feature authneticationOnly not supported” if true

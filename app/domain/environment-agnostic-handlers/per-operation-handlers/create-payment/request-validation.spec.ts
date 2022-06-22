@@ -1,4 +1,6 @@
 import handler  from '.';
+import { AbstractRequest } from '../../../../interfaces';
+import { RequestBodySchemaType } from './request-schema';
 
 jest.mock('../../../services/config-service/index', () => ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -41,10 +43,9 @@ describe('createPayment handler', () => {
   };
 
   const requestWithOptionalFields = {
-    // TODO: if this goes more crazy - use lodash.merge
     body: {
       custom: {
-        fields: {
+        fields: { // TODO: if this goes more crazy - use lodash.merge
           ...requiredCustomFields,
           ...optionalCustomFields
         }
@@ -56,7 +57,6 @@ describe('createPayment handler', () => {
 
     describe('when the request body contains only the required part', () => {
       it('responds with 200 and Hello World in the body', async () => {
-        console.log(JSON.stringify(requestWithoutFields, null, 5));
         const response = await handler(requestWithoutFields);
 
         expect(response.body).toMatchObject({
@@ -69,7 +69,6 @@ describe('createPayment handler', () => {
 
     describe('when the request body contains the required part + required custom fields', () => {
       it('responds with 200 and Hello World in the body', async () => {
-        console.log(JSON.stringify(requestWithOnlyRequiredFields, null, 5));
         const response = await handler(requestWithOnlyRequiredFields);
 
         expect(response.body).toMatchObject({
@@ -82,7 +81,6 @@ describe('createPayment handler', () => {
 
     describe('when the request body contains the required part + required and some optional custom fields', () => {
       it('responds with 200 and Hello World in the body', async () => {
-        console.log(JSON.stringify(requestWithOptionalFields, null, 5));
         const response = await handler(requestWithOptionalFields);
 
         expect(response.body).toMatchObject({
@@ -97,13 +95,35 @@ describe('createPayment handler', () => {
 
   describe('error cases', () => {
 
-    describe('when the request body has an INCORRECT STRUCTURE', () => {
-      it('responds with status 400', async () => {
-        const req = {
-          body: { x: 123 }
-        };
+    describe.only('when the request body misses a required field - responds with status 400 and the corresponding error message:', () => {
+      let request: AbstractRequest;
 
-        const response = await handler(req);
+      beforeEach(() => {
+        request = {
+          body: {
+            custom: {
+              fields: requiredCustomFields
+            }
+          }
+        };
+      });
+
+      it.each([
+        'merchantId',
+        'successUrl',
+        'errorUrl',
+        'cancelUrl'
+      ])('%s', async (fieldName) => {
+        // Stub eslint and TS to allow the access by fieldName
+        /* eslint-disable @typescript-eslint/ban-ts-comment */
+        /* @ts-ignore */
+        delete (request.body as RequestBodySchemaType).custom.fields[fieldName];
+
+        const response = await handler(request);
+
+        expect(response.body).toMatchObject({
+          message: `Custom field ${fieldName} is missing in Payment`
+        });
 
         expect(response.statusCode).toEqual(400);
       });
