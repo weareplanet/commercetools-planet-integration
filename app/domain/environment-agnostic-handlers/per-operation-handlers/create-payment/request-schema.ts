@@ -1,9 +1,8 @@
 import * as yup from 'yup';
 
 const RequestBodySchema = yup.object({
-  key: yup.string()
-    .max(20, 'Attribute key is longer than expected in Payment')
-    .optional(),
+  key: yup.string().required('Field key is missing in Payment')
+    .max(20, 'Attribute key is longer than expected in Payment'),
   custom: yup.object({
     fields: yup.object({
       merchantId: yup.string().required('Custom field merchantId is missing in Payment'), // TODO: try to use ${path}
@@ -11,18 +10,18 @@ const RequestBodySchema = yup.object({
       errorUrl: yup.string().required('Custom field errorUrl is missing in Payment'),
       cancelUrl: yup.string().required('Custom field cancelUrl is missing in Payment'),
       savePaymentMethod: yup.boolean().optional(),
-      //   .when('savedPaymentMethodAlias', {
-      //     is: (value: string) => !!value,
-      //     then: (thisField) => thisField.test(
-      //       'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty',
-      //       (value) => !value
-      //     )
-      //   }),
+      // .when('savedPaymentMethodAlias', {
+      //   is: (value: string) => !!value,
+      //   then: (thisField) => thisField.test(
+      //     'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty',
+      //     (value) => !value
+      //   )
+      // }),
       savedPaymentMethodKey: yup.string().optional(),
-      //   .when('savePaymentMethod', {
-      //     is: true,
-      //     then: (thisField) => thisField.required()
-      //   }),
+      // .when('savePaymentMethod', {
+      //   is: true,
+      //   then: (thisField) => thisField.required()
+      // }),
       savedPaymentMethodAlias: yup.string().optional(),
       initRequest: yup.string().optional() // TODO: custom validation which deserializes initRequest from JSON and then performs checks... See .transform
       // //  “Values [attributeName] specified in initRequest are duplicated” if also present in the <root> or `<root>.custom`
