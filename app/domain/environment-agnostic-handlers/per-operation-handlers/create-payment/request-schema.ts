@@ -17,11 +17,11 @@ const RequestBodySchema = yup.object({
       //     (value) => !value
       //   )
       // }),
-      savedPaymentMethodKey: yup.string().optional(),
-      // .when('savePaymentMethod', {
-      //   is: true,
-      //   then: (thisField) => thisField.required()
-      // }),
+      savedPaymentMethodKey: yup.string().optional()
+        .when('savePaymentMethod', {
+          is: true,
+          then: (thisField) => thisField.required('Custom field savedMethodsKey is missing in Payment')
+        }),
       savedPaymentMethodAlias: yup.string().optional(),
       initRequest: yup.string().optional() // TODO: custom validation which deserializes initRequest from JSON and then performs checks... See .transform
       // //  “Values [attributeName] specified in initRequest are duplicated” if also present in the <root> or `<root>.custom`
@@ -32,7 +32,7 @@ const RequestBodySchema = yup.object({
       // //  webhook             // “Webhook is a connector wide setting; setting it individually per request is not supported” if present
       // // }).optional()
     }).required()
-  }).optional()
+  }).required()
 }).required();
 
 type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
