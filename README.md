@@ -83,6 +83,20 @@ After the building the same structure as was before in `app` directory (but alre
 
 > You can take some extra insights from `serverless.yml` file...
 
+### Enviroment configuration
+
+The program is using `process.env` for set up enviroment configuration. We have following enviroment veriables:
+
+```
+CT_CLIENT_ID - CommerceTools client id
+CT_CLIENT_SECRET - CommerceTools client secret
+CT_PROJECT_ID - CommerceTools project ID
+CT_AUTH_URL - CommerceTools authentication URL
+CT_API_URL - CommerceTools API URL
+CT_MERCHANTS - array of objects which containes merchant `id`, `password` and `enviroment`
+# TODO: maybe need add info about where it get
+```
+
 ## Deployment
 
 > TODO: deploy script should execute `npm install`, `npm run build` commands and then use the `dist` content (together with `node_modules` and maybe `serverless.yml`) to produce a deployment package.

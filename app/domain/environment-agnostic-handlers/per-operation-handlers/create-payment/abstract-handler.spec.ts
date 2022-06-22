@@ -1,6 +1,14 @@
 import handler  from '.';
 
+jest.mock('../../../services/configs/index', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getConfig: () => ({}),
+}));
+
 describe('createPayment handler', () => {
+  afterAll(() => {
+    jest.resetModules();
+  });
 
   describe('cuccess cases', () => {
 
