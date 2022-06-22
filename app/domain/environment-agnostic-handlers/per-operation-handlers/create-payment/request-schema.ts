@@ -24,17 +24,63 @@ const RequestBodySchema = yup.object({
           then: (thisField) => thisField.required('Custom field savedMethodsKey is missing in Payment')
         }),
       savedPaymentMethodAlias: yup.string().optional(),
-      initRequest: yup.string().optional() // TODO: custom validation which deserializes initRequest from JSON and then performs checks... See .transform
-      // //  “Values [attributeName] specified in initRequest are duplicated” if also present in the <root> or `<root>.custom`
-      // //  autoSettle          // “Feature autoSettle not supported” if false    <-- strange
-      // //  authneticationOnly  // “Feature authneticationOnly not supported” if true
-      // //  mcp                 // “Feature mcp not supported” if present
-      // //  returnMobileToken   // “Feature returnMobileToken not supported” if present
-      // //  webhook             // “Webhook is a connector wide setting; setting it individually per request is not supported” if present
-      // // }).optional()
+      initRequest: yup.object().optional()
+        // .transform((value, originalvalue, context) => {
+        //   if (context.isType(value)) return value; // already parsed to object
+        //   try {
+        //     return JSON.parse(value);
+        //   } catch(e) {
+        //     return {}
+        //   }
+        // })
+        .test('initRequest content validator', (initRequestObj) => {
+          if (!initRequestObj) {
+            return true;
+          }
+          yup.boolean()
+            .test('boolean', 'Feature autoSettle disabling not supported', (value) => (value === undefined) || (value === true))
+            .validate(initRequestObj.autoSettle);
+
+          yup.boolean()
+            .test('boolean', 'Feature authneticationOnly not supported', (value) => !value)
+            .validate(initRequestObj.authneticationOnly);
+
+          yup.mixed()
+            .test('mixed', 'Feature mcp not supported', (value) => value === undefined)
+            .validate(initRequestObj.mcp);
+
+          yup.mixed()
+            .test('mixed', 'Feature returnMobileToken not supported', (value) => value === undefined)
+            .validate(initRequestObj.returnMobileToken);
+
+          yup.mixed()
+            .test('mixed', 'Webhook is a connector wide setting; setting it individually per request is not supported', (value) => value === undefined)
+            .validate(initRequestObj.webhook);
+
+          return true;
+        })
     }).required()
   }).required()
-}).required();
+}).required()
+  .test('initRequest fields duplicaction validator', (rootObj, context) => {
+    const initRequest = rootObj.custom.fields.initRequest;
+    if (!initRequest) {
+      return true;
+    }
+    const initRequestKeys = Object.keys(initRequest);
+
+    let duplicatedFields =
+    initRequestKeys.filter((key) => (key in rootObj))
+      .concat(initRequestKeys.filter((key) => (key in rootObj.custom)))
+      .concat(initRequestKeys.filter((key) => (key in rootObj.custom.fields)));
+
+    if (duplicatedFields.length) {
+      duplicatedFields = [...new Set(duplicatedFields)];
+      return context.createError({ message: `Values ${duplicatedFields} specified in initRequest are duplicated` });
+    }
+
+    return true;
+  });
 
 type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
 

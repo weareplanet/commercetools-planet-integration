@@ -23,7 +23,7 @@ describe('createPayment handler', () => {
     savePaymentMethod: false,
     savedPaymentMethodKey: 'savedPaymentMethodKey string value',
     savedPaymentMethodAlias: '',
-    initRequest: 'initRequest string value' // TODO: JSON
+    initRequest: '{}'
   };
 
   const requestWithOnlyRequiredFields = () => {
@@ -42,6 +42,8 @@ describe('createPayment handler', () => {
       body: {
         key: 'key string value',
         custom: {
+          /* eslint-disable @typescript-eslint/ban-ts-comment */
+          /* @ts-ignore */
           fields: { // TODO: if this goes more crazy - use lodash.merge
             ...requiredCustomFields,
             ...optionalCustomFields
@@ -180,7 +182,7 @@ describe('createPayment handler', () => {
       });
 
       describe('and savedPaymentMethodKey is absent', () => {
-        it('responds with status 400 and the corresponding error message', async () => {
+        it('responds with 200', async () => {
           delete request.body.custom.fields.savedPaymentMethodKey;
           const response = await handler(request);
 
@@ -304,6 +306,36 @@ describe('createPayment handler', () => {
 
           expect(response.statusCode).toEqual(200);
         });
+      });
+    });
+  });
+
+  describe('initRequest specific validations', () => {
+
+    describe('when some initRequest fields are also present somewhere outside of initRequest', () => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        optionalCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              /* eslint-disable @typescript-eslint/ban-ts-comment */
+              /* @ts-ignore */
+              fields: {
+                ...requiredCustomFields,
+                ...optionalCustomFields,
+                autoSettle: false,
+                authneticationOnly: false
+              }
+            }
+          }
+        });
+
+        expect(response.body).toMatchObject({
+          message: 'Values autoSettle,authneticationOnly specified in initRequest are duplicated'
+        });
+
+        expect(response.statusCode).toEqual(400);
       });
     });
   });
