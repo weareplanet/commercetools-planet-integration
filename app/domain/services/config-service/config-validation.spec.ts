@@ -69,7 +69,6 @@ describe('Connector config validations', () => {
     });
 
     it('should pass validation for commerceToolsConfig', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const logger = (await import('../log-service')).default;
       jest.spyOn(logger, 'info');
       jest.spyOn(logger, 'debug');
@@ -83,7 +82,6 @@ describe('Connector config validations', () => {
     });
 
     it('should throw validation error about merchants\' enviroment for commerceToolsConfig', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const logger = (await import('../log-service')).default;
       jest.spyOn(logger, 'info');
       jest.spyOn(logger, 'debug');
