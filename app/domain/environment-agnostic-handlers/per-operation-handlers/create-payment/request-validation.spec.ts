@@ -22,7 +22,7 @@ describe('createPayment handler', () => {
   const optionalCustomFields = {
     savePaymentMethod: false,
     savedPaymentMethodKey: 'savedPaymentMethodKey string value',
-    savedPaymentMethodAlias: 'savedPaymentMethodAlias string value',
+    savedPaymentMethodAlias: '',
     initRequest: 'initRequest string value' // TODO: JSON
   };
 
@@ -143,7 +143,7 @@ describe('createPayment handler', () => {
       });
 
       describe('and savedPaymentMethodKey is present', () => {
-        it('responds with status 400 and the corresponding error message', async () => {
+        it('responds with 200', async () => {
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -157,7 +157,7 @@ describe('createPayment handler', () => {
       });
 
       describe('and savedPaymentMethodKey is absent', () => {
-        it('responds with status 400 and the corresponding error message', async () => {
+        it('responds with 200', async () => {
           delete request.body.custom.fields.savedPaymentMethodKey;
           const response = await handler(request);
 
@@ -166,7 +166,7 @@ describe('createPayment handler', () => {
       });
 
       describe('and savedPaymentMethodKey is present', () => {
-        it('responds with status 400 and the corresponding error message', async () => {
+        it('responds with 200', async () => {
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -189,7 +189,117 @@ describe('createPayment handler', () => {
       });
 
       describe('and savedPaymentMethodKey is present', () => {
+        it('responds with 200', async () => {
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+    });
+  });
+
+  describe('savePaymentMethod specific validations', () => {
+    let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+    beforeEach(() => {
+      request = requestWithOptionalFields();
+    });
+
+    describe('when savedPaymentMethodAlias is NOT empty', () => {
+      beforeEach(() => {
+        request.body.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+      });
+
+      describe('and savePaymentMethod is true', () => {
         it('responds with status 400 and the corresponding error message', async () => {
+          request.body.custom.fields.savePaymentMethod = true;
+          const response = await handler(request);
+
+          expect(response.body).toMatchObject({
+            message: 'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty'
+          });
+
+          expect(response.statusCode).toEqual(400);
+        });
+      });
+
+      describe('and savePaymentMethod is false', () => {
+        it('responds with 200', async () => {
+          request.body.custom.fields.savePaymentMethod = false;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savePaymentMethod is absent', () => {
+        it('responds with 200', async () => {
+          delete request.body.custom.fields.savePaymentMethod;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+    });
+
+    describe('when savedPaymentMethodAlias is empty', () => {
+      beforeEach(() => {
+        request.body.custom.fields.savedPaymentMethodAlias = '';
+      });
+
+      describe('and savePaymentMethod is true', () => {
+        it('responds with 200', async () => {
+          request.body.custom.fields.savePaymentMethod = true;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savePaymentMethod is false', () => {
+        it('responds with 200', async () => {
+          request.body.custom.fields.savePaymentMethod = false;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savePaymentMethod is absent', () => {
+        it('responds with 200', async () => {
+          delete request.body.custom.fields.savePaymentMethod;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+    });
+
+    describe('when savedPaymentMethodAlias is absent', () => {
+      beforeEach(() => {
+        delete request.body.custom.fields.savedPaymentMethodAlias;
+      });
+
+      describe('and savePaymentMethod is true', () => {
+        it('responds with 200', async () => {
+          request.body.custom.fields.savePaymentMethod = true;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savePaymentMethod is false', () => {
+        it('responds with 200', async () => {
+          request.body.custom.fields.savePaymentMethod = false;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savePaymentMethod is absent', () => {
+        it('responds with 200', async () => {
+          delete request.body.custom.fields.savePaymentMethod;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);

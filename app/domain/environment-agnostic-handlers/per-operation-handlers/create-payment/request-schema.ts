@@ -9,14 +9,15 @@ const RequestBodySchema = yup.object({
       successUrl: yup.string().required('Custom field successUrl is missing in Payment'),
       errorUrl: yup.string().required('Custom field errorUrl is missing in Payment'),
       cancelUrl: yup.string().required('Custom field cancelUrl is missing in Payment'),
-      savePaymentMethod: yup.boolean().optional(),
-      // .when('savedPaymentMethodAlias', {
-      //   is: (value: string) => !!value,
-      //   then: (thisField) => thisField.test(
-      //     'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty',
-      //     (value) => !value
-      //   )
-      // }),
+      savePaymentMethod: yup.boolean().optional()
+        .when('savedPaymentMethodAlias', {
+          is: (value: string) => !!value,
+          then: (thisField) => thisField.test(
+            'boolean',
+            'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty',
+            (value) => !value
+          )
+        }),
       savedPaymentMethodKey: yup.string().optional()
         .when('savePaymentMethod', {
           is: true,
