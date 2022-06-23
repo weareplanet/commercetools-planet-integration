@@ -25,14 +25,6 @@ const RequestBodySchema = yup.object({
         }),
       savedPaymentMethodAlias: yup.string().optional(),
       initRequest: yup.object().optional()
-        // .transform((value, originalvalue, context) => {
-        //   if (context.isType(value)) return value; // already parsed to object
-        //   try {
-        //     return JSON.parse(value);
-        //   } catch(e) {
-        //     return {}
-        //   }
-        // })
         .test('initRequest content validator', (initRequestObj, context) => {
           if (!initRequestObj) {
             return true;
