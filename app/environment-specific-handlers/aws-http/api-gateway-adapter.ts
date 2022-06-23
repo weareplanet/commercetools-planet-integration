@@ -9,22 +9,21 @@ function bodyParcingError(e: Error): boolean {
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
   createEnvSpecificHandler(handler: IAbstractRequestHandler) {
     return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-      const apiGatewayAdapter = new AwsApiGatewayAdapter();
       try {
-        const agnosticRequest: IAbstractRequest = apiGatewayAdapter.cloudRequestToAbstract(event);
+        const agnosticRequest: IAbstractRequest = this.cloudRequestToAbstract(event);
         const agnosticResponse = await handler(agnosticRequest);
-        return apiGatewayAdapter.abstractResponseToCloud(agnosticResponse);
+        return this.abstractResponseToCloud(agnosticResponse);
       } catch (err) {
         // TODO: Handle err more accurately to distinguish 4xx from 5xx etc.
 
         if (bodyParcingError(err)) {
-          return apiGatewayAdapter.abstractResponseToCloud({
+          return this.abstractResponseToCloud({
             statusCode: HttpStatusCode.BAD_REQUEST,
             body: { message: `Error of body parsing: ${err.message}` }
           });
         }
 
-        return apiGatewayAdapter.abstractResponseToCloud({
+        return this.abstractResponseToCloud({
           statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
           body: {}
         });
