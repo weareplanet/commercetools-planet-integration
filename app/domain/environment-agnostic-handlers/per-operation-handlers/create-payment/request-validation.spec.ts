@@ -12,18 +12,22 @@ describe('createPayment handler', () => {
     jest.resetModules();
   });
 
-  const requiredCustomFields = {
-    merchantId: 'merchantId string value',
-    successUrl: 'successUrl string value',
-    errorUrl: 'errorUrl string value',
-    cancelUrl: 'cancelUrl string value'
+  const requiredCustomFields = () => {
+    return {
+      merchantId: 'merchantId string value',
+      successUrl: 'successUrl string value',
+      errorUrl: 'errorUrl string value',
+      cancelUrl: 'cancelUrl string value'
+    };
   };
 
-  const optionalCustomFields = {
-    savePaymentMethod: false,
-    savedPaymentMethodKey: 'savedPaymentMethodKey string value',
-    savedPaymentMethodAlias: '',
-    initRequest: '{}'
+  const optionalCustomFields = () => {
+    return {
+      savePaymentMethod: false,
+      savedPaymentMethodKey: 'savedPaymentMethodKey string value',
+      savedPaymentMethodAlias: '',
+      initRequest: '{}'
+    };
   };
 
   const requestWithOnlyRequiredFields = () => {
@@ -31,7 +35,7 @@ describe('createPayment handler', () => {
       body: {
         key: 'key string value',
         custom: {
-          fields: requiredCustomFields
+          fields: requiredCustomFields()
         }
       }
     };
@@ -45,8 +49,8 @@ describe('createPayment handler', () => {
           /* eslint-disable @typescript-eslint/ban-ts-comment */
           /* @ts-ignore */
           fields: { // TODO: if this goes more crazy - use lodash.merge
-            ...requiredCustomFields,
-            ...optionalCustomFields
+            ...requiredCustomFields(),
+            ...optionalCustomFields()
           }
         }
       }
@@ -346,18 +350,37 @@ describe('createPayment handler', () => {
   });
 
   describe('initRequest specific validations', () => {
-    describe('when some initRequest fields are also present somewhere outside of initRequest', () => {
-      it('responds with status 400 and the corresponding error message', async () => {
-        optionalCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
+    describe('When initRequest has a correct content', () => {
+      it('responds with 200', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
         const response = await handler({
           body: {
             key: 'key string value',
             custom: {
-              /* eslint-disable @typescript-eslint/ban-ts-comment */
-              /* @ts-ignore */
               fields: {
-                ...requiredCustomFields,
-                ...optionalCustomFields,
+                ...requiredCustomFields(),
+                ...optCustomFields,
+              }
+            }
+          }
+        });
+
+        expect(response.statusCode).toEqual(200);
+      });
+    });
+
+    describe('when some initRequest fields are also present somewhere outside of initRequest', () => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              fields: {
+                ...requiredCustomFields(),
+                ...optCustomFields,
                 autoSettle: false,
                 authneticationOnly: false
               }
@@ -367,6 +390,102 @@ describe('createPayment handler', () => {
 
         expect(response.body).toMatchObject({
           message: 'Values autoSettle,authneticationOnly specified in initRequest are duplicated'
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+
+    describe('When initRequest.autoSettle is true', () => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = '{ "autoSettle":false }';
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              fields: {
+                ...requiredCustomFields(),
+                ...optCustomFields,
+              }
+            }
+          }
+        });
+
+        expect(response.body).toMatchObject({
+          message: 'Feature autoSettle disabling not supported'
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+
+    describe('When initRequest.authneticationOnly is false', () => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = '{ "authneticationOnly":true }';
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              fields: {
+                ...requiredCustomFields(),
+                ...optCustomFields,
+              }
+            }
+          }
+        });
+
+        expect(response.body).toMatchObject({
+          message: 'Feature authneticationOnly not supported'
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+
+    describe.each(['mcp', 'returnMobileToken'])('When initRequest.%s is present', (fieldName) => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = `{ "${fieldName}":"something" }`;
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              fields: {
+                ...requiredCustomFields(),
+                ...optCustomFields,
+              }
+            }
+          }
+        });
+
+        expect(response.body).toMatchObject({
+          message: `Feature ${fieldName} not supported`
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+
+    describe('When initRequest.webhook is present', () => {
+      it('responds with status 400 and the corresponding error message', async () => {
+        const optCustomFields = optionalCustomFields();
+        optCustomFields.initRequest = '{ "webhook":"something" }';
+        const response = await handler({
+          body: {
+            key: 'key string value',
+            custom: {
+              fields: {
+                ...requiredCustomFields(),
+                ...optCustomFields,
+              }
+            }
+          }
+        });
+
+        expect(response.body).toMatchObject({
+          message: 'Webhook is a connector wide setting; setting it individually per request is not supported'
         });
 
         expect(response.statusCode).toEqual(400);

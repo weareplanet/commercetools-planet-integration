@@ -33,29 +33,30 @@ const RequestBodySchema = yup.object({
         //     return {}
         //   }
         // })
-        .test('initRequest content validator', (initRequestObj) => {
+        .test('initRequest content validator', (initRequestObj, context) => {
           if (!initRequestObj) {
             return true;
           }
+
           yup.boolean()
             .test('boolean', 'Feature autoSettle disabling not supported', (value) => (value === undefined) || (value === true))
-            .validate(initRequestObj.autoSettle);
+            .validateSync(initRequestObj.autoSettle);
 
           yup.boolean()
             .test('boolean', 'Feature authneticationOnly not supported', (value) => !value)
-            .validate(initRequestObj.authneticationOnly);
+            .validateSync(initRequestObj.authneticationOnly);
 
           yup.mixed()
             .test('mixed', 'Feature mcp not supported', (value) => value === undefined)
-            .validate(initRequestObj.mcp);
+            .validateSync(initRequestObj.mcp);
 
           yup.mixed()
             .test('mixed', 'Feature returnMobileToken not supported', (value) => value === undefined)
-            .validate(initRequestObj.returnMobileToken);
+            .validateSync(initRequestObj.returnMobileToken);
 
           yup.mixed()
             .test('mixed', 'Webhook is a connector wide setting; setting it individually per request is not supported', (value) => value === undefined)
-            .validate(initRequestObj.webhook);
+            .validateSync(initRequestObj.webhook);
 
           return true;
         })
