@@ -1,13 +1,7 @@
-import { APIGatewayProxyEvent, Context } from 'aws-lambda';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { allOperationsHandler as allOperationsApiGatewayHandler } from './index';
 
 describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway', () => {
-
-  const context: Context = {
-    functionName: 'allOperationsHandler'
-  } as Context;
-
-
   // TODO: All schema-related tests are on the lowest level (in app/domain/environment-agnostic-handlers/per-operation-handlers).
   // On a higher level (here) - test only what is implemented here (mocking a lower-level handler)
   // + a few integration tests (not covering everything)
@@ -30,7 +24,7 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
           body: 'unexpected payload'
         } as APIGatewayProxyEvent;
 
-        const response = await allOperationsApiGatewayHandler(event, context);
+        const response = await allOperationsApiGatewayHandler(event);
 
         expect(response.statusCode).toEqual(400);
       });

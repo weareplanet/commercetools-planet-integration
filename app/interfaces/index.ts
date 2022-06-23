@@ -13,9 +13,8 @@ export interface AbstractRequestHandler {
   (req: AbstractRequest): Promise<AbstractResponse>;
 }
 
-export interface AbstractAdapter<EnvironmentReq, EnvironmentRes> {
-  cloudRequestToAbstract(cloudRequest: EnvironmentReq): AbstractRequest;
-  abstractResponseToCloud(abstractResponse: AbstractResponse): EnvironmentRes;
+export interface AbstractAdapter<TEnvironmentReq, TEnvironmentRes> {
+  createEnvSpecificHandler(handler: AbstractRequestHandler): (req: TEnvironmentReq) => Promise<TEnvironmentRes>
 }
 
 // Specific object in the request body
