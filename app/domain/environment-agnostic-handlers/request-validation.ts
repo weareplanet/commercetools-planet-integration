@@ -1,5 +1,6 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { AnyObjectSchema } from 'yup';
+import logger from '../services/log-service';
 import {
   AbstractRequest,
   AbstractResponse,
@@ -21,12 +22,12 @@ export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: Abstra
     } else {
       try {
         const validationService = new InputValidationService();
-        req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: true });
-      } catch (err: unknown) {
-        // logger.error({ err }, 'Input validation error');
+        req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
+      } catch (err) {
+        logger.error({ err }, 'Input validation error');
         return {
           statusCode: HttpStatusCode.BAD_REQUEST,
-          body: { message: (err as Error).message }
+          body: { message: err.message }
         };
       }
     }

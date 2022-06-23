@@ -53,12 +53,13 @@ but is not aware of the request body structure specific for every use case.
 
 Every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` implements a handler for **one specific business operation** (one use case of the Connector).
 
-`app/domain/environment-agnostic-handlers/all-operations-handler.ts` provides a higher-level handler for all possible cases - **it combines all lower-level handlers into a single function** which knows criteria when to use which of them for a real request processing.
-_For the start (at least for MVP), this single function is considered enought for the outer consumption and thus only it is actually exported from `app/domain/environment-agnostic-handlers/index.ts` (what is the standard directory entry point in nodejs)._
+`app/domain/environment-agnostic-handlers/all-operations-handler` provides a higher-level handler for all possible cases - **it combines all lower-level handlers into a single function** which knows criteria when to use which of them for every real request processing.
+In the initial design (at least for MVP) this single `all-operations-handler` function is considered enough and reasonable (taking into account the mupti-environment deploy target) for the outer consumption - and thus it is the only function exported from `app/domain/environment-agnostic-handlers/index.ts` (the standart Nodejs directory root).
 
 > This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
 Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).
-In case of necessity, `app/domain/environment-agnostic-handlers/index.ts` can be corrected to re-export more cpecific handlers so that every one becomes accessible the same way as all-operations-handler is (via the index file). At the moment of the initial design it was considered redundant.
+In case of necessity, any usecase-specific handler from `app/domain/environment-agnostic-handlers` can be used for an individual deploy. At the moment of the initial design it was considered redundant.
+
 
 ## Programming language
 
@@ -144,13 +145,15 @@ Every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handl
 request-schema.ts
 handler.ts
 index.ts
-handler.spec.ts
+<aspect-1>.spec.ts
+<aspect-2>.spec.ts
+...
 ```
 
 - `request-schema.ts` exports the expected **request body schema** (declared in the [Yup schema format](https://github.com/jquense/yup#object)) for this handler.
 - `handler.ts` exports the handler function (`AbstractRequestHandlerWithTypedInput`). The handler is provided the request schema, thus it relies on the scheme to access the request body internals. But it does not know how to validate the input against that schema.
 - `index.ts` takes the exports of both `request-schema.ts` and `handler.ts` and wraps the imported `AbstractRequestHandlerWithTypedInput` handler into `AbstractRequestHandler` which **internally** cares about request shape validation.
-- `handler.spec.ts` file contains unit tests which check the handler logic including schema-related aspects (i.e. what happens when the request shape is as expected, what if not etc.).
+- `<aspect-1>.spec.ts`, `<aspect-2>.spec.ts` etc. files contain unit tests which check any aspects of the handler exported from `index.ts` (i.e. which has the request validation facility).
 
 Eventually every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` exports **`AbstractRequestHandler` which allows the consumer to not carry about the input validation.**
 
