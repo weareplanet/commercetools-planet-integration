@@ -1,6 +1,9 @@
 import { ConnectorEnvironment } from './interfaces';
 import { ICommerceToolsConfig } from './schema';
 
+// 'config' module is globally mocked in the test environment - so to test its internals we need to unmock it
+jest.unmock('./index');
+
 describe('Connector config validations', () => {
   const {
     CT_CLIENT_ID,

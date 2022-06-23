@@ -2,15 +2,7 @@ import handler  from '.';
 import { AbstractRequestWithTypedBody } from '../../../../interfaces';
 import { RequestBodySchemaType } from './request-schema';
 
-jest.mock('../../../services/config-service/index', () => ({
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  getConfig: () => ({}),
-}));
-
 describe('createPayment handler', () => {
-  afterAll(() => {
-    jest.resetModules();
-  });
 
   const requiredCustomFields = () => {
     return {
