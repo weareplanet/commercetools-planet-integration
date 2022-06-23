@@ -1,20 +1,12 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { allOperationsHandler as allOperationsApiGatewayHandler } from './index';
 
-jest.mock('../../domain/services/config-service/index', () => ({
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  getConfig: () => ({}),
-}));
-
 describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway', () => {
 
   const context: Context = {
     functionName: 'allOperationsHandler'
   } as Context;
 
-  afterAll(() => {
-    jest.resetModules();
-  });
 
   // TODO: All schema-related tests are on the lowest level (in app/domain/environment-agnostic-handlers/per-operation-handlers).
   // On a higher level (here) - test only what is implemented here (mocking a lower-level handler)

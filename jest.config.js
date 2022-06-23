@@ -14,7 +14,8 @@ module.exports = {
   ],
   rootDir: '.',
   setupFilesAfterEnv: [
-    '<rootDir>/test/setup/global-hooks.ts'
+    '<rootDir>/test/setup/global-hooks.ts',
+    '<rootDir>/test/setup/load-global-mocks.ts'
   ],
   silent: true,
   coverageThreshold: {
