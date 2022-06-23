@@ -4,15 +4,12 @@ import {
 } from '../../../../interfaces';
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { RequestBodySchemaType } from './request-schema';
-import configService from '../../../services/config-service';
 // import { PaymentService } from '../../services/payment-service';
 
 export default async (req: AbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<AbstractResponse> => {
   // TODO: Take what's needed from req and leverage necessary services...
   // const paymentService = new PaymentService();
   // await paymentService.initPayment();
-
-  configService.getConfig();
 
   return {
     statusCode: HttpStatusCode.OK,
