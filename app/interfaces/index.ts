@@ -13,6 +13,10 @@ export interface AbstractRequestHandler {
   (req: AbstractRequest): Promise<AbstractResponse>;
 }
 
+export interface AbstractAdapter<EnvironmentReq, EnvironmentRes> {
+  cloudRequestToAbstract(cloudRequest: EnvironmentReq): AbstractRequest;
+  abstractResponseToCloud(abstractResponse: AbstractResponse): EnvironmentRes;
+}
 
 // Specific object in the request body
 

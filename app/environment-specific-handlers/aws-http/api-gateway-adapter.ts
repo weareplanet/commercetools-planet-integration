@@ -1,13 +1,13 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import { AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../interfaces';
+import { AbstractAdapter, AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../interfaces';
 
 function bodyParcingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
-class AwsApiGatewayAdapter {
-  cloudRequestToAbstract(event: APIGatewayEvent): AbstractRequest {
+class AwsApiGatewayAdapter implements AbstractAdapter<APIGatewayEvent, APIGatewayProxyResult> {
+  cloudRequestToAbstract(event: APIGatewayEvent) {
     return {
       // TODO: move the JSON parcing (and the corresponding error handling)
       // into app/domain/environment-agnostic-handlers
@@ -15,7 +15,7 @@ class AwsApiGatewayAdapter {
     };
   }
 
-  abstractResponseToCloud(agnosticResponse: AbstractResponse): APIGatewayProxyResult {
+  abstractResponseToCloud(agnosticResponse: AbstractResponse) {
     return this.createApiGatewayResponse(agnosticResponse.statusCode, agnosticResponse.body);
   }
 
