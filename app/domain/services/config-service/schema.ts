@@ -1,24 +1,6 @@
 import * as yup from 'yup';
 
-import { ICommerceToolsConfig, ConnectorEnvironment } from './interfaces';
-
-const {
-  CT_CLIENT_ID,
-  CT_CLIENT_SECRET,
-  CT_PROJECT_ID,
-  CT_AUTH_URL,
-  CT_API_URL,
-  CT_MERCHANTS
-} = process.env;
-
-export const commerceToolsConfig: ICommerceToolsConfig = {
-  clientId: CT_CLIENT_ID,
-  clientSercet: CT_CLIENT_SECRET,
-  projectId: CT_PROJECT_ID,
-  authUrl: CT_AUTH_URL,
-  apiUrl: CT_API_URL,
-  merchants: CT_MERCHANTS ? JSON.parse(CT_MERCHANTS) : undefined,
-};
+import { ConnectorEnvironment } from './interfaces';
 
 export const CommerceToolsConfigSchema = yup.object({
   clientId: yup
@@ -63,3 +45,14 @@ export const CommerceToolsConfigSchema = yup.object({
         }).required()
     ).required('CT_MERCHANTS is required'),
 }).required();
+
+export type ICommerceToolsConfig = yup.InferType<typeof CommerceToolsConfigSchema>;
+
+export const commerceToolsConfig: ICommerceToolsConfig = {
+  clientId: process.env.CT_CLIENT_ID,
+  clientSercet: process.env.CT_CLIENT_SECRET,
+  projectId: process.env.CT_PROJECT_ID,
+  authUrl: process.env.CT_AUTH_URL,
+  apiUrl: process.env.CT_API_URL,
+  merchants: process.env.CT_MERCHANTS ? JSON.parse(process.env.CT_MERCHANTS) : undefined,
+};
