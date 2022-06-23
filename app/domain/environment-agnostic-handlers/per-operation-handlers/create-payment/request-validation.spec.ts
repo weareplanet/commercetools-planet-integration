@@ -120,6 +120,41 @@ describe('createPayment handler', () => {
     });
   });
 
+  describe('Payment key specific validations', () => {
+    let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+    beforeEach(() => {
+      request = requestWithOptionalFields();
+    });
+
+    describe('when key contains 20 symbols', () => {
+      beforeEach(() => {
+        request.body.key = '01234567890123456789';
+      });
+
+      it('responds with 200', async () => {
+        const response = await handler(request);
+
+        expect(response.statusCode).toEqual(200);
+      });
+    });
+
+    describe('when key contains 21 symbols', () => {
+      beforeEach(() => {
+        request.body.key = '012345678901234567891';
+      });
+
+      it('responds with status 400 and the corresponding error message', async () => {
+        const response = await handler(request);
+
+        expect(response.body).toMatchObject({
+          message: 'Attribute key is longer than expected in Payment'
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+  });
+
   describe('savedPaymentMethodKey specific validations', () => {
     let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
@@ -311,7 +346,6 @@ describe('createPayment handler', () => {
   });
 
   describe('initRequest specific validations', () => {
-
     describe('when some initRequest fields are also present somewhere outside of initRequest', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         optionalCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
