@@ -1,5 +1,5 @@
 import handler  from '.';
-import { AbstractRequestWithTypedBody } from '../../../../interfaces';
+import { IAbstractRequestWithTypedBody } from '../../../../interfaces';
 import { RequestBodySchemaType } from './request-schema';
 
 describe('createPayment handler', () => {
@@ -33,7 +33,7 @@ describe('createPayment handler', () => {
     };
   };
 
-  const requestWithOptionalFields = (): AbstractRequestWithTypedBody<RequestBodySchemaType> => {
+  const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<RequestBodySchemaType> => {
     return {
       body: {
         key: 'key string value',
@@ -88,7 +88,7 @@ describe('createPayment handler', () => {
     });
 
     describe('custom.fields:', () => {
-      let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+      let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
 
       beforeEach(() => {
         request = requestWithOptionalFields();
@@ -117,7 +117,7 @@ describe('createPayment handler', () => {
   });
 
   describe('Payment key specific validations', () => {
-    let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });
@@ -152,7 +152,7 @@ describe('createPayment handler', () => {
   });
 
   describe('savedPaymentMethodKey specific validations', () => {
-    let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });
@@ -232,7 +232,7 @@ describe('createPayment handler', () => {
   });
 
   describe('savePaymentMethod specific validations', () => {
-    let request: AbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });

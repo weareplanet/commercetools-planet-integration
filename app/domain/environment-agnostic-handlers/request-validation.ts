@@ -2,11 +2,11 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import { AnyObjectSchema } from 'yup';
 import logger from '../services/log-service';
 import {
-  AbstractRequest,
-  AbstractResponse,
-  AbstractRequestHandler,
-  AbstractRequestWithTypedBody,
-  AbstractRequestHandlerWithTypedInput
+  IAbstractRequest,
+  IAbstractResponse,
+  IAbstractRequestHandler,
+  IAbstractRequestWithTypedBody,
+  IAbstractRequestHandlerWithTypedInput
 } from '../../interfaces';
 import { InputValidationService } from '../services/input-validation-service';
 
@@ -15,8 +15,8 @@ import { InputValidationService } from '../services/input-validation-service';
 // ---
 // This function wraps a request shape-aware AbstractRequestHandlerWithTypedInput
 // into a shape-unaware AbstractRequestHandler suitable for higher-level consumers.
-export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: AbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): AbstractRequestHandler => {
-  return async (req: AbstractRequest): Promise<AbstractResponse> => {
+export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: IAbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): IAbstractRequestHandler => {
+  return async (req: IAbstractRequest): Promise<IAbstractResponse> => {
     if (!inputSchema) {
       req.body = {}; // TODO: think more about correctness of this
     } else {
@@ -32,6 +32,6 @@ export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: Abstra
       }
     }
 
-    return lowLevelHandler(req as AbstractRequestWithTypedBody<TRequestBody>); // TODO: think how to improve this brutal type cast
+    return lowLevelHandler(req as IAbstractRequestWithTypedBody<TRequestBody>); // TODO: think how to improve this brutal type cast
   };
 };

@@ -1,17 +1,17 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { AbstractAdapter, AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../interfaces';
+import { IAbstractToEnvHandlerAdapter, IAbstractRequest, IAbstractResponse, IAbstractRequestHandler } from '../../interfaces';
 
 function bodyParcingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
-export class AwsApiGatewayAdapter implements AbstractAdapter<APIGatewayEvent, APIGatewayProxyResult> {
-  createEnvSpecificHandler(handler: AbstractRequestHandler) {
+export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
+  createEnvSpecificHandler(handler: IAbstractRequestHandler) {
     return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
       const apiGatewayAdapter = new AwsApiGatewayAdapter();
       try {
-        const agnosticRequest: AbstractRequest = apiGatewayAdapter.cloudRequestToAbstract(event);
+        const agnosticRequest: IAbstractRequest = apiGatewayAdapter.cloudRequestToAbstract(event);
         const agnosticResponse = await handler(agnosticRequest);
         return apiGatewayAdapter.abstractResponseToCloud(agnosticResponse);
       } catch (err) {
@@ -34,13 +34,13 @@ export class AwsApiGatewayAdapter implements AbstractAdapter<APIGatewayEvent, AP
 
   private cloudRequestToAbstract(event: APIGatewayEvent) {
     return {
-      // TODO: move the JSON parcing (and the corresponding error handling)
+      // TODO: move the JSON parcing (and the corIAbstractRequestHandlering)
       // into app/domain/environment-agnostic-handlers
       body: JSON.parse(event.body)
     };
   }
 
-  private abstractResponseToCloud(agnosticResponse: AbstractResponse) {
+  private abstractResponseToCloud(agnosticResponse: IAbstractResponse) {
     return this.createApiGatewayResponse(agnosticResponse.statusCode, agnosticResponse.body);
   }
 

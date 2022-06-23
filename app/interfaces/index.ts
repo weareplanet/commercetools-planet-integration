@@ -1,28 +1,28 @@
 // Any object in the request body
 
-export interface AbstractRequest {
+export interface IAbstractRequest {
   body: Record<string, unknown>;
 }
 
-export interface AbstractResponse {
+export interface IAbstractResponse {
   statusCode: number;
   body: Record<string, unknown>;
 }
 
-export interface AbstractRequestHandler {
-  (req: AbstractRequest): Promise<AbstractResponse>;
+export interface IAbstractRequestHandler {
+  (req: IAbstractRequest): Promise<IAbstractResponse>;
 }
 
-export interface AbstractAdapter<TEnvironmentReq, TEnvironmentRes> {
-  createEnvSpecificHandler(handler: AbstractRequestHandler): (req: TEnvironmentReq) => Promise<TEnvironmentRes>
+export interface IAbstractToEnvHandlerAdapter<IEnvironmentReq, IEnvironmentRes> {
+  createEnvSpecificHandler(handler: IAbstractRequestHandler): (req: IEnvironmentReq) => Promise<IEnvironmentRes>
 }
 
 // Specific object in the request body
 
-export interface AbstractRequestWithTypedBody<TRequestBody> {
+export interface IAbstractRequestWithTypedBody<TRequestBody> {
   body: TRequestBody;
 }
 
-export interface AbstractRequestHandlerWithTypedInput<TRequestBody> {
-  (req: AbstractRequestWithTypedBody<TRequestBody>): Promise<AbstractResponse>;
+export interface IAbstractRequestHandlerWithTypedInput<TRequestBody> {
+  (req: IAbstractRequestWithTypedBody<TRequestBody>): Promise<IAbstractResponse>;
 }
