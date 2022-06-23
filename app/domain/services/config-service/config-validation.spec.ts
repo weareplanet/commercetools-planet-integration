@@ -1,4 +1,5 @@
-import { ICommerceToolsConfig, ConnectorEnvironment } from './interfaces';
+import { ConnectorEnvironment } from './interfaces';
+import { ICommerceToolsConfig } from './schema';
 
 describe('Connector config validations', () => {
   const {

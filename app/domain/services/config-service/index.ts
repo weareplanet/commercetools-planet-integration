@@ -1,8 +1,7 @@
 import logger from '../log-service';
 import { InputValidationService } from '../input-validation-service';
 
-import { ICommerceToolsConfig } from './interfaces';
-import { commerceToolsConfig, CommerceToolsConfigSchema } from './schema';
+import { CommerceToolsConfigSchema, ICommerceToolsConfig, commerceToolsConfig } from './schema';
 
 class ConfigService {
   private config: {
