@@ -1,4 +1,4 @@
-import { version } from '../../../../package.json';
+import { name, version } from '../../../../package.json';
 import logger from '../log-service';
 import { logConnectorVersion } from '.';
 
@@ -8,6 +8,6 @@ describe('Connector version', () => {
 
     logConnectorVersion();
 
-    expect(logger.info).toHaveBeenCalledWith(`Connector is running with version: ${version}`);
+    expect(logger.info).toHaveBeenCalledWith({ name, version }, 'Connector is running');
   });
 });
