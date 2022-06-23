@@ -49,6 +49,13 @@ describe('Connector config validations', () => {
       delete process.env.CT_MERCHANTS;
     }
   };
+  const loadLogger = async () => {
+    const logger = (await import('../log-service')).default;
+    jest.spyOn(logger, 'info');
+    jest.spyOn(logger, 'debug');
+
+    return logger;
+  };
   const testEnvVarsValues = {
     clientId: 'clientId',
     clientSercet: 'clientSercet',
@@ -75,9 +82,8 @@ describe('Connector config validations', () => {
     });
 
     it('should pass validation for commerceToolsConfig', async () => {
-      const logger = (await import('../log-service')).default;
-      jest.spyOn(logger, 'info');
-      jest.spyOn(logger, 'debug');
+      expect.assertions(3);
+      const logger = await loadLogger();
       setProcessEnvVars(testEnvVarsValues);
 
       const configService = (await import('.')).default;
@@ -88,9 +94,8 @@ describe('Connector config validations', () => {
     });
 
     it('should throw validation error about merchants\' enviroment for commerceToolsConfig', async () => {
-      const logger = (await import('../log-service')).default;
-      jest.spyOn(logger, 'info');
-      jest.spyOn(logger, 'debug');
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -100,16 +105,17 @@ describe('Connector config validations', () => {
 
       try {
         await import('.');
-        expect.assertions(1);
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' enviroment specified');
-        expect(logger.info).not.toHaveBeenCalled();
-        expect(logger.debug).not.toHaveBeenCalled();
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about merchants\' password for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -119,14 +125,17 @@ describe('Connector config validations', () => {
 
       try {
         await import('.');
-        expect.assertions(1);
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' password as a string');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about merchants\' id for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -141,9 +150,13 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' id as string');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about clientId for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         clientId: undefined
@@ -156,9 +169,13 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_CLIENT_ID is required');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about clientSercet for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         clientSercet: undefined
@@ -171,9 +188,13 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_CLIENT_SECRET is required');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about projectId for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         projectId: undefined
@@ -186,9 +207,13 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_PROJECT_ID is required');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about authUrl for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         authUrl: undefined
@@ -201,9 +226,13 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_AUTH_URL is required');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it('should throw validation error about apiUrl for commerceToolsConfig', async () => {
+      expect.assertions(4);
+      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         apiUrl: undefined
@@ -216,6 +245,8 @@ describe('Connector config validations', () => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('CT_API_URL is required');
       }
+      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
   });
 });
