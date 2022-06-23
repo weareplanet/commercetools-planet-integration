@@ -1,3 +1,5 @@
+import { ICommerceToolsConfig, ConnectorEnvironment } from './interfaces';
+
 describe('Connector config validations', () => {
   const {
     CT_CLIENT_ID,
@@ -15,7 +17,7 @@ describe('Connector config validations', () => {
     apiUrl: CT_API_URL,
     merchants: CT_MERCHANTS,
   };
-  const setProcessEnvVars = (envVars: Record<string, any>) => {
+  const setProcessEnvVars = (envVars: ICommerceToolsConfig) => {
     if (envVars.clientId) {
       process.env.CT_CLIENT_ID = envVars.clientId;
     } else {
@@ -53,17 +55,21 @@ describe('Connector config validations', () => {
     projectId: 'projectId',
     authUrl: 'authUrl',
     apiUrl: 'apiUrl',
-    merchants: [{ id: 'id', password: 'password', environment: 'test' }],
+    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
   };
 
   afterAll(() => {
     // reset to default
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     setProcessEnvVars(originalEnvVarsValues);
     jest.resetModules();
   });
 
   describe('Validate commerTools config', () => {
     beforeEach(async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       setProcessEnvVars(originalEnvVarsValues);
       jest.resetModules();
     });
@@ -87,6 +93,8 @@ describe('Connector config validations', () => {
       jest.spyOn(logger, 'debug');
       setProcessEnvVars({
         ...testEnvVarsValues,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         merchants: [{ id: 1 }]
       });
 
@@ -104,7 +112,9 @@ describe('Connector config validations', () => {
     it('should throw validation error about merchants\' password for commerceToolsConfig', async () => {
       setProcessEnvVars({
         ...testEnvVarsValues,
-        merchants: [{ id: '1', password: 123, environment: 'test' }]
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST }]
       });
 
       try {
@@ -119,6 +129,8 @@ describe('Connector config validations', () => {
     it('should throw validation error about merchants\' id for commerceToolsConfig', async () => {
       setProcessEnvVars({
         ...testEnvVarsValues,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         merchants: [{ id: 1, password: '123', environment: 'test' }]
       });
 
