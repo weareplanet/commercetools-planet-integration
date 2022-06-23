@@ -5,7 +5,7 @@ import {
 } from '../../../interfaces';
 
 // Import all possible operation handlers
-import { default as createPaymentHandler } from '../per-operation-handlers/create-payment';
+import createPaymentHandler from '../per-operation-handlers/create-payment';
 
 ///// PREPARE A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
 
