@@ -206,7 +206,7 @@ describe('createPayment handler', () => {
           const response = await handler(request);
 
           expect(response.body).toMatchObject({
-            message: 'Custom field savedMethodsKey is missing in Payment'
+            message: 'Custom field savedPaymentMethodKey is missing in Payment'
           });
 
           expect(response.statusCode).toEqual(400);
