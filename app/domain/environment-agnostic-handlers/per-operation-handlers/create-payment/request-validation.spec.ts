@@ -1,12 +1,14 @@
 import handler  from '.';
 import { IAbstractRequestWithTypedBody } from '../../../../interfaces';
 import { RequestBodySchemaType } from './request-schema';
+import configService from '../../../services/config-service';
 
 describe('createPayment handler', () => {
 
   const requiredCustomFields = () => {
+    const merchantIdPresentInConfig = configService.getConfig().commerceToolsConfig?.merchants[0].id;
     return {
-      merchantId: 'merchantId string value',
+      merchantId: merchantIdPresentInConfig,
       successUrl: 'successUrl string value',
       errorUrl: 'errorUrl string value',
       cancelUrl: 'cancelUrl string value'
@@ -116,6 +118,42 @@ describe('createPayment handler', () => {
     });
   });
 
+  describe('merchantId specific validations', () => {
+    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+    beforeEach(() => {
+      request = requestWithOptionalFields();
+    });
+
+    describe('when the credentials for merchantId are PRESENT in config', () => {
+      beforeEach(() => {
+        const merchantIdPresentInConfig = configService.getConfig().commerceToolsConfig?.merchants[0].id;
+        request.body.custom.fields.merchantId = merchantIdPresentInConfig;
+      });
+
+      it('responds with 200', async () => {
+        const response = await handler(request);
+
+        expect(response.statusCode).toEqual(200);
+      });
+    });
+
+    describe('when the credentials for merchantId are ABSENT in config', () => {
+      beforeEach(() => {
+        request.body.custom.fields.merchantId = 'merchantIdAbsentInConfig';
+      });
+
+      it('responds with status 400 and the corresponding error message', async () => {
+        const response = await handler(request);
+
+        expect(response.body).toMatchObject({
+          message: 'Merchant credentials are missing'
+        });
+
+        expect(response.statusCode).toEqual(400);
+      });
+    });
+  });
+
   describe('Payment key specific validations', () => {
     let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
@@ -168,7 +206,7 @@ describe('createPayment handler', () => {
           const response = await handler(request);
 
           expect(response.body).toMatchObject({
-            message: 'Custom field savedMethodsKey is missing in Payment'
+            message: 'Custom field savedPaymentMethodKey is missing in Payment'
           });
 
           expect(response.statusCode).toEqual(400);
