@@ -1,15 +1,34 @@
 import * as yup from 'yup';
+import configService from '../../../services/config-service';
 
 const RequestBodySchema = yup.object({
-  key: yup.string().required('Field key is missing in Payment')
+  key: yup.string()
+    .required('Field key is missing in Payment')
     .max(20, 'Attribute key is longer than expected in Payment'),
   custom: yup.object({
     fields: yup.object({
-      merchantId: yup.string().required('Custom field merchantId is missing in Payment'), // TODO: try to use ${path}
-      successUrl: yup.string().required('Custom field successUrl is missing in Payment'),
-      errorUrl: yup.string().required('Custom field errorUrl is missing in Payment'),
-      cancelUrl: yup.string().required('Custom field cancelUrl is missing in Payment'),
-      savePaymentMethod: yup.boolean().optional()
+      merchantId: yup
+        .string()
+        .required('Custom field merchantId is missing in Payment')
+        .test((value, context) => {
+          const merchantConfig = configService.getConfig().commerceToolsConfig?.merchants.find((mc) => mc.id === value);
+          if (!merchantConfig || !merchantConfig.password) {
+            return context.createError({ message: 'Merchant credentials are missing' });
+          }
+          return true;
+        }),
+      successUrl: yup
+        .string()
+        .required('Custom field successUrl is missing in Payment'),
+      errorUrl: yup
+        .string()
+        .required('Custom field errorUrl is missing in Payment'),
+      cancelUrl: yup
+        .string()
+        .required('Custom field cancelUrl is missing in Payment'),
+      savePaymentMethod: yup
+        .boolean()
+        .optional()
         .when('savedPaymentMethodAlias', {
           is: (value: string) => !!value,
           then: (thisField) => thisField.test(
@@ -18,13 +37,19 @@ const RequestBodySchema = yup.object({
             (value) => !value
           )
         }),
-      savedPaymentMethodKey: yup.string().optional()
+      savedPaymentMethodKey: yup
+        .string()
+        .optional()
         .when('savePaymentMethod', {
           is: true,
           then: (thisField) => thisField.required('Custom field savedMethodsKey is missing in Payment')
         }),
-      savedPaymentMethodAlias: yup.string().optional(),
-      initRequest: yup.object().optional()
+      savedPaymentMethodAlias: yup
+        .string()
+        .optional(),
+      initRequest: yup
+        .object()
+        .optional()
         .test('initRequest content validator', (initRequestObj, context) => {
           if (!initRequestObj) {
             return true;
