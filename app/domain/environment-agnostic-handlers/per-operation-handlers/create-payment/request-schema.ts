@@ -46,7 +46,7 @@ const RequestBodySchema = yup.object({
         .string()
         .required(ErrorMessages.missingCustomField())
         .test((value, context) => {
-          const merchantConfig = configService.getConfig().commerceToolsConfig?.merchants.find((mc) => mc.id === value);
+          const merchantConfig = configService.getConfigValueByKey('merchants').find((mc) => mc.id === value);
           if (!merchantConfig || !merchantConfig.password) {
             return context.createError({ message: ErrorMessages.merchantCredentialsMissing() });
           }
