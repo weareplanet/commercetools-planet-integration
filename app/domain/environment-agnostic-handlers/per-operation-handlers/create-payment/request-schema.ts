@@ -6,45 +6,61 @@ const takeFieldNameFromPath = (path: string) => {
   return path.split('.').pop();
 };
 
+// Every message is a function for the sake of unification.
+// When it's possible (and makes sense) to force Yup to calculate the field name at the validation time - it returns a function (for Yup),
+// otherwise - returns a string calculated at the schema declaration time.
 const ErrorMessages = {
-  missingPaymentField: (params: MessageParams): string => `Field ${takeFieldNameFromPath(params.path)} is missing in Payment`,
-  longKey: () => 'Attribute key is longer than expected in Payment',
-  merchantCredentialsMissing: () => 'Merchant credentials are missing',
-  missingCustomField: (params: MessageParams): string => `Custom field ${takeFieldNameFromPath(params.path)} is missing in Payment`,
-  rejectedSavePaymentMethod: () => 'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty',
-  rejectedWebhook: () => 'Webhook is a connector wide setting; setting it individually per request is not supported',
-  // For the following messages I couldn't force Yup to calculate the field name -
-  // so you cannot just pass any of these functions to Yup,
-  // you have to call it on the schema declaration time
-  featureNotSupported: (fieldName: string): string => `Feature ${fieldName} not supported`,
-  featureDisablingNotSupported: (fieldName: string): string => `Feature ${takeFieldNameFromPath(fieldName)} disabling not supported`,
+  missingPaymentField: () => {
+    return (params: MessageParams) => `Field ${takeFieldNameFromPath(params.path)} is missing in Payment`;
+  },
+  missingCustomField: () => {
+    return (params: MessageParams) => `Custom field ${takeFieldNameFromPath(params.path)} is missing in Payment`;
+  },
+  longKey: () => {
+    return 'Attribute key is longer than expected in Payment';
+  },
+  merchantCredentialsMissing: () => {
+    return 'Merchant credentials are missing';
+  },
+  rejectedSavePaymentMethod: () => {
+    return 'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty';
+  },
+  rejectedWebhook: () => {
+    return 'Webhook is a connector wide setting; setting it individually per request is not supported';
+  },
+  featureNotSupported: (fieldName: string) => {
+    return `Feature ${fieldName} not supported`;
+  },
+  featureDisablingNotSupported: (fieldName: string) => {
+    return `Feature ${fieldName} disabling not supported`;
+  },
 };
 
 const RequestBodySchema = yup.object({
   key: yup.string()
-    .required(ErrorMessages.missingPaymentField)
-    .max(20, ErrorMessages.longKey),
+    .required(ErrorMessages.missingPaymentField())
+    .max(20, ErrorMessages.longKey()),
   custom: yup.object({
     fields: yup.object({
       merchantId: yup
         .string()
-        .required(ErrorMessages.missingCustomField)
+        .required(ErrorMessages.missingCustomField())
         .test((value, context) => {
           const merchantConfig = configService.getConfig().commerceToolsConfig?.merchants.find((mc) => mc.id === value);
           if (!merchantConfig || !merchantConfig.password) {
-            return context.createError({ message: ErrorMessages.merchantCredentialsMissing });
+            return context.createError({ message: ErrorMessages.merchantCredentialsMissing() });
           }
           return true;
         }),
       successUrl: yup
         .string()
-        .required(ErrorMessages.missingCustomField),
+        .required(ErrorMessages.missingCustomField()),
       errorUrl: yup
         .string()
-        .required(ErrorMessages.missingCustomField),
+        .required(ErrorMessages.missingCustomField()),
       cancelUrl: yup
         .string()
-        .required(ErrorMessages.missingCustomField),
+        .required(ErrorMessages.missingCustomField()),
       savePaymentMethod: yup
         .boolean()
         .optional()
@@ -52,7 +68,7 @@ const RequestBodySchema = yup.object({
           is: (value: string) => !!value,
           then: (thisField) => thisField.test(
             'savePaymentMethod vs savedPaymentMethodAlias validator',
-            ErrorMessages.rejectedSavePaymentMethod,
+            ErrorMessages.rejectedSavePaymentMethod(),
             (value) => !value
           )
         }),
@@ -61,7 +77,7 @@ const RequestBodySchema = yup.object({
         .optional()
         .when('savePaymentMethod', {
           is: true,
-          then: (thisField) => thisField.required(ErrorMessages.missingCustomField)
+          then: (thisField) => thisField.required(ErrorMessages.missingCustomField())
         }),
       savedPaymentMethodAlias: yup
         .string()
@@ -91,7 +107,7 @@ const RequestBodySchema = yup.object({
             .validateSync(initRequestObj.returnMobileToken);
 
           yup.mixed()
-            .test('mixed', ErrorMessages.rejectedWebhook, (value) => value === undefined)
+            .test('mixed', ErrorMessages.rejectedWebhook(), (value) => value === undefined)
             .validateSync(initRequestObj.webhook);
 
           return true;
