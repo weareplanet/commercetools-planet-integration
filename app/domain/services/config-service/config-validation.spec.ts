@@ -1,8 +1,10 @@
 import { ConnectorEnvironment } from './interfaces';
 import { ICommerceToolsConfig } from './schema';
 
-// 'config' module is globally mocked in the test environment - so to test its internals we need to unmock it
-jest.unmock('./index');
+
+
+// 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
+jest.unmock('./env-loader');
 
 describe('Connector config validations', () => {
   const {
@@ -13,6 +15,7 @@ describe('Connector config validations', () => {
     CT_API_URL,
     CT_MERCHANTS
   } = process.env;
+
   const originalEnvVarsValues = {
     clientId: CT_CLIENT_ID,
     clientSercet: CT_CLIENT_SECRET,
@@ -21,6 +24,16 @@ describe('Connector config validations', () => {
     apiUrl: CT_API_URL,
     merchants: CT_MERCHANTS,
   };
+
+  const testEnvVarsValues = {
+    clientId: 'clientId',
+    clientSercet: 'clientSercet',
+    projectId: 'projectId',
+    authUrl: 'authUrl',
+    apiUrl: 'apiUrl',
+    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+  };
+
   const setProcessEnvVars = (envVars: ICommerceToolsConfig) => {
     if (envVars.clientId) {
       process.env.CT_CLIENT_ID = envVars.clientId;
@@ -53,20 +66,14 @@ describe('Connector config validations', () => {
       delete process.env.CT_MERCHANTS;
     }
   };
+
+  // TODO: get rid of this weird async load in every test
   const loadLogger = async () => {
     const logger = (await import('../log-service')).default;
     jest.spyOn(logger, 'info');
     jest.spyOn(logger, 'debug');
 
     return logger;
-  };
-  const testEnvVarsValues = {
-    clientId: 'clientId',
-    clientSercet: 'clientSercet',
-    projectId: 'projectId',
-    authUrl: 'authUrl',
-    apiUrl: 'apiUrl',
-    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
   };
 
   afterAll(() => {
@@ -88,8 +95,8 @@ describe('Connector config validations', () => {
     it('should pass validation for commerceToolsConfig', async () => {
       expect.assertions(3);
       const logger = await loadLogger();
-      setProcessEnvVars(testEnvVarsValues);
 
+      setProcessEnvVars(testEnvVarsValues);
       const configService = (await import('.')).default;
 
       expect(configService.getConfig().commerceToolsConfig).toEqual(testEnvVarsValues);
