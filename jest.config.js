@@ -7,7 +7,6 @@ module.exports = {
     'app/**/*.ts',
     '!**/*spec.ts',
     '!**/*specs.ts',
-    '!app/domain/services/configs/*.config.ts'
   ],
   coverageReporters: [
     'json', 'html', 'text'

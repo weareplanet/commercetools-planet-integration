@@ -1,13 +1,37 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import { AbstractRequest, AbstractResponse, AbstractRequestHandler } from '../../interfaces';
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { IAbstractToEnvHandlerAdapter, IAbstractRequest, IAbstractResponse, IAbstractRequestHandler } from '../../interfaces';
 
 function bodyParcingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
-class AwsApiGatewayAdapter {
-  cloudRequestToAbstract(event: APIGatewayEvent): AbstractRequest {
+export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
+  createEnvSpecificHandler(handler: IAbstractRequestHandler) {
+    return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+      try {
+        const agnosticRequest: IAbstractRequest = this.cloudRequestToAbstract(event);
+        const agnosticResponse = await handler(agnosticRequest);
+        return this.abstractResponseToCloud(agnosticResponse);
+      } catch (err) {
+        // TODO: Handle err more accurately to distinguish 4xx from 5xx etc.
+
+        if (bodyParcingError(err)) {
+          return this.abstractResponseToCloud({
+            statusCode: HttpStatusCode.BAD_REQUEST,
+            body: { message: `Error of body parsing: ${err.message}` }
+          });
+        }
+
+        return this.abstractResponseToCloud({
+          statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
+          body: {}
+        });
+      }
+    };
+  }
+
+  private cloudRequestToAbstract(event: APIGatewayEvent) {
     return {
       // TODO: move the JSON parcing (and the corresponding error handling)
       // into app/domain/environment-agnostic-handlers
@@ -15,7 +39,7 @@ class AwsApiGatewayAdapter {
     };
   }
 
-  abstractResponseToCloud(agnosticResponse: AbstractResponse): APIGatewayProxyResult {
+  private abstractResponseToCloud(agnosticResponse: IAbstractResponse) {
     return this.createApiGatewayResponse(agnosticResponse.statusCode, agnosticResponse.body);
   }
 
@@ -33,33 +57,3 @@ class AwsApiGatewayAdapter {
     };
   }
 }
-
-export const createApiGatewayHandler = (handler: AbstractRequestHandler) => {
-  return async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    // const apiGatewayAdapter = new AwsApiGatewayAdapter();
-    // const abstractRequest: AbstractRequest = apiGatewayAdapter.cloudRequestToAbstract(event);
-    // const abstractResponse = await handler(abstractRequest);
-    // return apiGatewayAdapter.abstractResponseToCloud(abstractResponse);
-
-    const apiGatewayAdapter = new AwsApiGatewayAdapter();
-    try {
-      const agnosticRequest: AbstractRequest = apiGatewayAdapter.cloudRequestToAbstract(event);
-      const agnosticResponse = await handler(agnosticRequest);
-      return apiGatewayAdapter.abstractResponseToCloud(agnosticResponse);
-    } catch (err) {
-      // TODO: Handle err more accurately to distinguish 4xx from 5xx etc.
-
-      if (bodyParcingError(err)) {
-        return apiGatewayAdapter.abstractResponseToCloud({
-          statusCode: HttpStatusCode.BAD_REQUEST,
-          body: { message: `Error of body parsing: ${err.message}` }
-        });
-      }
-
-      return apiGatewayAdapter.abstractResponseToCloud({
-        statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
-        body: {}
-      });
-    }
-  };
-};

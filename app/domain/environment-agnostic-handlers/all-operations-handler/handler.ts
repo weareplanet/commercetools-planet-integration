@@ -1,15 +1,19 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import {
-  AbstractRequest,
-  AbstractResponse
+  IAbstractRequest,
+  IAbstractResponse
 } from '../../../interfaces';
+import { logConnectorVersion } from '../../services/connector-version-service';
 
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';
 
 ///// PREPARE A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
 
-export default async (req: AbstractRequest): Promise<AbstractResponse> => {
+export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
+  // Cross-envs connector initialization phase
+  logConnectorVersion();
+
   // Delegate the request to a proper handler depending on the req content
 
   if (typeof req.body === 'object' /* TODO: condition for the call on a Payment creation */) {
