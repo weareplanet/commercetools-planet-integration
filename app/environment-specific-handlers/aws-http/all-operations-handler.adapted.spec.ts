@@ -91,7 +91,7 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
   describe('rejecting on the adapter level (not even leveraging the lower-level environment-agnostic handler)', () => {
 
     describe('when the request body is not parsable to JSON', () => {
-      it('responds with status 400 from ', async () => {
+      it('responds with status 400', async () => {
         const event: APIGatewayProxyEvent = {
           httpMethod: 'POST',
           headers: {},
