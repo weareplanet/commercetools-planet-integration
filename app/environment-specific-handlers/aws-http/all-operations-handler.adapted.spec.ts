@@ -1,23 +1,97 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
+let fakeAllOpsAgnosticHandler: IAbstractRequestHandler; // exactly here, otherwise jest swears
+import { IAbstractResponse, IAbstractRequestHandler } from '../../interfaces';
 import { allOperationsHandler as allOperationsApiGatewayHandler } from './index';
 
-describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway', () => {
-  // TODO: All schema-related tests are on the lowest level (in app/domain/environment-agnostic-handlers/per-operation-handlers).
-  // On a higher level (here) - test only what is implemented here (mocking a lower-level handler)
-  // + a few integration tests (not covering everything)
-  // ---
-  // An example of a unit test:
-  // 1. Mock app/domain/environment-agnostic-handlers/index.ts.allOperationsHandler's implementation
-  // to return some correct AbstractResponse
-  // 2. Import and call the wrapped app/environment-specific-handlers/aws-http/index.ts.allOperationsHandler hadler
-  // with some correct APIGatewayProxyEvent and make sure that:
-  // - the underlying handler was called with the expected AbstractRequest
-  // - the underlying handler's mocked return is translated to the expected APIGatewayProxyResults
+const fakeAbstractResponse200: IAbstractResponse = {
+  statusCode: 200,
+  body: {
+    test: 'OK'
+  }
+};
 
-  describe('error cases', () => {
+jest.mock('../../domain/environment-agnostic-handlers', () => {
+  fakeAllOpsAgnosticHandler = jest.fn().mockImplementation(async (): Promise<IAbstractResponse> => fakeAbstractResponse200);
+  return {
+    // Stub the behavior of a lower-level env-sagnostic handler
+    // to TEST ONLY THE INTERACTION WITH IT from the higher lvel
+    allOperationHandler: fakeAllOpsAgnosticHandler
+  };
+});
+
+
+describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway', () => {
+
+  afterEach(() => {
+    (fakeAllOpsAgnosticHandler as jest.Mock).mockReset();
+  });
+
+  describe('leverageing the lower-level environment-agnostic handler', () => {
+
+    describe('when the request body is parsable to JSON', () => {
+      it('and the lower-level handler responds 200', async () => {
+        const event: APIGatewayProxyEvent = {
+          httpMethod: 'POST',
+          headers: {},
+          body: '{ "payload": "something" }' // serialized JSON
+        } as APIGatewayProxyEvent;
+
+        const response = await allOperationsApiGatewayHandler(event);
+
+        expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: { 'payload': 'something' } // JSON parsed into object
+          })
+        );
+
+        expect(response).toMatchObject({
+          statusCode: 200,
+          body: JSON.stringify(fakeAbstractResponse200.body)
+        });
+      });
+    });
+
+    describe('when the request body is parsable to JSON', () => {
+      const fakeAbstractResponse400: IAbstractResponse = {
+        statusCode: 400,
+        body: {
+          message: 'Something is wrong in the request'
+        }
+      };
+
+      beforeEach(() => {
+        (fakeAllOpsAgnosticHandler as jest.Mock).mockImplementation(async (): Promise<IAbstractResponse> => fakeAbstractResponse400);
+      });
+
+      it('and the lower-level handler responds 400', async () => {
+        const event: APIGatewayProxyEvent = {
+          httpMethod: 'POST',
+          headers: {},
+          body: '{ "payload": "something" }' // serialized JSON
+        } as APIGatewayProxyEvent;
+
+        const response = await allOperationsApiGatewayHandler(event);
+
+        expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: { 'payload': 'something' } // JSON parsed into object
+          })
+        );
+
+        expect(response).toMatchObject({
+          statusCode: 400,
+          body: JSON.stringify(fakeAbstractResponse400.body)
+        });
+      });
+    });
+
+  });
+
+
+  describe('rejecting on the adapter level (not even leveraging the lower-level environment-agnostic handler)', () => {
 
     describe('when the request body is not parsable to JSON', () => {
-      it('responds with status 400', async () => {
+      it('responds with status 400 from ', async () => {
         const event: APIGatewayProxyEvent = {
           httpMethod: 'POST',
           headers: {},
@@ -25,6 +99,8 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
         } as APIGatewayProxyEvent;
 
         const response = await allOperationsApiGatewayHandler(event);
+
+        expect(fakeAllOpsAgnosticHandler).not.toHaveBeenCalled();
 
         expect(response.statusCode).toEqual(400);
       });
