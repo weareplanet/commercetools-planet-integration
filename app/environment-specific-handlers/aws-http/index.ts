@@ -1,5 +1,5 @@
 import { AwsApiGatewayAdapter } from './api-gateway-adapter';
-import envAgnosticAllOpsHandler from '../../domain/environment-agnostic-handlers/all-operations-handler';
+import { allOperationHandler as envAgnosticAllOpsHandler }  from '../../domain/environment-agnostic-handlers';
 
 const awsApiGatewayAdapter = new AwsApiGatewayAdapter();
 
