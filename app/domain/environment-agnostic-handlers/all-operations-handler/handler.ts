@@ -4,6 +4,7 @@ import {
   IAbstractResponse
 } from '../../../interfaces';
 import { logConnectorVersion } from '../../services/connector-version-service';
+import configService from '../../services/config-service';
 
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';
@@ -13,6 +14,8 @@ import createPaymentHandler from '../per-operation-handlers/create-payment';
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
   // Cross-envs connector initialization phase
   logConnectorVersion();
+
+  configService.getConfig();
 
   // Delegate the request to a proper handler depending on the req content
 
