@@ -1,0 +1,82 @@
+{
+  "key": "pp-datatrans-securefields-payment-type",
+  "name": {
+    "en": "PlanetPaymentSecuredFieldPaymentType"
+  },
+  "resourceTypeIds": ["payment"],
+  "fieldDefinitions": [
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "merchantId",
+      "label": {
+        "en": "Merchant ID"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "returnUrl",
+      "label": {
+        "en": "Return URL"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "Boolean"
+      },
+      "name": "saveMethod",
+      "label": {
+        "en": "Save method"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "savedMethodsKey",
+      "label": {
+        "en": "Saved methods key"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "initRequest",
+      "label": {
+        "en": "Init Request"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "Enum",
+        "values": [
+          {"key": "status", "label": "status"}
+        ]
+      },
+      "name": "action",
+      "label": {
+        "en": "Action"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "transactionId",
+      "label": {
+        "en": "Transaction ID"
+      },
+      "required": false
+    }
+  ]
+}

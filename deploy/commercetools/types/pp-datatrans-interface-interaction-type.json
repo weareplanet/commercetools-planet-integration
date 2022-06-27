@@ -1,0 +1,53 @@
+{
+  "key": "pp-datatrans-interface-interaction-type",
+  "name": {
+    "en": "PlanetPaymentInterfaceInteractionType"
+  },
+  "resourceTypeIds": ["payment-interface-interaction"],
+  "fieldDefinitions": [
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "message",
+      "label": {
+        "en": "Message"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "DateTime"
+      },
+      "name": "timeStamp",
+      "label": {
+        "en": "Time Stamp"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "Enum",
+        "values": [
+          {"key": "initRequest", "label": "Initial Request"},
+          {"key": "initResponse", "label": "Initial Response"},
+          {"key": "authorizeSplitRequest", "label": "Authorize Request"},
+          {"key": "authorizeSplitResponse", "label": "Authorize Response"},
+          {"key": "statusResponse", "label": "Status Response"},
+          {"key": "webhook", "label": "Webhook"},
+          {"key": "refundRequest", "label": "Refund Request"},
+          {"key": "refundResponse", "label": "Refund Response"},
+          {"key": "settleRequest", "label": "Settle Request"},
+          {"key": "settleResponse", "label": "Settle Response"},
+          {"key": "cancelRequest", "label": "Cancel Request"},
+          {"key": "cancelResponse", "label": "Cancel Response"}
+        ]
+      },
+      "name": "interactionType",
+      "label": {
+        "en": "Interaction Type"
+      },
+      "required": true
+    }
+  ]
+}

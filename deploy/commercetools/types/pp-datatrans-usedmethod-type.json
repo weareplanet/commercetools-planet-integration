@@ -1,0 +1,29 @@
+{
+  "key": "pp-datatrans-usedmethod-type",
+  "name": {
+    "en": "PlanetPaymentUsedMethodType"
+  },
+  "resourceTypeIds": ["transaction"],
+  "fieldDefinitions": [
+  	{
+      "type": {
+        "name": "String"
+      },
+      "name": "paymentMethod",
+      "label": {
+        "en": "Payment Method"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "info",
+      "label": {
+        "en": "Info"
+      },
+      "required": true
+    }
+  ]
+}
