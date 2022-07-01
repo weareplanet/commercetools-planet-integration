@@ -3,16 +3,21 @@ export default {
     clientId: 'Test clientId',
     clientSercet: 'Test clientSercet',
     projectId: 'Test projectId',
-    authUrl: 'Test authUrl',
-    apiUrl: 'Test apiUrl',
+    authUrl: 'https://authUrl.fake',
+    apiUrl: 'https://apiUrl.fake',
   },
   datatrans: {
-    merchants: [
-      { id: 'Test_merchant_id', password: 'Test_merchant_password', environment: 'test' }
-    ],
     apiUrls: {
-      test: 'Test apiUrl',
-      prod: 'Prod apiUrl'
-    }
+      test: 'https://apiUrl.test.fake',
+      prod: 'https://apiUrl.prod.fake'
+    },
+    webhookUrl: 'https://webhookUrl.fake',
+    merchants: [
+      {
+        id: 'Test_merchant_id',
+        password: 'Test_merchant_password',
+        environment: 'test',
+        dtHmacKey: 'Test_merchant_dtHmacKey' }
+    ]
   }
 };

@@ -4,20 +4,19 @@ let fakeConfigValues: IAppConfig;
 jest.mock('./env-loader', () => {
   fakeConfigValues = {
     commerceTools: {
-      clientId: 'Test clientId value',
-      clientSercet: 'Test clientSercet value',
-      projectId: 'Test projectId value',
-      authUrl: 'Test authUrl value',
-      apiUrl: 'Test apiUrl value',
+      clientId: 'clientId',
+      clientSercet: 'clientSercet',
+      projectId: 'projectId',
+      authUrl: 'https://authUrl.test',
+      apiUrl: 'https://apiUrl.test',
     },
     datatrans: {
-      merchants: [
-        { id: 'TestMervchant id', password: 'TestMervchant password', environment: 'test' }
-      ],
       apiUrls: {
-        test: 'test apiUrl',
-        prod: 'prod apiUrl'
-      }
+        test: 'https://testUrl.test',
+        prod: 'https://prodUrl.test'
+      },
+      webhookUrl: 'https://webhookUrl.test',
+      merchants: [{ id: 'id', password: 'password', environment: 'test', dtHmacKey: 'HMAC key' }],
     }
   };
   return fakeConfigValues;
@@ -32,4 +31,5 @@ describe('ConfigService', () => {
       expect(configService.getConfig()).toMatchObject(fakeConfigValues);
     });
   });
+
 });
