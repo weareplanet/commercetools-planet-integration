@@ -11,9 +11,10 @@ describe('Connector config validations', () => {
     CT_PROJECT_ID,
     CT_AUTH_URL,
     CT_API_URL,
-    DT_MERCHANTS,
     DT_TEST_API_URL,
-    DT_PROD_API_URL
+    DT_PROD_API_URL,
+    DT_MERCHANTS,
+    DT_CONNECTOR_WEBHOOK_URL
   } = process.env;
 
   const originalEnvVarsValues = {
@@ -29,6 +30,7 @@ describe('Connector config validations', () => {
         test: DT_TEST_API_URL,
         prod: DT_PROD_API_URL
       },
+      webhookUrl: DT_CONNECTOR_WEBHOOK_URL,
       merchants: DT_MERCHANTS,
     }
   };
@@ -38,15 +40,16 @@ describe('Connector config validations', () => {
       clientId: 'clientId',
       clientSercet: 'clientSercet',
       projectId: 'projectId',
-      authUrl: 'authUrl',
-      apiUrl: 'apiUrl',
+      authUrl: 'https://authUrl.test',
+      apiUrl: 'https://apiUrl.test',
     },
     datatrans: {
       apiUrls: {
-        test: 'testUrl',
-        prod: 'prodUrl'
+        test: 'https://testUrl.test',
+        prod: 'https://prodUrl.test'
       },
-      merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+      webhookUrl: 'https://webhookUrl.test',
+      merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }],
     }
   };
 
@@ -76,11 +79,6 @@ describe('Connector config validations', () => {
     } else {
       delete process.env.CT_API_URL;
     }
-    if (envVars.datatrans.merchants) {
-      process.env.DT_MERCHANTS = envVars.datatrans.merchants ? JSON.stringify(envVars.datatrans.merchants) : undefined;
-    } else {
-      delete process.env.DT_MERCHANTS;
-    }
     if (envVars.datatrans.apiUrls.test) {
       process.env.DT_TEST_API_URL = envVars.datatrans.apiUrls.test;
     } else {
@@ -90,6 +88,16 @@ describe('Connector config validations', () => {
       process.env.DT_PROD_API_URL = envVars.datatrans.apiUrls.prod;
     } else {
       delete process.env.DT_PROD_API_URL;
+    }
+    if (envVars.datatrans.webhookUrl) {
+      process.env.DT_CONNECTOR_WEBHOOK_URL = envVars.datatrans.webhookUrl;
+    } else {
+      delete process.env.DT_CONNECTOR_WEBHOOK_URL;
+    }
+    if (envVars.datatrans.merchants) {
+      process.env.DT_MERCHANTS = envVars.datatrans.merchants ? JSON.stringify(envVars.datatrans.merchants) : undefined;
+    } else {
+      delete process.env.DT_MERCHANTS;
     }
   };
 
@@ -103,22 +111,21 @@ describe('Connector config validations', () => {
   };
 
   afterAll(() => {
-    // reset to default
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    setProcessEnvVars(originalEnvVarsValues);
+    setProcessEnvVars(originalEnvVarsValues); // reset to defaults
     jest.resetModules();
   });
 
-  describe('Validate commerTools config', () => {
+  describe('commerTools config validations', () => {
     beforeEach(async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      setProcessEnvVars(originalEnvVarsValues);
+      setProcessEnvVars(originalEnvVarsValues); // reset to defaults
       jest.resetModules();
     });
 
-    it('should pass validation for commerceToolsConfig', async () => {
+    it('should pass when all neccessary values are provided and correct', async () => {
       expect.assertions(3);
       const logger = await loadLogger();
 
@@ -130,83 +137,15 @@ describe('Connector config validations', () => {
       expect(logger.debug).toHaveBeenCalled();
     });
 
-    it('should throw validation error about merchants\' enviroment for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        datatrans: {
-          ...testEnvVarsValues.datatrans,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          merchants: [{ id: 1 }]
-        }
-      });
-
-      try {
-        await import('.');
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' enviroment specified');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
-    });
-
-    it('should throw validation error about merchants\' password for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        datatrans: {
-          ...testEnvVarsValues.datatrans,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST }]
-        }
-      });
-
-      try {
-        await import('.');
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' password as a string');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
-    });
-
-    it('should throw validation error about merchants\' id for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        datatrans: {
-          ...testEnvVarsValues.datatrans,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          merchants: [{ id: 1, password: '123', environment: 'test' }]
-        },
-      });
-
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' id as string');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
-    });
-
-    it('should throw validation error about clientId for commerceToolsConfig', async () => {
+    it('should throw validation error about clientId', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
           ...testEnvVarsValues.commerceTools,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           clientId: undefined
         }
       });
@@ -222,13 +161,15 @@ describe('Connector config validations', () => {
       expect(logger.debug).not.toHaveBeenCalled();
     });
 
-    it('should throw validation error about clientSercet for commerceToolsConfig', async () => {
+    it('should throw validation error about clientSercet', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
           ...testEnvVarsValues.commerceTools,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           clientSercet: undefined
         }
       });
@@ -244,13 +185,15 @@ describe('Connector config validations', () => {
       expect(logger.debug).not.toHaveBeenCalled();
     });
 
-    it('should throw validation error about projectId for commerceToolsConfig', async () => {
+    it('should throw validation error about projectId', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
           ...testEnvVarsValues.commerceTools,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           projectId: undefined
         }
       });
@@ -266,13 +209,15 @@ describe('Connector config validations', () => {
       expect(logger.debug).not.toHaveBeenCalled();
     });
 
-    it('should throw validation error about authUrl for commerceToolsConfig', async () => {
+    it('should throw validation error about authUrl', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
           ...testEnvVarsValues.commerceTools,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           authUrl: undefined
         }
       });
@@ -288,13 +233,15 @@ describe('Connector config validations', () => {
       expect(logger.debug).not.toHaveBeenCalled();
     });
 
-    it('should throw validation error about apiUrl for commerceToolsConfig', async () => {
+    it('should throw validation error about apiUrl', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
           ...testEnvVarsValues.commerceTools,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           apiUrl: undefined
         }
       });
@@ -308,6 +255,376 @@ describe('Connector config validations', () => {
       }
       expect(logger.info).not.toHaveBeenCalled();
       expect(logger.debug).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Datatrans config validations', () => {
+    beforeEach(async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      setProcessEnvVars(originalEnvVarsValues);
+      jest.resetModules();
+    });
+
+    describe('apiUrls validations', () => {
+      describe('apiUrls.prod', () => {
+        it('when prod URL is absent - should throw an error', async () => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              apiUrls: {
+                ...testEnvVarsValues.datatrans.apiUrls,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                prod: undefined
+              }
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('DT_PROD_API_URL is required');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when prod URL is malformed - should throw an error', async () => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              apiUrls: {
+                ...testEnvVarsValues.datatrans.apiUrls,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                prod: 'incorrect URL'
+              }
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('DT_PROD_API_URL must be a valid URL');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('apiUrls.test', () => {
+        it('when test URL is absent - should throw an error', async () => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              apiUrls: {
+                ...testEnvVarsValues.datatrans.apiUrls,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                test: undefined
+              }
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('DT_TEST_API_URL is required');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when test URL is malformed - should throw an error', async () => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              apiUrls: {
+                ...testEnvVarsValues.datatrans.apiUrls,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                test: 'incorrect URL'
+              }
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('DT_TEST_API_URL must be a valid URL');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('webhookUrl validations', () => {
+      it('when absent - should throw an error', async () => {
+        expect.assertions(4);
+        const logger = await loadLogger();
+        setProcessEnvVars({
+          ...testEnvVarsValues,
+          datatrans: {
+            ...testEnvVarsValues.datatrans,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            webhookUrl: undefined
+          }
+        });
+
+        try {
+          await import('.');
+          expect.assertions(1);
+        } catch (err) {
+          expect(err).toBeInstanceOf(Error);
+          expect(err.message).toEqual('DT_CONNECTOR_WEBHOOK_URL is required');
+        }
+        expect(logger.info).not.toHaveBeenCalled();
+        expect(logger.debug).not.toHaveBeenCalled();
+      });
+
+      it('when is malformed - should throw an error', async () => {
+        expect.assertions(4);
+        const logger = await loadLogger();
+        setProcessEnvVars({
+          ...testEnvVarsValues,
+          datatrans: {
+            ...testEnvVarsValues.datatrans,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            webhookUrl: 'incorrect URL'
+          }
+        });
+
+        try {
+          await import('.');
+          expect.assertions(1);
+        } catch (err) {
+          expect(err).toBeInstanceOf(Error);
+          expect(err.message).toEqual('DT_CONNECTOR_WEBHOOK_URL must be a valid URL');
+        }
+        expect(logger.info).not.toHaveBeenCalled();
+        expect(logger.debug).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('merchants validations', () => {
+
+      describe('should throw validation error about merchants\' id for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ password: '123', environment: 'test', dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: 1, password: '123', environment: 'test', dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('should throw validation error about merchants\' password for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: '1', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('should throw validation error about merchants\' enviroment for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: 'id', password: 'password', dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: 'id', password: 'password', environment: 'incorrect env value', dtHmacKey: 'HMAC key' }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('merchant\'s enviroment must be one of the following values: prod, stage, test');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('should throw validation error about merchants\' dtHmacKey for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          // expect.assertions(2);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            datatrans: {
+              ...testEnvVarsValues.datatrans,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 123 }]
+            }
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
     });
   });
 });

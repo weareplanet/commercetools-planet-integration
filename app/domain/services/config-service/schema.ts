@@ -17,19 +17,29 @@ const CommerceToolsConfigSchema = yup.object({
     .required('CT_PROJECT_ID is required'),
   authUrl: yup
     .string()
-    .typeError('CT_AUTH_URL must be a string')
+    .url('CT_AUTH_URL must be a valid URL')
     .required('CT_AUTH_URL is required'),
   apiUrl: yup
     .string()
-    .typeError('CT_API_URL must be a string')
+    .url('CT_API_URL must be a valid URL')
     .required('CT_API_URL is required'),
 });
 
 const DatatransConfigSchema = yup.object({
   apiUrls: yup.object({
-    test: yup.string().required(),
-    prod: yup.string().required(),
+    test: yup
+      .string()
+      .url('DT_TEST_API_URL must be a valid URL')
+      .required('DT_TEST_API_URL is required'),
+    prod: yup
+      .string()
+      .url('DT_PROD_API_URL must be a valid URL')
+      .required('DT_PROD_API_URL is required'),
   }),
+  webhookUrl: yup
+    .string()
+    .url('DT_CONNECTOR_WEBHOOK_URL must be a valid URL')
+    .required('DT_CONNECTOR_WEBHOOK_URL is required'),
   merchants: yup
     .array()
     .typeError('CT_MERCHANTS must be stringified array of objects')
@@ -38,17 +48,21 @@ const DatatransConfigSchema = yup.object({
         .object({
           id: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' id as string')
-            .required('CT_MERCHANTS must be stringified array with merchants\' id as string'),
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified'),
           password: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' password as a string')
-            .required('CT_MERCHANTS must be stringified array with merchants\' password as a string'),
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified'),
           environment: yup
             .string()
-            .oneOf(Object.values(ConnectorEnvironment))
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' enviroment specified')
-            .required('CT_MERCHANTS must be stringified array with merchants\' enviroment specified')
+            .oneOf(Object.values(ConnectorEnvironment), 'merchant\'s enviroment must be one of the following values: prod, stage, test')
+            // .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified'),
+          dtHmacKey: yup
+            .string()
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified')
         }).required()
     ).required('CT_MERCHANTS is required'),
 });
