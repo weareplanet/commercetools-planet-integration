@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 import { ConnectorEnvironment } from './interfaces';
 
-export const CommerceToolsConfigSchema = yup.object({
+const CommerceToolsConfigSchema = yup.object({
   clientId: yup
     .string()
     .typeError('CT_CLIENT_ID must be a string')
@@ -23,6 +23,13 @@ export const CommerceToolsConfigSchema = yup.object({
     .string()
     .typeError('CT_API_URL must be a string')
     .required('CT_API_URL is required'),
+});
+
+const DatatransConfigSchema = yup.object({
+  apiUrls: yup.object({
+    test: yup.string().required(),
+    prod: yup.string().required(),
+  }),
   merchants: yup
     .array()
     .typeError('CT_MERCHANTS must be stringified array of objects')
@@ -44,6 +51,13 @@ export const CommerceToolsConfigSchema = yup.object({
             .required('CT_MERCHANTS must be stringified array with merchants\' enviroment specified')
         }).required()
     ).required('CT_MERCHANTS is required'),
+});
+
+export const AppConfigSchema = yup.object({
+  commerceTools: CommerceToolsConfigSchema,
+  datatrans: DatatransConfigSchema
 }).required();
 
+export type IAppConfig = yup.InferType<typeof AppConfigSchema>;
 export type ICommerceToolsConfig = yup.InferType<typeof CommerceToolsConfigSchema>;
+export type IDatatransConfig = yup.InferType<typeof DatatransConfigSchema>;

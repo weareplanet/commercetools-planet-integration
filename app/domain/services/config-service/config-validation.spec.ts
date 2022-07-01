@@ -1,7 +1,5 @@
 import { ConnectorEnvironment } from './interfaces';
-import { ICommerceToolsConfig } from './schema';
-
-
+import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
 jest.unmock('./env-loader');
@@ -13,57 +11,85 @@ describe('Connector config validations', () => {
     CT_PROJECT_ID,
     CT_AUTH_URL,
     CT_API_URL,
-    CT_MERCHANTS
+    DT_MERCHANTS,
+    DT_TEST_API_URL,
+    DT_PROD_API_URL
   } = process.env;
 
   const originalEnvVarsValues = {
-    clientId: CT_CLIENT_ID,
-    clientSercet: CT_CLIENT_SECRET,
-    projectId: CT_PROJECT_ID,
-    authUrl: CT_AUTH_URL,
-    apiUrl: CT_API_URL,
-    merchants: CT_MERCHANTS,
+    commerceTools: {
+      clientId: CT_CLIENT_ID,
+      clientSercet: CT_CLIENT_SECRET,
+      projectId: CT_PROJECT_ID,
+      authUrl: CT_AUTH_URL,
+      apiUrl: CT_API_URL,
+    },
+    datatrans: {
+      apiUrls: {
+        test: DT_TEST_API_URL,
+        prod: DT_PROD_API_URL
+      },
+      merchants: DT_MERCHANTS,
+    }
   };
 
   const testEnvVarsValues = {
-    clientId: 'clientId',
-    clientSercet: 'clientSercet',
-    projectId: 'projectId',
-    authUrl: 'authUrl',
-    apiUrl: 'apiUrl',
-    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+    commerceTools: {
+      clientId: 'clientId',
+      clientSercet: 'clientSercet',
+      projectId: 'projectId',
+      authUrl: 'authUrl',
+      apiUrl: 'apiUrl',
+    },
+    datatrans: {
+      apiUrls: {
+        test: 'testUrl',
+        prod: 'prodUrl'
+      },
+      merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+    }
   };
 
-  const setProcessEnvVars = (envVars: ICommerceToolsConfig) => {
-    if (envVars.clientId) {
-      process.env.CT_CLIENT_ID = envVars.clientId;
+  const setProcessEnvVars = (envVars: IAppConfig) => {
+    if (envVars.commerceTools.clientId) {
+      process.env.CT_CLIENT_ID = envVars.commerceTools.clientId;
     } else {
       delete process.env.CT_CLIENT_ID;
     }
-    if (envVars.clientSercet) {
-      process.env.CT_CLIENT_SECRET = envVars.clientSercet;
+    if (envVars.commerceTools.clientSercet) {
+      process.env.CT_CLIENT_SECRET = envVars.commerceTools.clientSercet;
     } else {
       delete process.env.CT_CLIENT_SECRET;
     }
-    if (envVars.projectId) {
-      process.env.CT_PROJECT_ID = envVars.projectId;
+    if (envVars.commerceTools.projectId) {
+      process.env.CT_PROJECT_ID = envVars.commerceTools.projectId;
     } else {
       delete process.env.CT_PROJECT_ID;
     }
-    if (envVars.authUrl) {
-      process.env.CT_AUTH_URL = envVars.authUrl;
+    if (envVars.commerceTools.authUrl) {
+      process.env.CT_AUTH_URL = envVars.commerceTools.authUrl;
     } else {
       delete process.env.CT_AUTH_URL;
     }
-    if (envVars.apiUrl) {
-      process.env.CT_API_URL = envVars.apiUrl;
+    if (envVars.commerceTools.apiUrl) {
+      process.env.CT_API_URL = envVars.commerceTools.apiUrl;
     } else {
       delete process.env.CT_API_URL;
     }
-    if (envVars.merchants) {
-      process.env.CT_MERCHANTS = envVars.merchants ? JSON.stringify(envVars.merchants) : undefined;
+    if (envVars.datatrans.merchants) {
+      process.env.DT_MERCHANTS = envVars.datatrans.merchants ? JSON.stringify(envVars.datatrans.merchants) : undefined;
     } else {
-      delete process.env.CT_MERCHANTS;
+      delete process.env.DT_MERCHANTS;
+    }
+    if (envVars.datatrans.apiUrls.test) {
+      process.env.DT_TEST_API_URL = envVars.datatrans.apiUrls.test;
+    } else {
+      delete process.env.DT_TEST_API_URL;
+    }
+    if (envVars.datatrans.apiUrls.prod) {
+      process.env.DT_PROD_API_URL = envVars.datatrans.apiUrls.prod;
+    } else {
+      delete process.env.DT_PROD_API_URL;
     }
   };
 
@@ -99,7 +125,7 @@ describe('Connector config validations', () => {
       setProcessEnvVars(testEnvVarsValues);
       const configService = (await import('.')).default;
 
-      expect(configService.getConfig().commerceToolsConfig).toEqual(testEnvVarsValues);
+      expect(configService.getConfig()).toEqual(testEnvVarsValues);
       expect(logger.info).toHaveBeenCalled();
       expect(logger.debug).toHaveBeenCalled();
     });
@@ -109,9 +135,12 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: 1 }]
+        datatrans: {
+          ...testEnvVarsValues.datatrans,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          merchants: [{ id: 1 }]
+        }
       });
 
       try {
@@ -129,9 +158,12 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST }]
+        datatrans: {
+          ...testEnvVarsValues.datatrans,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST }]
+        }
       });
 
       try {
@@ -149,9 +181,12 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: 1, password: '123', environment: 'test' }]
+        datatrans: {
+          ...testEnvVarsValues.datatrans,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          merchants: [{ id: 1, password: '123', environment: 'test' }]
+        },
       });
 
       try {
@@ -170,7 +205,10 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        clientId: undefined
+        commerceTools: {
+          ...testEnvVarsValues.commerceTools,
+          clientId: undefined
+        }
       });
 
       try {
@@ -189,7 +227,10 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        clientSercet: undefined
+        commerceTools: {
+          ...testEnvVarsValues.commerceTools,
+          clientSercet: undefined
+        }
       });
 
       try {
@@ -208,7 +249,10 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        projectId: undefined
+        commerceTools: {
+          ...testEnvVarsValues.commerceTools,
+          projectId: undefined
+        }
       });
 
       try {
@@ -227,7 +271,10 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        authUrl: undefined
+        commerceTools: {
+          ...testEnvVarsValues.commerceTools,
+          authUrl: undefined
+        }
       });
 
       try {
@@ -246,7 +293,10 @@ describe('Connector config validations', () => {
       const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
-        apiUrl: undefined
+        commerceTools: {
+          ...testEnvVarsValues.commerceTools,
+          apiUrl: undefined
+        }
       });
 
       try {
