@@ -1,13 +1,11 @@
 import logger from '../log-service';
 import { InputValidationService } from '../input-validation-service';
 
-import { CommerceToolsConfigSchema, ICommerceToolsConfig } from './schema';
+import { AppConfigSchema, IAppConfig } from './schema';
 import configFromEnv from './env-loader';
 
 class ConfigService {
-  private config: {
-    commerceToolsConfig?: ICommerceToolsConfig,
-  } = {};
+  private config: IAppConfig;
 
   constructor() {
     this.init();
@@ -17,21 +15,16 @@ class ConfigService {
     return this.config;
   }
 
-  getConfigValueByKey<K extends keyof ICommerceToolsConfig>(key: K) {
-    // TODO: when we have some other config section(s) alongside with `commerceToolsConfig` -
-    // then enhance this logic (maybe support "path" key like `commerceToolsConfig.clientId`).
-    return this.config.commerceToolsConfig[key];
-  }
-
   private init() {
     const inputValidationService = new InputValidationService();
-    this.config.commerceToolsConfig = inputValidationService.transformAndValidate(
+    this.config = inputValidationService.transformAndValidate(
       configFromEnv,
-      CommerceToolsConfigSchema,
+      AppConfigSchema,
       { strict: true }
     );
 
-    logger.debug(this.config.commerceToolsConfig, 'CommerceTools config');
+    logger.debug(this.config.commerceTools, 'CommerceTools config');
+    logger.debug(this.config.datatrans, 'Datatrans config');
     logger.info('All configs are valid');
   }
 }

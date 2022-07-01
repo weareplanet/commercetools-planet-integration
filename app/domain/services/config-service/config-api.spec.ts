@@ -1,16 +1,24 @@
-import { ICommerceToolsConfig } from './schema';
+import { IAppConfig } from './schema';
 
-let fakeConfigValues: ICommerceToolsConfig;
+let fakeConfigValues: IAppConfig;
 jest.mock('./env-loader', () => {
   fakeConfigValues = {
-    clientId: 'Test clientId value',
-    clientSercet: 'Test clientSercet value',
-    projectId: 'Test projectId value',
-    authUrl: 'Test authUrl value',
-    apiUrl: 'Test apiUrl value',
-    merchants: [
-      { id: 'TestMervchant id', password: 'TestMervchant password', environment: 'test' }
-    ]
+    commerceTools: {
+      clientId: 'Test clientId value',
+      clientSercet: 'Test clientSercet value',
+      projectId: 'Test projectId value',
+      authUrl: 'Test authUrl value',
+      apiUrl: 'Test apiUrl value',
+    },
+    datatrans: {
+      merchants: [
+        { id: 'TestMervchant id', password: 'TestMervchant password', environment: 'test' }
+      ],
+      apiUrls: {
+        test: 'test apiUrl',
+        prod: 'prod apiUrl'
+      }
+    }
   };
   return fakeConfigValues;
 });
@@ -21,16 +29,7 @@ describe('ConfigService', () => {
 
   describe('getConfig', () => {
     it('returns the loaded variable set under `commerceToolsConfig` key', () => {
-      expect(configService.getConfig()).toMatchObject({
-        commerceToolsConfig: fakeConfigValues
-      });
+      expect(configService.getConfig()).toMatchObject(fakeConfigValues);
     });
   });
-
-  describe('getConfigValueByKey', () => {
-    it('returns the value kept under the specified key within `commerceToolsConfig`', () => {
-      expect(configService.getConfigValueByKey('projectId')).toEqual(fakeConfigValues.projectId);
-    });
-  });
-
 });

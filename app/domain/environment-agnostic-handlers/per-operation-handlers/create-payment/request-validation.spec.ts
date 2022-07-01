@@ -6,7 +6,7 @@ import configService from '../../../services/config-service';
 describe('createPayment handler', () => {
 
   const requiredCustomFields = () => {
-    const merchantIdPresentInConfig = configService.getConfig().commerceToolsConfig?.merchants[0].id;
+    const merchantIdPresentInConfig = configService.getConfig().datatrans?.merchants[0].id;
     return {
       merchantId: merchantIdPresentInConfig,
       successUrl: 'successUrl string value',
@@ -126,7 +126,7 @@ describe('createPayment handler', () => {
 
     describe('when the credentials for merchantId are PRESENT in config', () => {
       beforeEach(() => {
-        const merchantIdPresentInConfig = configService.getConfig().commerceToolsConfig?.merchants[0].id;
+        const merchantIdPresentInConfig = configService.getConfig().datatrans?.merchants[0].id;
         request.body.custom.fields.merchantId = merchantIdPresentInConfig;
       });
 
