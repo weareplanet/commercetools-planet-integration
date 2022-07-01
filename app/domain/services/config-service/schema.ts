@@ -31,17 +31,21 @@ export const CommerceToolsConfigSchema = yup.object({
         .object({
           id: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' id as string')
-            .required('CT_MERCHANTS must be stringified array with merchants\' id as string'),
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified'),
           password: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' password as a string')
-            .required('CT_MERCHANTS must be stringified array with merchants\' password as a string'),
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified'),
           environment: yup
             .string()
-            .oneOf(Object.values(ConnectorEnvironment))
-            .typeError('CT_MERCHANTS must be stringified array with merchants\' enviroment specified')
-            .required('CT_MERCHANTS must be stringified array with merchants\' enviroment specified')
+            .oneOf(Object.values(ConnectorEnvironment), 'merchant\'s enviroment must be one of the following values: prod, stage, test')
+            // .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified'),
+          dtHmacKey: yup
+            .string()
+            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string')
+            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified')
         }).required()
     ).required('CT_MERCHANTS is required'),
 }).required();

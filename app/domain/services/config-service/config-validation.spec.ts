@@ -31,7 +31,7 @@ describe('Connector config validations', () => {
     projectId: 'projectId',
     authUrl: 'authUrl',
     apiUrl: 'apiUrl',
-    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+    merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }],
   };
 
   const setProcessEnvVars = (envVars: ICommerceToolsConfig) => {
@@ -104,65 +104,177 @@ describe('Connector config validations', () => {
       expect(logger.debug).toHaveBeenCalled();
     });
 
-    it('should throw validation error about merchants\' enviroment for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: 1 }]
+    describe('CT_MERCHANS validations', () => {
+
+      describe('should throw validation error about merchants\' id for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ password: '123', environment: 'test', dtHmacKey: 'HMAC key' }]
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: 1, password: '123', environment: 'test', dtHmacKey: 'HMAC key' }]
+          });
+
+          try {
+            await import('.');
+            expect.assertions(1);
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
       });
 
-      try {
-        await import('.');
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' enviroment specified');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
-    });
+      describe('should throw validation error about merchants\' password for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: '1', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+          });
 
-    it('should throw validation error about merchants\' password for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST }]
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
       });
 
-      try {
-        await import('.');
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' password as a string');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
-    });
+      describe('should throw validation error about merchants\' enviroment for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: 'id', password: 'password', dtHmacKey: 'HMAC key' }],
+          });
 
-    it('should throw validation error about merchants\' id for commerceToolsConfig', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
-      setProcessEnvVars({
-        ...testEnvVarsValues,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        merchants: [{ id: 1, password: '123', environment: 'test' }]
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: 'id', password: 'password', environment: 'incorrect env value', dtHmacKey: 'HMAC key' }],
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('merchant\'s enviroment must be one of the following values: prod, stage, test');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_MERCHANTS must be stringified array with merchants\' id as string');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      describe('should throw validation error about merchants\' dtHmacKey for commerceToolsConfig', () => {
+        it('when it is absent', async() => {
+          expect.assertions(4);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }],
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+
+        it('when it is malformed', async() => {
+          // expect.assertions(2);
+          const logger = await loadLogger();
+          setProcessEnvVars({
+            ...testEnvVarsValues,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 123 }],
+          });
+
+          try {
+            await import('.');
+          } catch (err) {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
+          }
+          expect(logger.info).not.toHaveBeenCalled();
+          expect(logger.debug).not.toHaveBeenCalled();
+        });
+      });
     });
 
     it('should throw validation error about clientId for commerceToolsConfig', async () => {
