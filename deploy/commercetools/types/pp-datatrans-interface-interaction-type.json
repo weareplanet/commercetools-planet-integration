@@ -1,7 +1,7 @@
 {
   "key": "pp-datatrans-interface-interaction-type",
   "name": {
-    "en": "PlanetPaymentInterfaceInteractionType"
+    "en": "PlanetPaymentCustomInteractionType"
   },
   "resourceTypeIds": ["payment-interface-interaction"],
   "fieldDefinitions": [

@@ -17,7 +17,8 @@ export default {
         id: 'Test_merchant_id',
         password: 'Test_merchant_password',
         environment: 'test',
-        dtHmacKey: 'Test_merchant_dtHmacKey' }
+        dtHmacKey: 'Test_merchant_dtHmacKey'
+      }
     ]
   }
 };

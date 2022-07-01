@@ -1,7 +1,7 @@
 import {
-  CommerceToolsCustomTypesKey,
-  InterfaceInteraction,
-  InterfaceInteractionType,
+  CommerceToolsCustomTypeKey,
+  ICommerceToolsCustomInterfaceInteractionInfo,
+  CommerceToolsCustomInteractionType,
 } from '../../../interfaces';
 
 import { PaymentUpdateAction } from '@commercetools/platform-sdk';
@@ -30,12 +30,12 @@ export class CommerceToolsActionsBuilder {
     return this;
   }
 
-  addInterfaceInteraction(interactionType: InterfaceInteractionType, message: InterfaceInteraction) {
+  addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, message: ICommerceToolsCustomInterfaceInteractionInfo) {
     this.actions.push({
       action: 'addInterfaceInteraction',
       type: {
         typeId: 'type',
-        key: CommerceToolsCustomTypesKey.PlanetPaymentInterfaceInteractionType,
+        key: CommerceToolsCustomTypeKey.PlanetPaymentCustomInteractionType,
       },
       fields: {
         message: JSON.stringify(message),

@@ -1,10 +1,10 @@
-import { ExtensionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
+import { ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
 import { detectOperation, PaymentCreateOperation, PaymentInterface } from './operation-detector';
 
 describe('Operation mapping', () => {
   it('should return "Redirect And Lightbox Init"', () => {
     const body: ICommerceToolsExtensionRequestBoby = {
-      action: ExtensionAction.Create,
+      action: 'Create',
       resource: {
         obj: {
           paymentMethodInfo: {
@@ -16,7 +16,7 @@ describe('Operation mapping', () => {
           paymentStatus: {}
         }
       }
-    };
+    } as ICommerceToolsExtensionRequestBoby; // TODO: Find a solution for optional fields in the Yup.TypeOf result...
 
     const result = detectOperation(body);
 

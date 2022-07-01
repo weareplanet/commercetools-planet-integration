@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import { DatatransEnvironment } from './interfaces';
+import { DatatransEnvironment } from '../../../interfaces';
 
 const CommerceToolsConfigSchema = yup.object({
   clientId: yup
@@ -56,7 +56,7 @@ const DatatransConfigSchema = yup.object({
             .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified'),
           environment: yup
             .string()
-            .oneOf(Object.values(DatatransEnvironment), 'merchant\'s enviroment must be one of the following values: prod, stage, test')
+            .oneOf(Object.values(DatatransEnvironment), 'merchant\'s enviroment must be one of the following values: ${values}')
             // .typeError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment as string')
             .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified'),
           dtHmacKey: yup

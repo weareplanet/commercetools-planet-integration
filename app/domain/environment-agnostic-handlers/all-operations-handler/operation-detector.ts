@@ -1,4 +1,4 @@
-import { ExtensionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
+import { ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
 const hasProperties = (obj: object, fields: string[]) => obj && fields.every((field) => obj.hasOwnProperty(field));
@@ -14,7 +14,7 @@ export enum PaymentInterface {
 export const detectOperation = (body: ICommerceToolsExtensionRequestBoby) => {
   const payment = body.resource.obj;
   const isRedirectLightboxPaymentFlow =
-    body?.action === ExtensionAction.Create
+    body?.action === 'Create'
     && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
     && !hasProperties(payment?.custom?.fields, ['transactionId', 'savedPaymentMethodAlias'])
     && !payment?.paymentStatus?.interfaceCode;

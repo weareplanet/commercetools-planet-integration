@@ -1,3 +1,12 @@
+export enum DatatransEnvironment {
+  PROD = 'prod',
+  TEST = 'test'
+}
+
+export {
+  type RequestBodySchemaType as IWebhookRequestBody
+} from '../domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification/request-schema';
+
 export enum DatatransPaymentMethod {
   ACC = 'ACC',
   ALP = 'ALP',
@@ -46,7 +55,19 @@ export enum DatatransPaymentMethod {
   WEC = 'WEC'
 }
 
-export interface IInitializeTransaction {
+export enum DatatransTransactionStatus {
+  initialized = 'initialized',
+  challenge_required = 'challenge_required',
+  challenge_ongoing = 'challenge_ongoing',
+  authenticated = 'authenticated',
+  authorized = 'authorized',
+  settled = 'settled',
+  canceled = 'canceled',
+  transmitted = 'transmitted',
+  failed = 'failed'
+}
+
+export interface IDatatransInitializeTransaction {
   currency: string; // 3 letter ISO-4217
   refno: string; // [1...20]
   amount?: number;

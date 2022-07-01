@@ -1,13 +1,13 @@
 import { createSchema, morphism } from 'morphism';
 
 import {
-  IInitializeTransaction,
-  ICommerceToolsPaymentType,
+  IDatatransInitializeTransaction,
+  ICommerceToolsPayment,
   DatatransPaymentMethod
 } from '../../../interfaces';
 
-export const toInitializeTransaction = (payment: ICommerceToolsPaymentType, webhookUrl: string): IInitializeTransaction => {
-  const result = morphism(createSchema<IInitializeTransaction, ICommerceToolsPaymentType>({
+export const toInitializeTransaction = (payment: ICommerceToolsPayment, webhookUrl: string): IDatatransInitializeTransaction => {
+  const result = morphism(createSchema<IDatatransInitializeTransaction, ICommerceToolsPayment>({
     refno: ({ key }) => key,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
     amount: ({ amountPlanned }) => amountPlanned?.centAmount,
