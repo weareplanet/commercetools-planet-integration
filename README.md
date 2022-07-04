@@ -120,7 +120,7 @@ In a local development environment the connector can be running with use of Serv
 
 #### Steps to run the application locally
 
-1. Befor run the project you need provide all enviroment veriables into app. For making it, you need create `.env` and provide all necessary values from [Enviroment configuration](#enviroment-configuration) or you can simply rename `.env.example` to `.env` and fill with correct values.
+1. Before run the project you need provide all enviroment veriables into app. For making it, you need create `.env` and provide all necessary values from [Enviroment configuration](#enviroment-configuration) or you can simply rename `.env.example` to `.env` and fill with correct values.
 2. Run the app.
 
 `npm run start:local-dev`
