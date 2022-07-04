@@ -1,9 +1,9 @@
-import { ExtentionAction, IExtensionRequestBody } from '../../../interfaces';
-import { getOperation, PaymentCreateOperation, PaymentInterface } from './operations-mapper';
+import { ExtentionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
+import { detectOperation, PaymentCreateOperation, PaymentInterface } from './operation-detector';
 
 describe('Operation mapping', () => {
   it('should return "Redirect And Lightbox Init"', () => {
-    const body: IExtensionRequestBody = {
+    const body: ICommerceToolsExtensionRequestBoby = {
       action: ExtentionAction.Create,
       resource: {
         obj: {
@@ -18,7 +18,7 @@ describe('Operation mapping', () => {
       }
     };
 
-    const result = getOperation(body);
+    const result = detectOperation(body);
 
     expect(result).toEqual(PaymentCreateOperation.RedirectAndLightboxInit);
   });
@@ -28,9 +28,9 @@ describe('Operation mapping', () => {
       resource: {
         obj: {}
       }
-    } as IExtensionRequestBody;
+    } as ICommerceToolsExtensionRequestBoby;
 
-    const result = getOperation(body);
+    const result = detectOperation(body);
 
     expect(result).toEqual('');
   });

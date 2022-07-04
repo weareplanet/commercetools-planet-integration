@@ -1,17 +1,17 @@
 import {
-  CommerceToolsTypesKey,
+  CommerceToolsCustomTypesKey,
   InterfaceInteraction,
   InterfaceInteractionType,
-  PaymentUpdateActions,
-  PaymentUpdateActionsType,
 } from '@app/interfaces';
 
+import { PaymentUpdateAction } from '@commercetools/platform-sdk';
+
 export class CommerceToolsActionsBuilder {
-  private actions: PaymentUpdateActions[] = [];
+  private actions: PaymentUpdateAction[] = [];
 
   setCustomField(field: string, value: unknown) {
     this.actions.push({
-      action: PaymentUpdateActionsType.SetCustomField,
+      action: 'setCustomField',
       name: field,
       value: value
     });
@@ -22,7 +22,7 @@ export class CommerceToolsActionsBuilder {
   setStatus(payload: { interfaceCode: string }) {
     if (payload.interfaceCode) {
       this.actions.push({
-        action: PaymentUpdateActionsType.SetStatusInterfaceCode,
+        action: 'setStatusInterfaceCode',
         interfaceCode: payload.interfaceCode
       });
     }
@@ -32,9 +32,10 @@ export class CommerceToolsActionsBuilder {
 
   addInterfaceInteraction(interactionType: InterfaceInteractionType, message: InterfaceInteraction) {
     this.actions.push({
-      action: PaymentUpdateActionsType.AddInterfaceInteraction,
+      action: 'addInterfaceInteraction',
       type: {
-        key: CommerceToolsTypesKey.PlanetPaymentInterfaceInteractionType,
+        typeId: 'type',
+        key: CommerceToolsCustomTypesKey.PlanetPaymentInterfaceInteractionType,
       },
       fields: {
         message: JSON.stringify(message),

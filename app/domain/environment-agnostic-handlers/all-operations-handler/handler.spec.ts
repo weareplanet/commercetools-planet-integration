@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import handler from './handler';
 
 describe('Main handler', () => {
-  it('should go throw default flow', async () => {
+  it('should go through default flow', async () => {
     const req = {
       body: {
         resource: {

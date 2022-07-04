@@ -34,46 +34,15 @@ export interface InterfaceInteraction {
   [key: string]: unknown;
 }
 
-export enum PaymentUpdateActionsType {
-  SetCustomField = 'setCustomField',
-  SetStatusInterfaceCode = 'setStatusInterfaceCode',
-  AddInterfaceInteraction = 'addInterfaceInteraction'
-}
-
-export interface ISetCustomFiledAction {
-  action: PaymentUpdateActionsType.SetCustomField;
-  name: string;
-  value: unknown; // it must be the same type as you customField in commerceTools
-}
-
-export interface ISetStatusInterfaceCodeAction {
-  action: PaymentUpdateActionsType.SetStatusInterfaceCode,
-  interfaceCode: string;
-}
-
 // !IMPORTANT!: values must have the same name as "key" field in files '/deploy/commercetools/types'
-export enum CommerceToolsTypesKey {
+export enum CommerceToolsCustomTypesKey {
   PlanetPaymentRedirectPaymentType = 'pp-datatrans-redirect-payment-type',
   PlanetPaymentSecuredFieldPaymentType = 'pp-datatrans-securefields-payment-type',
   PlanetPaymentInterfaceInteractionType = 'pp-datatrans-interface-interaction-type',
   PlanetPaymentUsedMethodType = 'pp-datatrans-usedmethod-type'
 }
 
-export interface IAddInterfaceInteractionAction {
-  action: PaymentUpdateActionsType.AddInterfaceInteraction,
-  type: {
-    key: CommerceToolsTypesKey;
-  },
-  fields: {
-    message: string;
-    timeStamp: string,
-    interactionType: InterfaceInteractionType;
-  }
-}
-
-export type PaymentUpdateActions = ISetCustomFiledAction | ISetStatusInterfaceCodeAction | IAddInterfaceInteractionAction;
-
-export interface IExtensionRequestBody {
+export interface ICommerceToolsExtensionRequestBoby {
   action: ExtentionAction,
   resource: {
     obj: IPayment;
