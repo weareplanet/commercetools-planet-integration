@@ -1,4 +1,4 @@
-export enum PaymentMethod {
+export enum DatatransPaymentMethod {
   ACC = 'ACC',
   ALP = 'ALP',
   APL = 'APL',
@@ -50,7 +50,7 @@ export interface IInitializeTransaction {
   currency: string; // 3 letter ISO-4217
   refno: string; // [1...20]
   amount?: number;
-  paymentMethods?: PaymentMethod[];
+  paymentMethods?: DatatransPaymentMethod[];
   language?: string;
   option?: {
     createAlias: boolean;
