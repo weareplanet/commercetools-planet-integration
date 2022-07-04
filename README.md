@@ -86,37 +86,20 @@ After the building the same structure as was before in `app` directory (but alre
 
 ### Enviroment configuration
 
-The program is using `process.env` for set up enviroment configuration. We have following enviroment veriables:
+The program is using environment variables to initialize application configuration. We have following enviroment veriables:
 
-[in progress]
-| Variable name    | Type                                                    | Required  | Default | Semantics       |
-|------------------|----------------------------------------------------------------|-----------|---------|-----------------|
-| LOG_LEVEL        |  one of string: trace, debug, info, warn, error, fatal, silent |    -      | debug   | string          |
-| CT_CLIENT_ID     |  string `example: 4XmKDlB_Vb4jU7a93EcJwsHj`           |    +      |         | string          |
-| CT_CLIENT_SECRET |             |    +      |         | string          |
-| CT_PROJECT_ID    |             |    +      |         | string          |
-| CT_AUTH_URL      |             |    +      |         | string          |
-| CT_API_URL       |             |    +      |         | string          |
-| CT_MERCHANTS     |             |    +      |         | string          |
-| CT_MERCHANTS     |             |    +      |         | stringified Array<{ id*: string, password*: string, environment: 'test' | 'prod' }>          |
-
-
-#### Required fields
-```
-CT_CLIENT_ID - CommerceTools client id
-CT_CLIENT_SECRET - CommerceTools client secret
-CT_PROJECT_ID - CommerceTools project ID
-CT_AUTH_URL - CommerceTools authentication URL
-CT_API_URL - CommerceTools API URL
-CT_MERCHANTS - array of objects which containes merchant `id`, `password` and `enviroment`
-# TODO: maybe need add info about where it get
-```
-
-#### Optional fields
-
-```
-LOG_LEVEL - fatal, error, warn, info, debug, trace or silent. Default: debug
-```
+| Variable name            | Value format                                                                                        | Required  | Default | Semantics |
+|--------------------------|-----------------------------------------------------------------------------------------------------|-----------|---------|-----------|
+| LOG_LEVEL                |  `string` one of: `trace, debug, info, warn, error, fatal, silent  `                                |    -      | debug   | Level of logs which application will show |
+| CT_CLIENT_ID             |  `string` Example: `4XmKDlB_Vb4jU7a93EcJwsHj`                                                       |    +      |         | [CommerceTools credantials](https://docs.commercetools.com/getting-started/create-api-client) which need for comunication |
+| CT_CLIENT_SECRET         |  `string` Example: `sUEvUKiJ-LQGGj3P6uvmrbk8UV4Odrtc`                                               |    +      |         | [CommerceTools credantials](https://docs.commercetools.com/getting-started/create-api-client) which need for comunication |
+| CT_PROJECT_ID            |  `string`                                                                                           |    +      |         | [CommerceTools credantials](https://docs.commercetools.com/getting-started/create-api-client) which need for comunication |
+| CT_AUTH_URL              |  `URL`. Example: `https://auth.us-central1.gcp.commercetools.com`                                   |    +      |         | [CommerceTools credantials](https://docs.commercetools.com/getting-started/create-api-client) which need for comunication |
+| CT_API_URL               |  `URL`. Example: `https://api.us-central1.gcp.commercetools.com`                                    |    +      |         | [CommerceTools credantials](https://docs.commercetools.com/getting-started/create-api-client) which need for comunication |
+| DT_MERCHANTS             |  `Stringified JSON array of objects` which containes merchant `id`, `password` and `enviroment`     |    +      |         | [Merchant credantials](https://api-reference.datatrans.ch/#section/Authentication) |
+| DT_TEST_API_URL          |  `URL`. Example: `	https://api.sandbox.datatrans.com/v1`                                            |    +      |         | DataTrans has two environments |
+| DT_PROD_API_URL          |  `URL`. Example: `	https://api.datatrans.com/v1`                                                    |    +      |         | DataTrans has two environments |
+| DT_CONNECTOR_WEBHOOK_URL |  `URL`. Example: `	https://example.com`                                                             |    +      |         | The [URL to be used by Datatrans for Webhook requests](https://api-reference.datatrans.ch/#section/Webhook) |
 
 ## Deployment
 
@@ -135,7 +118,7 @@ If you prefer to use another deployment tool - you are free to ignore `serverles
 
 In a local development environment the connector can be running with use of Serverless Framework and [Serverless Offline plugin](serverless.com/plugins/serverless-offline)
 
-#### Steps for running local development
+#### Steps to run the application locally
 
 1. Befor run the project you need provide all enviroment veriables into app. For making it, you need create `.env` and provide all necessary values from [Enviroment configuration](#enviroment-configuration) or you can simply rename `.env.example` to `.env` and fill with correct values.
 2. Run the app.

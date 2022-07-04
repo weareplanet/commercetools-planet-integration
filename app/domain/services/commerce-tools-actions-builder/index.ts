@@ -7,7 +7,7 @@ import {
 } from '@app/interfaces';
 
 export class CommerceToolsActionsBuilder {
-  private actions: PaymentUpdateActions[] = []; // specifie interface
+  private actions: PaymentUpdateActions[] = [];
 
   setCustomField(field: string, value: unknown) {
     this.actions.push({
