@@ -61,7 +61,6 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
         statusCode: HttpStatusCode.BAD_REQUEST,
         body: {
           message: `Error of body parsing: ${err.message}`,
-          errors: [err]
         }
       });
     }

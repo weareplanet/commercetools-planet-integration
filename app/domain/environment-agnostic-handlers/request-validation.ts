@@ -7,7 +7,7 @@ import {
   IAbstractRequestHandler,
   IAbstractRequestWithTypedBody,
   IAbstractRequestHandlerWithTypedInput
-} from '@app/interfaces/handler-specific';
+} from '@app/interfaces';
 import logger from '../services/log-service';
 import { InputValidationService } from '../services/input-validation-service';
 
