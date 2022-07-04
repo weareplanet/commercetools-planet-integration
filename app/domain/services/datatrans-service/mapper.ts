@@ -1,10 +1,13 @@
 import { createSchema, morphism } from 'morphism';
 
-import { IInitializeTransaction, PaymentMethod } from '@app/interfaces/datatrans';
-import { PaymentSchemaType } from '@domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema';
+import {
+  IInitializeTransaction,
+  ICommerceToolsPaymentType,
+  PaymentMethod
+} from '@app/interfaces';
 
-export const toInitializeTransaction = (payment: PaymentSchemaType): IInitializeTransaction => {
-  const result = morphism(createSchema<IInitializeTransaction, PaymentSchemaType>({
+export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IInitializeTransaction => {
+  const result = morphism(createSchema<IInitializeTransaction, ICommerceToolsPaymentType>({
     refno: ({ custom }) => custom?.fields?.merchantId,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
     amount: ({ amountPlanned }) => amountPlanned?.centAmount,

@@ -1,4 +1,4 @@
-import { ExtentionAction, IExtensionRequestBody } from '@app/interfaces';
+import { ExtentionAction, ICommerceToolsExtensionRequestBoby } from '@app/interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
 const hasProperties = (obj: object, fields: string[]) => obj && fields.every((field) => obj.hasOwnProperty(field));
@@ -11,7 +11,7 @@ export enum PaymentInterface {
   DataTransRedirectIntegration = 'pp-datatrans-redirect-integration'
 }
 
-export const getOperation = (body: IExtensionRequestBody) => {
+export const detectOperation = (body: ICommerceToolsExtensionRequestBoby) => {
   const payment = body.resource.obj;
   const isRedirectLightboxPaymentFlow =
     body?.action === ExtentionAction.Create

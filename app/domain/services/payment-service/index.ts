@@ -1,15 +1,15 @@
 // This service implements the domain logic
 // when necessary - does necessary requests to datatrans (using DatatransService).
-import { InterfaceInteractionType, PaymentUpdateActions } from '@app/interfaces';
-import { PaymentSchemaType } from '@domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema';
+import { PaymentUpdateAction } from '@commercetools/platform-sdk';
 
+import { InterfaceInteractionType, ICommerceToolsPaymentType } from '@app/interfaces';
 import logger from '../log-service';
 import { DatatransService } from '../datatrans-service';
 import { CommerceToolsActionsBuilder } from '../commerce-tools-actions-builder';
 import { toInitializeTransaction } from '../datatrans-service/mapper';
 
 export class PaymentService {
-  async initRedirectLightboxPayment(payment: PaymentSchemaType): Promise<PaymentUpdateActions[]> {
+  async initRedirectAndLightboxInit(payment: ICommerceToolsPaymentType): Promise<PaymentUpdateAction[]> {
     const datatransService = new DatatransService();
     const actionsBuilder = new CommerceToolsActionsBuilder();
     const initializeTransactionPayload = toInitializeTransaction(payment);
