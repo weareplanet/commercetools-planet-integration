@@ -1,10 +1,13 @@
 #!/bin/bash
 
-CTP_PROJECT_KEY=""
-CTP_CLIENT_SECRET=""
-CTP_CLIENT_ID=""
-CTP_AUTH_URL=""
-CTP_API_URL=""
+# This script is just an example, the final real-life implementation may be quite different.
+
+# You can get some insights about the variables semantics in README.md at the repository root.
+CT_PROJECT_ID=""
+CT_CLIENT_SECRET=""
+CT_CLIENT_ID=""
+CT_AUTH_URL=""
+CT_API_URL=""
 CTP_SCOPES=""
 
 #{
@@ -13,8 +16,8 @@ CTP_SCOPES=""
 #	"expires_in":172800,
 #	"scope":"manage_project:planetpayment-discovery"
 #}
-ACCESS_TOKEN=$(curl ${CTP_AUTH_URL}/oauth/token \
-     --basic --user "${CTP_CLIENT_ID}:${CTP_CLIENT_SECRET}" \
+ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token \
+     --basic --user "${CT_CLIENT_ID}:${CT_CLIENT_SECRET}" \
      -X POST \
      -d "grant_type=client_credentials&scope=${CTP_SCOPES}" |\
      jq -r '.access_token')
@@ -26,7 +29,7 @@ for filename in ./types/*.json; do
 	echo "Checking if ${typeKey} exists in commercetools..."
 
 	statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
-		-X GET ${CTP_API_URL}/${CTP_PROJECT_KEY}/types/key=${typeKey} -i \
+		-X GET ${CT_API_URL}/${CT_PROJECT_ID}/types/key=${typeKey} -i \
 		--header "Authorization: Bearer ${ACCESS_TOKEN}")
 
 	if [[ $statusCode -eq 404 ]]
@@ -34,7 +37,7 @@ for filename in ./types/*.json; do
 		echo "   Type ${typeKey} does not exists in commercetools. Creating..."
 
 		statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
-			-X POST ${CTP_API_URL}/${CTP_PROJECT_KEY}/types -i \
+			-X POST ${CT_API_URL}/${CTP_PROJECT_KEY}/types -i \
 			--header "Authorization: Bearer ${ACCESS_TOKEN}" \
 			--header 'Content-Type: application/json' \
 			--data-binary "@${filename}")
@@ -44,7 +47,7 @@ for filename in ./types/*.json; do
 			echo "      Type ${typeKey} successfully created!"
 		else
 			echo "      Got HTTP ${statusCode}. Not expected!"
-		fi 
+		fi
 
 	elif [[ $statusCode -eq 200 ]]
 	then
