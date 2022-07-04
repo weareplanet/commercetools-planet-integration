@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import handler from './handler';
 
 describe('Main handler', () => {
-  it('should fo throw default flow', async () => {
+  it('should go throw default flow', async () => {
     const req = {
       body: {
         resource: {
@@ -16,7 +16,9 @@ describe('Main handler', () => {
     expect(result).toEqual(
       {
         statusCode: HttpStatusCode.OK,
-        body: {}
+        body: {
+          actions: []
+        }
       }
     );
   });
