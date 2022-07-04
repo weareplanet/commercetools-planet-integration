@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint 'app/**/*.ts' 'test/**/*.ts'",
-    "transpile": "tsc",
+    "transpile": "tsc && tsc-alias -p tsconfig.json",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
     "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand --coverage",
@@ -13,8 +13,7 @@
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
     "start:local-dev": "cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1",
-    "start:local-dev:formatted": "npm run start:local-dev | pino-pretty -t HH:MM:ss",
-    "prepare": "husky install"
+    "start:local-dev:formatted": "npm run start:local-dev | pino-pretty -t HH:MM:ss"
   },
   "keywords": [
     "Datatrans",
@@ -26,10 +25,12 @@
   "dependencies": {
     "axios": "^0.27.2",
     "http-status-code-const-enum": "^1.0.2",
+    "morphism": "^1.12.3",
     "pino": "^8.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@commercetools/platform-sdk": "^2.8.0",
     "@types/aws-lambda": "^8.10.99",
     "@types/jest": "^28.1.1",
     "@types/node": "^17.0.40",
@@ -50,6 +51,7 @@
     "serverless-offline": "^8.8.0",
     "ts-jest": "^28.0.4",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.6.11",
     "typescript": "^4.7.3"
   },
   "lint-staged": {

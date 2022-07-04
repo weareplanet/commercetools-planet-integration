@@ -1,18 +1,28 @@
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
-} from '../../../../interfaces';
+} from '@app/interfaces/handler-specific';
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { RequestBodySchemaType } from './request-schema';
-// import { PaymentService } from '../../services/payment-service';
+import { PaymentService } from '@domain/services/payment-service';
+import { FailedValidationError } from '@domain/services/errors';
+import logger from '@domain/services/log-service';
 
 export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<IAbstractResponse> => {
-  // TODO: Take what's needed from req and leverage necessary services...
-  // const paymentService = new PaymentService();
-  // await paymentService.initPayment();
+  try {
+    const paymentService = new PaymentService();
+    const payment = req.body.resource?.obj;
 
-  return {
-    statusCode: HttpStatusCode.OK,
-    body: { message: 'Hello World from create-payment handler!' } // TODO: form a meaningful response
-  };
+    const actions = await paymentService.initRedirectLightboxPayment(payment);
+
+    return {
+      statusCode: HttpStatusCode.OK,
+      body: {
+        actions,
+      }
+    };
+  } catch (err) {
+    logger.error(err);
+    throw new FailedValidationError((err as Error).message, err);
+  }
 };

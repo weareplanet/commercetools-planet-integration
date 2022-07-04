@@ -1,4 +1,4 @@
-import { ConnectorEnvironment } from './interfaces';
+import { DatatransEnvironment } from './interfaces';
 import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
@@ -49,7 +49,7 @@ describe('Connector config validations', () => {
         prod: 'https://prodUrl.test'
       },
       webhookUrl: 'https://webhookUrl.test',
-      merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }],
+      merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }],
     }
   };
 
@@ -451,7 +451,7 @@ describe('Connector config validations', () => {
             expect.assertions(1);
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -475,7 +475,7 @@ describe('Connector config validations', () => {
             expect.assertions(1);
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -492,7 +492,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: '1', environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+              merchants: [{ id: '1', environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }]
             }
           });
 
@@ -500,7 +500,7 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -515,7 +515,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: '1', password: 123, environment: ConnectorEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+              merchants: [{ id: '1', password: 123, environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }]
             }
           });
 
@@ -523,7 +523,7 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -548,7 +548,7 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -588,7 +588,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST }]
+              merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST }]
             }
           });
 
@@ -596,7 +596,7 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
@@ -611,7 +611,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: 'id', password: 'password', environment: ConnectorEnvironment.TEST, dtHmacKey: 123 }]
+              merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST, dtHmacKey: 123 }]
             }
           });
 
@@ -619,7 +619,7 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
+            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();

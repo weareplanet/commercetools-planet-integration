@@ -1,6 +1,4 @@
-// NOTE: could be changed if it need
-export enum ConnectorEnvironment {
+export enum DatatransEnvironment {
   PROD = 'prod',
-  STAGE = 'stage',
   TEST = 'test'
 }

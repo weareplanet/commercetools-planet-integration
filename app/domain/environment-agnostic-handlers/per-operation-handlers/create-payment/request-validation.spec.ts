@@ -1,7 +1,11 @@
-import handler  from '.';
+import handler from '.';
 import { IAbstractRequestWithTypedBody } from '../../../../interfaces';
 import { RequestBodySchemaType } from './request-schema';
 import configService from '../../../services/config-service';
+
+jest.mock('axios', () => ({
+  create: () => ({ post: () => Promise.resolve({ data: {}, headers: {} }) })
+}));
 
 describe('createPayment handler', () => {
 
@@ -27,9 +31,16 @@ describe('createPayment handler', () => {
   const requestWithOnlyRequiredFields = () => {
     return {
       body: {
-        key: 'key string value',
-        custom: {
-          fields: requiredCustomFields()
+        action: 'Create',
+        resource: {
+          typeId: 'typeId',
+          id: 'id',
+          obj: {
+            key: 'key string value',
+            custom: {
+              fields: requiredCustomFields()
+            }
+          }
         }
       }
     };
@@ -38,13 +49,20 @@ describe('createPayment handler', () => {
   const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<RequestBodySchemaType> => {
     return {
       body: {
-        key: 'key string value',
-        custom: {
-          /* eslint-disable @typescript-eslint/ban-ts-comment */
-          /* @ts-ignore */
-          fields: { // TODO: if this goes more crazy - use lodash.merge
-            ...requiredCustomFields(),
-            ...optionalCustomFields()
+        action: 'Create',
+        resource: {
+          typeId: 'typeId',
+          id: 'id',
+          obj: {
+            key: 'key string value',
+            custom: {
+              /* eslint-disable @typescript-eslint/ban-ts-comment */
+              /* @ts-ignore */
+              fields: { // TODO: if this goes more crazy - use lodash.merge
+                ...requiredCustomFields(),
+                ...optionalCustomFields()
+              }
+            }
           }
         }
       }
@@ -56,7 +74,42 @@ describe('createPayment handler', () => {
       const response = await handler(requestWithOnlyRequiredFields());
 
       expect(response.body).toMatchObject({
-        message: 'Hello World from create-payment handler!'
+        'actions': [
+          {
+            'action': 'setCustomField',
+            'name': 'transactionId',
+            'value': undefined,
+          },
+          {
+            'action': 'setCustomField',
+            'name': 'redirectUrl',
+            'value': undefined,
+          },
+          {
+            'action': 'addInterfaceInteraction',
+            'fields': {
+              'interactionType': 'initRequest',
+              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"option":{}}}',
+            },
+            'type': {
+              'key': 'pp-datatrans-interface-interaction-type',
+            },
+          },
+          {
+            'action': 'addInterfaceInteraction',
+            'fields': {
+              'interactionType': 'initResponse',
+              'message': '{"body":{},"headers":{}}',
+            },
+            'type': {
+              'key': 'pp-datatrans-interface-interaction-type',
+            },
+          },
+          {
+            'action': 'setStatusInterfaceCode',
+            'interfaceCode': 'Initial',
+          }
+        ]
       });
 
       expect(response.statusCode).toEqual(200);
@@ -68,7 +121,42 @@ describe('createPayment handler', () => {
       const response = await handler(requestWithOptionalFields());
 
       expect(response.body).toMatchObject({
-        message: 'Hello World from create-payment handler!'
+        'actions': [
+          {
+            'action': 'setCustomField',
+            'name': 'transactionId',
+            'value': undefined,
+          },
+          {
+            'action': 'setCustomField',
+            'name': 'redirectUrl',
+            'value': undefined,
+          },
+          {
+            'action': 'addInterfaceInteraction',
+            'fields': {
+              'interactionType': 'initRequest',
+              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"option":{}}}',
+            },
+            'type': {
+              'key': 'pp-datatrans-interface-interaction-type',
+            },
+          },
+          {
+            'action': 'addInterfaceInteraction',
+            'fields': {
+              'interactionType': 'initResponse',
+              'message': '{"body":{},"headers":{}}',
+            },
+            'type': {
+              'key': 'pp-datatrans-interface-interaction-type',
+            },
+          },
+          {
+            'action': 'setStatusInterfaceCode',
+            'interfaceCode': 'Initial',
+          }
+        ]
       });
 
       expect(response.statusCode).toEqual(200);
@@ -78,7 +166,7 @@ describe('createPayment handler', () => {
   describe('when the request body misses a required field - responds with status 400 and the corresponding error message', () => {
     it('key', async () => {
       const requestWithoutPaymentKey = requestWithOnlyRequiredFields();
-      delete (requestWithoutPaymentKey.body as RequestBodySchemaType).key;
+      delete (requestWithoutPaymentKey.body as RequestBodySchemaType).resource.obj.key;
 
       const response = await handler(requestWithoutPaymentKey);
 
@@ -105,7 +193,7 @@ describe('createPayment handler', () => {
         // Stub eslint and TS to allow the dynamic access by fieldName
         /* eslint-disable @typescript-eslint/ban-ts-comment */
         /* @ts-ignore */
-        delete request.body.custom.fields[fieldName];
+        delete request.body.resource.obj.custom.fields[fieldName];
 
         const response = await handler(request);
 
@@ -127,7 +215,7 @@ describe('createPayment handler', () => {
     describe('when the credentials for merchantId are PRESENT in config', () => {
       beforeEach(() => {
         const merchantIdPresentInConfig = configService.getConfig().datatrans?.merchants[0].id;
-        request.body.custom.fields.merchantId = merchantIdPresentInConfig;
+        request.body.resource.obj.custom.fields.merchantId = merchantIdPresentInConfig;
       });
 
       it('responds with 200', async () => {
@@ -139,7 +227,7 @@ describe('createPayment handler', () => {
 
     describe('when the credentials for merchantId are ABSENT in config', () => {
       beforeEach(() => {
-        request.body.custom.fields.merchantId = 'merchantIdAbsentInConfig';
+        request.body.resource.obj.custom.fields.merchantId = 'merchantIdAbsentInConfig';
       });
 
       it('responds with status 400 and the corresponding error message', async () => {
@@ -162,7 +250,7 @@ describe('createPayment handler', () => {
 
     describe('when key contains 20 symbols', () => {
       beforeEach(() => {
-        request.body.key = '01234567890123456789';
+        request.body.resource.obj.key = '01234567890123456789';
       });
 
       it('responds with 200', async () => {
@@ -174,7 +262,7 @@ describe('createPayment handler', () => {
 
     describe('when key contains 21 symbols', () => {
       beforeEach(() => {
-        request.body.key = '012345678901234567891';
+        request.body.resource.obj.key = '012345678901234567891';
       });
 
       it('responds with status 400 and the corresponding error message', async () => {
@@ -197,12 +285,12 @@ describe('createPayment handler', () => {
 
     describe('when savePaymentMethod is true', () => {
       beforeEach(() => {
-        request.body.custom.fields.savePaymentMethod = true;
+        request.body.resource.obj.custom.fields.savePaymentMethod = true;
       });
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with status 400 and the corresponding error message', async () => {
-          delete request.body.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
           const response = await handler(request);
 
           expect(response.body).toMatchObject({
@@ -224,12 +312,12 @@ describe('createPayment handler', () => {
 
     describe('when savePaymentMethod is false', () => {
       beforeEach(() => {
-        request.body.custom.fields.savePaymentMethod = false;
+        request.body.resource.obj.custom.fields.savePaymentMethod = false;
       });
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -247,12 +335,12 @@ describe('createPayment handler', () => {
 
     describe('when savePaymentMethod is absent', () => {
       beforeEach(() => {
-        delete request.body.custom.fields.savePaymentMethod;
+        delete request.body.resource.obj.custom.fields.savePaymentMethod;
       });
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -277,12 +365,12 @@ describe('createPayment handler', () => {
 
     describe('when savedPaymentMethodAlias is NOT empty', () => {
       beforeEach(() => {
-        request.body.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+        request.body.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
       });
 
       describe('and savePaymentMethod is true', () => {
         it('responds with status 400 and the corresponding error message', async () => {
-          request.body.custom.fields.savePaymentMethod = true;
+          request.body.resource.obj.custom.fields.savePaymentMethod = true;
           const response = await handler(request);
 
           expect(response.body).toMatchObject({
@@ -295,7 +383,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is false', () => {
         it('responds with 200', async () => {
-          request.body.custom.fields.savePaymentMethod = false;
+          request.body.resource.obj.custom.fields.savePaymentMethod = false;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -304,7 +392,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.custom.fields.savePaymentMethod;
+          delete request.body.resource.obj.custom.fields.savePaymentMethod;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -314,12 +402,12 @@ describe('createPayment handler', () => {
 
     describe('when savedPaymentMethodAlias is empty', () => {
       beforeEach(() => {
-        request.body.custom.fields.savedPaymentMethodAlias = '';
+        request.body.resource.obj.custom.fields.savedPaymentMethodAlias = '';
       });
 
       describe('and savePaymentMethod is true', () => {
         it('responds with 200', async () => {
-          request.body.custom.fields.savePaymentMethod = true;
+          request.body.resource.obj.custom.fields.savePaymentMethod = true;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -328,7 +416,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is false', () => {
         it('responds with 200', async () => {
-          request.body.custom.fields.savePaymentMethod = false;
+          request.body.resource.obj.custom.fields.savePaymentMethod = false;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -337,7 +425,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.custom.fields.savePaymentMethod;
+          delete request.body.resource.obj.custom.fields.savePaymentMethod;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -347,12 +435,12 @@ describe('createPayment handler', () => {
 
     describe('when savedPaymentMethodAlias is absent', () => {
       beforeEach(() => {
-        delete request.body.custom.fields.savedPaymentMethodAlias;
+        delete request.body.resource.obj.custom.fields.savedPaymentMethodAlias;
       });
 
       describe('and savePaymentMethod is true', () => {
         it('responds with 200', async () => {
-          request.body.custom.fields.savePaymentMethod = true;
+          request.body.resource.obj.custom.fields.savePaymentMethod = true;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -361,7 +449,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is false', () => {
         it('responds with 200', async () => {
-          request.body.custom.fields.savePaymentMethod = false;
+          request.body.resource.obj.custom.fields.savePaymentMethod = false;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -370,7 +458,7 @@ describe('createPayment handler', () => {
 
       describe('and savePaymentMethod is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.custom.fields.savePaymentMethod;
+          delete request.body.resource.obj.custom.fields.savePaymentMethod;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -386,15 +474,24 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
+            action: 'Create',
+            resource: {
+              id: 'id',
+              typeId: 'typeId',
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
+                }
               }
             }
           }
         });
+
+        console.log('response: ', response);
 
         expect(response.statusCode).toEqual(200);
       });
@@ -406,13 +503,18 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
-                autoSettle: false,
-                authneticationOnly: false
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                    autoSettle: false,
+                    authneticationOnly: false
+                  }
+                }
               }
             }
           }
@@ -432,11 +534,16 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = '{ "autoSettle":false }';
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
+                }
               }
             }
           }
@@ -456,11 +563,16 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = '{ "authneticationOnly":true }';
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
+                }
               }
             }
           }
@@ -480,11 +592,16 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = `{ "${fieldName}":"something" }`;
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
+                }
               }
             }
           }
@@ -504,11 +621,16 @@ describe('createPayment handler', () => {
         optCustomFields.initRequest = '{ "webhook":"something" }';
         const response = await handler({
           body: {
-            key: 'key string value',
-            custom: {
-              fields: {
-                ...requiredCustomFields(),
-                ...optCustomFields,
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
+                }
               }
             }
           }
