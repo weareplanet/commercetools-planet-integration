@@ -9,6 +9,9 @@ export class FailedValidationError implements InvalidInputError {
     this.message = message;
 
     if (extensionExtraInfo) {
+      delete extensionExtraInfo?.config;
+      delete extensionExtraInfo?.stack;
+
       this.extensionExtraInfo = extensionExtraInfo;
     }
   }

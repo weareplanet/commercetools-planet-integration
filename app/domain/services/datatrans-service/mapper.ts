@@ -3,8 +3,6 @@ import { createSchema, morphism } from 'morphism';
 import { IInitializeTransaction, PaymentMethod } from '@app/interfaces/datatrans';
 import { PaymentSchemaType } from '@domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema';
 
-
-
 export const toInitializeTransaction = (payment: PaymentSchemaType): IInitializeTransaction => {
   const result = morphism(createSchema<IInitializeTransaction, PaymentSchemaType>({
     refno: ({ custom }) => custom?.fields?.merchantId,

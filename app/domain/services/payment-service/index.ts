@@ -9,7 +9,7 @@ import { CommerceToolsActionsBuilder } from '../commerce-tools-actions-builder';
 import { toInitializeTransaction } from '../datatrans-service/mapper';
 
 export class PaymentService {
-  async initRedirectLightboxPayment(payment: PaymentSchemaType): Promise<PaymentUpdateActions[]> { // specifie return interface
+  async initRedirectLightboxPayment(payment: PaymentSchemaType): Promise<PaymentUpdateActions[]> {
     const datatransService = new DatatransService();
     const actionsBuilder = new CommerceToolsActionsBuilder();
     const initializeTransactionPayload = toInitializeTransaction(payment);
