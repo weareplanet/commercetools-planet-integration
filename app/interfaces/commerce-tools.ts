@@ -43,7 +43,7 @@ export enum PaymentUpdateActionsType {
 export interface ISetCustomFiledAction {
   action: PaymentUpdateActionsType.SetCustomField;
   name: string;
-  value: unknown // it must be the same type as you customField in commerceTools
+  value: unknown; // it must be the same type as you customField in commerceTools
 }
 
 export interface ISetStatusInterfaceCodeAction {
