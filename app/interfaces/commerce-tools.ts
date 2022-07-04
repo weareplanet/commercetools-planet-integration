@@ -58,8 +58,12 @@ export interface IIninitRequest extends AnyObject {
   mcp?: Record<string, unknown>;
 }
 
+export enum ICommerceToolsErrorCode {
+  InvalidInput = 'InvalidInput'
+}
+
 export interface ICommerceToolsError {
-  code: string;
+  code: ICommerceToolsErrorCode;
   message: string;
   localizedMessage?: string;
   extensionExtraInfo?: Record<string, unknown>;

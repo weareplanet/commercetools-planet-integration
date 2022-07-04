@@ -7,13 +7,10 @@ import {
   IAbstractRequestHandler,
   ICommerceToolsError
 } from '@app/interfaces';
+import { isDataTransError } from '@app/domain/services/errors-service';
 
 function bodyParcingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
-}
-
-function isDataTransError(err: ICommerceToolsError) {
-  return !!err.code;
 }
 
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {

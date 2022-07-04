@@ -5,6 +5,6 @@ import {
 
 export type ICreatePaymentRequestBodySchemaType = RequestBodySchemaType;
 export type ICommerceToolsPaymentType = PaymentSchemaType;
-export * from './handler-specific';
+export * from './handler-interfaces';
 export * from './datatrans';
 export * from './commerce-tools';

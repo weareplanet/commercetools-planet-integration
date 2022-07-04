@@ -7,8 +7,7 @@ module.exports = {
     'app/**/*.ts',
     '!**/*spec.ts',
     '!**/*specs.ts',
-    '!app/interfaces/*.ts',
-    '!app/domain/environment-agnostic-handlers/**/index.ts'
+    '!app/interfaces/*.ts'
   ],
   coverageReporters: [
     'json', 'html', 'text'

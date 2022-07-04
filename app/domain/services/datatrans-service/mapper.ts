@@ -3,7 +3,7 @@ import { createSchema, morphism } from 'morphism';
 import {
   IInitializeTransaction,
   ICommerceToolsPaymentType,
-  PaymentMethod
+  DatatransPaymentMethod
 } from '@app/interfaces';
 
 export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IInitializeTransaction => {
@@ -11,7 +11,7 @@ export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IIn
     refno: ({ custom }) => custom?.fields?.merchantId,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
     amount: ({ amountPlanned }) => amountPlanned?.centAmount,
-    paymentMethods: ({ paymentMethodInfo }) => paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as PaymentMethod[],
+    paymentMethods: ({ paymentMethodInfo }) => paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as DatatransPaymentMethod[],
     language: ({ custom }) => custom?.fields?.language,
     option: ({ custom }) => custom?.fields?.savePaymentMethod ? ({
       createAlias: custom?.fields?.savePaymentMethod
