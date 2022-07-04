@@ -1,9 +1,19 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { IAbstractToEnvHandlerAdapter, IAbstractRequest, IAbstractResponse, IAbstractRequestHandler } from '../../interfaces';
+import {
+  IAbstractToEnvHandlerAdapter,
+  IAbstractRequest,
+  IAbstractResponse,
+  IAbstractRequestHandler,
+  ICommerceToolsError
+} from '@app/interfaces';
 
 function bodyParcingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
+}
+
+function isDataTransError(err: ICommerceToolsError) {
+  return !!err.code;
 }
 
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
@@ -14,19 +24,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
         const agnosticResponse = await handler(agnosticRequest);
         return this.abstractResponseToCloud(agnosticResponse);
       } catch (err) {
-        // TODO: Handle err more accurately to distinguish 4xx from 5xx etc.
-
-        if (bodyParcingError(err)) {
-          return this.abstractResponseToCloud({
-            statusCode: HttpStatusCode.BAD_REQUEST,
-            body: { message: `Error of body parsing: ${err.message}` }
-          });
-        }
-
-        return this.abstractResponseToCloud({
-          statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
-          body: {}
-        });
+        return this.errorHandling(err);
       }
     };
   }
@@ -55,5 +53,32 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
         'Content-Type': 'application/json'
       }
     };
+  }
+
+  private errorHandling(err: Error | ICommerceToolsError) {
+    if (bodyParcingError(err as Error)) {
+      return this.abstractResponseToCloud({
+        statusCode: HttpStatusCode.BAD_REQUEST,
+        body: {
+          message: `Error of body parsing: ${err.message}`,
+          errors: [err]
+        }
+      });
+    }
+
+    if (isDataTransError(err as ICommerceToolsError)) {
+      return this.abstractResponseToCloud({
+        statusCode: HttpStatusCode.BAD_REQUEST,
+        body: {
+          message: err.message,
+          errors: [err]
+        }
+      });
+    }
+
+    return this.abstractResponseToCloud({
+      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
+      body: {}
+    });
   }
 }

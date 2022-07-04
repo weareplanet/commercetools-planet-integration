@@ -1,0 +1,27 @@
+import { ExtentionAction, IExtensionRequestBody } from '@app/interfaces';
+
+// eslint-disable-next-line no-prototype-builtins
+const hasProperties = (obj: object, fields: string[]) => obj && fields.every((field) => obj.hasOwnProperty(field));
+
+export enum PaymentCreateOperation {
+  RedirectAndLightboxInit = 'Redirect And Lightbox Init'
+}
+
+export enum PaymentInterface {
+  DataTransRedirectIntegration = 'pp-datatrans-redirect-integration'
+}
+
+export const getOperation = (body: IExtensionRequestBody) => {
+  const payment = body.resource.obj;
+  const isRedirectLightboxPaymentFlow =
+    body?.action === ExtentionAction.Create
+    && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
+    && !hasProperties(payment?.custom?.fields, ['transactionId', 'savedPaymentMethodAlias'])
+    && !payment?.paymentStatus?.interfaceCode;
+
+  if (isRedirectLightboxPaymentFlow) {
+    return PaymentCreateOperation.RedirectAndLightboxInit;
+  }
+
+  return '';
+};

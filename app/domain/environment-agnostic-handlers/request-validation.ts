@@ -1,13 +1,14 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { AnyObjectSchema } from 'yup';
-import logger from '../services/log-service';
+
 import {
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
   IAbstractRequestWithTypedBody,
   IAbstractRequestHandlerWithTypedInput
-} from '../../interfaces';
+} from '@app/interfaces/handler-specific';
+import logger from '../services/log-service';
 import { InputValidationService } from '../services/input-validation-service';
 
 // A higher-level consumer (AWS adapter etc.) does not care about the request body shape -

@@ -88,6 +88,19 @@ After the building the same structure as was before in `app` directory (but alre
 
 The program is using `process.env` for set up enviroment configuration. We have following enviroment veriables:
 
+[in progress]
+| Variable name    | Type                                                    | Required  | Default | Semantics       |
+|------------------|----------------------------------------------------------------|-----------|---------|-----------------|
+| LOG_LEVEL        |  one of string: trace, debug, info, warn, error, fatal, silent |    -      | debug   | string          |
+| CT_CLIENT_ID     |  string `example: 4XmKDlB_Vb4jU7a93EcJwsHj`           |    +      |         | string          |
+| CT_CLIENT_SECRET |             |    +      |         | string          |
+| CT_PROJECT_ID    |             |    +      |         | string          |
+| CT_AUTH_URL      |             |    +      |         | string          |
+| CT_API_URL       |             |    +      |         | string          |
+| CT_MERCHANTS     |             |    +      |         | string          |
+| CT_MERCHANTS     |             |    +      |         | stringified Array<{ id*: string, password*: string, environment: 'test' | 'prod' }>          |
+
+
 #### Required fields
 ```
 CT_CLIENT_ID - CommerceTools client id

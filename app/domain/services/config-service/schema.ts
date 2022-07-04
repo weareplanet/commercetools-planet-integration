@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import { ConnectorEnvironment } from './interfaces';
+import { DatatransEnvironment } from './interfaces';
 
 const CommerceToolsConfigSchema = yup.object({
   clientId: yup
@@ -42,29 +42,29 @@ const DatatransConfigSchema = yup.object({
     .required('DT_CONNECTOR_WEBHOOK_URL is required'),
   merchants: yup
     .array()
-    .typeError('CT_MERCHANTS must be stringified array of objects')
+    .typeError('DT_MERCHANTS must be stringified array of objects')
     .of(
       yup
         .object({
           id: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string')
-            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified'),
+            .typeError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string')
+            .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified'),
           password: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string')
-            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified'),
+            .typeError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string')
+            .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified'),
           environment: yup
             .string()
-            .oneOf(Object.values(ConnectorEnvironment), 'merchant\'s enviroment must be one of the following values: prod, stage, test')
-            // .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment as string')
-            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified'),
+            .oneOf(Object.values(DatatransEnvironment), 'merchant\'s enviroment must be one of the following values: prod, stage, test')
+            // .typeError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment as string')
+            .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified'),
           dtHmacKey: yup
             .string()
-            .typeError('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string')
-            .required('CT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified')
+            .typeError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string')
+            .required('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified')
         }).required()
-    ).required('CT_MERCHANTS is required'),
+    ).required('DT_MERCHANTS is required'),
 });
 
 export const AppConfigSchema = yup.object({

@@ -1,6 +1,8 @@
 import * as yup from 'yup';
 import { MessageParams } from 'yup/lib/types';
-import configService from '../../../services/config-service';
+
+import { IIninitRequest } from '@app/interfaces';
+import configService from '@domain/services/config-service';
 
 const takeFieldNameFromPath = (path: string) => {
   return path.split('.').pop();
@@ -36,10 +38,17 @@ const ErrorMessages = {
   },
 };
 
-const RequestBodySchema = yup.object({
+const PaymentSchema = yup.object({
   key: yup.string()
     .required(ErrorMessages.missingPaymentField())
     .max(20, ErrorMessages.longKey()),
+  amountPlanned: yup.object({
+    currencyCode: yup.string().optional(),
+    centAmount: yup.number().optional(),
+  }).optional(),
+  paymentMethodInfo: yup.object({
+    method: yup.string().optional(),
+  }),
   custom: yup.object({
     fields: yup.object({
       merchantId: yup
@@ -83,7 +92,7 @@ const RequestBodySchema = yup.object({
         .string()
         .optional(),
       initRequest: yup
-        .object()
+        .object<IIninitRequest>()
         .optional()
         .test('initRequest content validator', (initRequestObj) => {
           if (!initRequestObj) {
@@ -111,7 +120,8 @@ const RequestBodySchema = yup.object({
             .validateSync(initRequestObj.webhook);
 
           return true;
-        })
+        }),
+      language: yup.string().optional(),
     }).required()
   }).required()
 }).required()
@@ -123,9 +133,9 @@ const RequestBodySchema = yup.object({
     const initRequestKeys = Object.keys(initRequest);
 
     let duplicatedFields =
-    initRequestKeys.filter((key) => (key in rootObj))
-      .concat(initRequestKeys.filter((key) => (key in rootObj.custom)))
-      .concat(initRequestKeys.filter((key) => (key in rootObj.custom.fields)));
+      initRequestKeys.filter((key) => (key in rootObj))
+        .concat(initRequestKeys.filter((key) => (key in rootObj.custom)))
+        .concat(initRequestKeys.filter((key) => (key in rootObj.custom.fields)));
 
     if (duplicatedFields.length) {
       duplicatedFields = [...new Set(duplicatedFields)];
@@ -135,10 +145,21 @@ const RequestBodySchema = yup.object({
     return true;
   });
 
-type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
 
+const RequestBodySchema = yup.object({
+  action: yup.string().required(),
+  resource: yup.object({
+    typeId: yup.string().required(),
+    id: yup.string().required(),
+    obj: PaymentSchema
+  })
+});
+
+type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
+type PaymentSchemaType = yup.TypeOf<typeof PaymentSchema>;
 
 export {
   RequestBodySchema, // This is exported to perform the validation (where handler is leveraged)
-  RequestBodySchemaType // This is exported to be used as a type variable for generics
+  RequestBodySchemaType, // This is exported to be used as a type variable for generics
+  PaymentSchemaType
 };
