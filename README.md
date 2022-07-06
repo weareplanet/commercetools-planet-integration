@@ -104,6 +104,7 @@ The program is using environment variables to initialize application configurati
 ## Deployment
 
 > TODO: deploy script should execute `npm install`, `npm run build` commands and then use the `dist` content (together with `node_modules` and maybe `serverless.yml`) to produce a deployment package.
+In a local deevlopment environment you can use `npm run build && npm run package:local-dev` for a quick deploy artifact preparation.
 
 This repository uses [Serverless Framework](https://www.serverless.com/) at least for local development.
 

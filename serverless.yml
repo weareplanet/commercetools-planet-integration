@@ -9,6 +9,9 @@ plugins:
 
 package:
   individually: true
+  include:
+    - app/**/*.js
+    - ../node_modules/**
 
 frameworkVersion: ">=2.11.1"
 

@@ -8,6 +8,7 @@
     "transpile": "tsc && tsc-alias -p tsconfig.json",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
+    "package:local-dev": "rm -rf ./package/local-dev/ && cd dist && cp ../serverless.yml . && serverless package --stage local-dev --region local-fake-region --verbose --package ./package/local-dev/",
     "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand --coverage",
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
