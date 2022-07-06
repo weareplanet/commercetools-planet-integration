@@ -1,10 +1,10 @@
-import { ExtentionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
+import { ExtensionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
 import { detectOperation, PaymentCreateOperation, PaymentInterface } from './operation-detector';
 
 describe('Operation mapping', () => {
   it('should return "Redirect And Lightbox Init"', () => {
     const body: ICommerceToolsExtensionRequestBoby = {
-      action: ExtentionAction.Create,
+      action: ExtensionAction.Create,
       resource: {
         obj: {
           paymentMethodInfo: {

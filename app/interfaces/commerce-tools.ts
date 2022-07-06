@@ -1,7 +1,3 @@
-import { ReferenceTypeId as CommerceToolsReferenceTypeId } from '@commercetools/platform-sdk';
-
-export type ReferenceTypeId = CommerceToolsReferenceTypeId;
-
 export interface IPayment {
   paymentMethodInfo: {
     paymentInterface?: string;
