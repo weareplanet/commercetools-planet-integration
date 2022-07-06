@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { MessageParams } from 'yup/lib/types';
 
-import configService from '@domain/services/config-service';
+import configService from '../../../services/config-service';
 
 const takeFieldNameFromPath = (path: string) => {
   return path.split('.').pop();

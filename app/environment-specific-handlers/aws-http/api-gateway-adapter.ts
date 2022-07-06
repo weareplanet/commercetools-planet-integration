@@ -7,8 +7,8 @@ import {
   IAbstractRequestHandler,
   IAWSAPIGatewayProxyResult,
   ICommerceToolsError
-} from '@app/interfaces';
-import { isDataTransError } from '@app/domain/services/errors-service';
+} from '../../interfaces';
+import { isDataTransError } from '../../domain/services/errors-service';
 
 function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');

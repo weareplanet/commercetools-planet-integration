@@ -17,11 +17,6 @@ module.exports = {
     '<rootDir>/test/setup/global-hooks.ts',
     '<rootDir>/test/setup/load-global-mocks.ts'
   ],
-  moduleNameMapper: {
-    '@app/(.*)': '<rootDir>/app/$1',
-    '@domain/(.*)': '<rootDir>/app/domain/$1',
-    '@environment-specific-handlers/(.*)': 'app/environment-specific-handlers/$1'
-  },
   silent: true,
   coverageThreshold: {
     global: {

@@ -1,4 +1,4 @@
-import { ExtensionAction, ICommerceToolsExtensionRequestBoby } from '@app/interfaces';
+import { ExtensionAction, ICommerceToolsExtensionRequestBoby } from '../../../interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
 const hasProperties = (obj: object, fields: string[]) => obj && fields.every((field) => obj.hasOwnProperty(field));
