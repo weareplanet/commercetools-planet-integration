@@ -1,21 +1,22 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayEvent } from 'aws-lambda';
 import {
   IAbstractToEnvHandlerAdapter,
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
+  IAWSAPIGatewayProxyResult,
   ICommerceToolsError
 } from '@app/interfaces';
 import { isDataTransError } from '@app/domain/services/errors-service';
 
-function bodyParcingError(e: Error): boolean {
+function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
-export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
+export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, IAWSAPIGatewayProxyResult> {
   createEnvSpecificHandler(handler: IAbstractRequestHandler) {
-    return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+    return async (event: APIGatewayEvent): Promise<IAWSAPIGatewayProxyResult> => {
       try {
         const agnosticRequest: IAbstractRequest = this.cloudRequestToAbstract(event);
         const agnosticResponse = await handler(agnosticRequest);
@@ -28,7 +29,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
 
   private cloudRequestToAbstract(event: APIGatewayEvent) {
     return {
-      // TODO: move the JSON parcing (and the corresponding error handling)
+      // TODO: move the JSON parsing (and the corresponding error handling)
       // into app/domain/environment-agnostic-handlers
       body: JSON.parse(event.body)
     };
@@ -41,23 +42,30 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
   private createApiGatewayResponse(
     statusCode: number,
     payload: string|Record<string, unknown>
-  ): APIGatewayProxyResult {
-    const body = (payload && typeof payload === 'object') ? payload : { payload };
-    return {
+  ): IAWSAPIGatewayProxyResult {
+    const body = (payload && typeof payload === 'object') ? payload : { payload }; // NOTE: maybe we need change this logic
+    const response: IAWSAPIGatewayProxyResult = {
       statusCode,
-      body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json'
       }
     };
+
+    if (payload) {
+      response.body = JSON.stringify(body);
+    }
+
+    return response;
   }
 
   private errorHandling(err: Error | ICommerceToolsError) {
-    if (bodyParcingError(err as Error)) {
+    if (bodyParsingError(err as Error)) {
       return this.abstractResponseToCloud({
         statusCode: HttpStatusCode.BAD_REQUEST,
         body: {
           message: `Error of body parsing: ${err.message}`,
+          code: 'InvalidInput',
+          errors: [err]
         }
       });
     }

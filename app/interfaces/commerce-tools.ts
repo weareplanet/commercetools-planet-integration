@@ -1,4 +1,3 @@
-import { AnyObject } from 'yup/lib/object';
 import { ReferenceTypeId as CommerceToolsReferenceTypeId } from '@commercetools/platform-sdk';
 
 export type ReferenceTypeId = CommerceToolsReferenceTypeId;
@@ -18,7 +17,7 @@ export interface IPayment {
   };
 }
 
-export enum ExtentionAction {
+export enum ExtensionAction {
   Create = 'Create',
   Update = 'Update'
 }
@@ -43,19 +42,10 @@ export enum CommerceToolsCustomTypesKey {
 }
 
 export interface ICommerceToolsExtensionRequestBoby {
-  action: ExtentionAction,
+  action: ExtensionAction,
   resource: {
     obj: IPayment;
   }
-}
-
-export interface IIninitRequest extends AnyObject {
-  option?: Record<string, unknown>;
-  autoSettle?: boolean;
-  authneticationOnly?: boolean;
-  returnMobileToken?: boolean;
-  webhook?: Record<string, unknown>;
-  mcp?: Record<string, unknown>;
 }
 
 export enum ICommerceToolsErrorCode {

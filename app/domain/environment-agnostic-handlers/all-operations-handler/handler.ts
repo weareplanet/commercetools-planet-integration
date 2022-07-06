@@ -26,9 +26,6 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
     default: {
       return {
         statusCode: HttpStatusCode.OK,
-        body: {
-          actions: []
-        }
       };
     }
   }
