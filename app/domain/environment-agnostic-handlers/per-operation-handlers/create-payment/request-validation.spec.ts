@@ -70,7 +70,7 @@ describe('createPayment handler', () => {
   };
 
   describe('when the request body contains only the required part', () => {
-    it('responds with 200 and Hello World in the body', async () => {
+    it('responds with 200 and actions with updates', async () => {
       const response = await handler(requestWithOnlyRequiredFields());
 
       expect(response.body).toMatchObject({
@@ -89,7 +89,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"option":{}}}',
+              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',
@@ -117,7 +117,7 @@ describe('createPayment handler', () => {
   });
 
   describe('when the request body contains the required part + some optional custom fields', () => {
-    it('responds with 200 and Hello World in the body', async () => {
+    it('responds with 200 and actions with updates', async () => {
       const response = await handler(requestWithOptionalFields());
 
       expect(response.body).toMatchObject({
@@ -136,7 +136,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"option":{}}}',
+              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',

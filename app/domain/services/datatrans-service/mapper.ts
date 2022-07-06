@@ -22,13 +22,18 @@ export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IIn
       errorUrl: custom?.fields?.errorUrl,
     })
   }, { undefinedValues: { strip: true } }))(payment);
+  const option = result.option || payment?.custom?.fields?.initRequest?.option
+    ? {
+      option: {
+        ...(payment?.custom?.fields?.initRequest?.option as Record<string, unknown>),
+        ...result.option
+      }
+    }
+    : { option: undefined };
 
   return {
     ...payment?.custom?.fields?.initRequest,
     ...result,
-    option: {
-      ...(payment?.custom?.fields?.initRequest?.option as Record<string, unknown>),
-      ...result.option
-    }
+    ...option
   };
 };

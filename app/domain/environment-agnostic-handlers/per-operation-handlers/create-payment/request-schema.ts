@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import { MessageParams } from 'yup/lib/types';
 
-import { IIninitRequest } from '@app/interfaces';
 import configService from '@domain/services/config-service';
 
 const takeFieldNameFromPath = (path: string) => {
@@ -92,7 +91,14 @@ const PaymentSchema = yup.object({
         .string()
         .optional(),
       initRequest: yup
-        .object<IIninitRequest>()
+        .object({
+          option: yup.object().optional(),
+          autoSettle: yup.boolean().optional(),
+          authneticationOnly: yup.boolean().optional(),
+          returnMobileToken: yup.boolean().optional(),
+          webhook: yup.object().optional(),
+          mcp: yup.object().optional(),
+        })
         .optional()
         .test('initRequest content validator', (initRequestObj) => {
           if (!initRequestObj) {
