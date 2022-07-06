@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@commercetools/platform-sdk';
 
-import { ICommerceToolsError, ICommerceToolsErrorCode } from '@app/interfaces';
+import { ICommerceToolsError, ICommerceToolsErrorCode } from '../../../interfaces';
 
 export class FailedValidationError implements InvalidInputError {
   readonly code = ICommerceToolsErrorCode.InvalidInput;

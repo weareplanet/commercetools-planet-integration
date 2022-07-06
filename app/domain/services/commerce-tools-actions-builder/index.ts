@@ -2,7 +2,7 @@ import {
   CommerceToolsCustomTypesKey,
   InterfaceInteraction,
   InterfaceInteractionType,
-} from '@app/interfaces';
+} from '../../../interfaces';
 
 import { PaymentUpdateAction } from '@commercetools/platform-sdk';
 

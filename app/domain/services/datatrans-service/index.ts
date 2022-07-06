@@ -2,7 +2,7 @@
 // and hides it from a consumer
 import axios, { AxiosInstance } from 'axios';
 
-import { IInitializeTransaction } from '@app/interfaces';
+import { IInitializeTransaction } from '../../../interfaces';
 import { IDatatransConfig } from '../config-service/schema';
 import configService from '../config-service';
 import { DatatransEnvironment } from '../config-service/interfaces';

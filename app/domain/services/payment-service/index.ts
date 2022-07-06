@@ -2,7 +2,7 @@
 // when necessary - does necessary requests to datatrans (using DatatransService).
 import { PaymentUpdateAction } from '@commercetools/platform-sdk';
 
-import { InterfaceInteractionType, ICommerceToolsPaymentType } from '@app/interfaces';
+import { InterfaceInteractionType, ICommerceToolsPaymentType } from '../../../interfaces';
 import logger from '../log-service';
 import { DatatransService } from '../datatrans-service';
 import { CommerceToolsActionsBuilder } from '../commerce-tools-actions-builder';

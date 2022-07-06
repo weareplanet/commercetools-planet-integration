@@ -2,10 +2,10 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
-} from '@app/interfaces';
-import { PaymentService } from '@domain/services/payment-service';
-import { FailedValidationError } from '@app/domain/services/errors-service';
-import logger from '@domain/services/log-service';
+} from '../../../../interfaces';
+import { PaymentService } from '../../../services/payment-service';
+import { FailedValidationError } from '../../../services/errors-service';
+import logger from '../../../services/log-service';
 import { RequestBodySchemaType } from './request-schema';
 
 export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<IAbstractResponse> => {

@@ -4,7 +4,7 @@ import {
   IInitializeTransaction,
   ICommerceToolsPaymentType,
   DatatransPaymentMethod
-} from '@app/interfaces';
+} from '../../../interfaces';
 
 export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IInitializeTransaction => {
   const result = morphism(createSchema<IInitializeTransaction, ICommerceToolsPaymentType>({

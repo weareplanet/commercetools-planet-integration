@@ -3,7 +3,7 @@ import {
   IAbstractRequest,
   IAbstractResponse,
   ICommerceToolsExtensionRequestBoby
-} from '@app/interfaces';
+} from '../../../interfaces';
 import { logConnectorVersion } from '../../services/connector-version-service';
 import { PaymentCreateOperation, detectOperation } from './operation-detector';
 import '../../services/config-service';

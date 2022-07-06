@@ -12,11 +12,6 @@
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "typeRoots": [ "./node_modules/@types"],
-    "paths": {
-      "@app/*": ["app/*"],
-      "@domain/*": ["app/domain/*"],
-      "@environment-specific-handlers/*": ["app/environment-specific-handlers/*"]
-    }
+    "typeRoots": [ "./node_modules/@types"]
   }
 }
