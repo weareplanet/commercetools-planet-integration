@@ -12,7 +12,7 @@
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
-    "start:local-dev": "cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1",
+    "start:local-dev": "cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config -r module-alias/register\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1",
     "start:local-dev:formatted": "npm run start:local-dev | pino-pretty -t HH:MM:ss",
     "prepare": "husky install"
   },
@@ -47,6 +47,7 @@
     "jest": "^28.1.0",
     "jest-when": "^3.5.1",
     "lint-staged": "^13.0.1",
+    "module-alias": "^2.2.2",
     "pino-pretty": "^8.0.0",
     "serverless": "^3.19.0",
     "serverless-offline": "^8.8.0",
@@ -57,5 +58,10 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint"
+  },
+  "_moduleAliases": {
+    "@app": "./app",
+    "@domain": "./app/domain",
+    "@environment-specific-handlers": "./app/environment-specific-handlers"
   }
 }
