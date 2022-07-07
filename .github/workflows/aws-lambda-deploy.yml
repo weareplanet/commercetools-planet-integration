@@ -22,10 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Snooping ENV vars
-        run: | 
-          echo "github.actor: ${{ github.actor }}"; \
-          echo "github.event.push.user.login: ${{ github.event.push.user.login }}"; \
-          echo "github.event.release.tag_name: ${{ github.event.release.tag_name }}"
+        run: echo "github.actor: ${{ github.actor }}"
       - name: Snooping the GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -50,7 +47,7 @@ jobs:
 
       - name: Get formatted date
         id: date
-        run: echo "::set-output name::$(date +%Y%m%d-%H%M%S)"
+        run: echo "::set-output name=date::$(date +%Y%m%d-%H%M%S)"
 
       - name: Configure AWS Credentials  
         uses: aws-actions/configure-aws-credentials@v1 
@@ -58,6 +55,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1 
-      - name: deploy
+      - name: zipping package
         run: |
-          echo "s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip"
+          zip -j paymentconnector-${{ steps.date.outputs.date }}.zip ./* 
+      - name: pushing package to S3
+        run: |
+          aws s3 cp paymentconnector-${{ steps.date.outputs.date }}.zip  \
+            s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip
+      - name: updating lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name=paymentconnector-${{ github.actor }} \
+            --S3-bucket commercetools-paymentconnector-lambda-releases \
+            --S3-key ${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip 
