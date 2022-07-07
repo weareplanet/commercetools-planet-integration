@@ -9,7 +9,7 @@ import {
   RedirectAndLightboxPaymentInitResponseBody,
   CreateInitializeTransactionRequest,
   CreateInitializeTransactionMockResponse
-} from '../../../../test/mocks/Redirect&Lightbox Payment Init.mock';
+} from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
 describe('Main handler', () => {
   let handler: (req: IAbstractRequest) => Promise<IAbstractResponse>;
