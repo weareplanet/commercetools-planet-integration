@@ -48,16 +48,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1 
-      - name: zipping package
+      - name: Zipping package
         run: |
           zip -j paymentconnector-${{ steps.date.outputs.date }}.zip ./* 
-      - name: pushing package to S3
+      - name: Pushing package to S3
         run: |
           aws s3 cp paymentconnector-${{ steps.date.outputs.date }}.zip  \
             s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip
-      - name: updating lambda
+      - name: Updating lambda
         run: |
           aws lambda update-function-code \
             --function-name=paymentconnector-${{ github.actor }} \
-            --S3-bucket=commercetools-paymentconnector-lambda-releases \
-            --S3-key=${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip 
+            --s3-bucket=commercetools-paymentconnector-lambda-releases \
+            --s3-key=${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip 
