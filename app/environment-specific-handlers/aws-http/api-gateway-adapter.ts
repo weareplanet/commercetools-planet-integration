@@ -1,11 +1,10 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import { APIGatewayEvent } from 'aws-lambda';
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import {
   IAbstractToEnvHandlerAdapter,
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
-  IAWSAPIGatewayProxyResult,
   ICommerceToolsError
 } from '../../interfaces';
 import { isDataTransError } from '../../domain/services/errors-service';
@@ -14,9 +13,9 @@ function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
-export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, IAWSAPIGatewayProxyResult> {
+export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
   createEnvSpecificHandler(handler: IAbstractRequestHandler) {
-    return async (event: APIGatewayEvent): Promise<IAWSAPIGatewayProxyResult> => {
+    return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
       try {
         const agnosticRequest: IAbstractRequest = this.cloudRequestToAbstract(event);
         const agnosticResponse = await handler(agnosticRequest);
@@ -42,18 +41,23 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
   private createApiGatewayResponse(
     statusCode: number,
     payload: string|Record<string, unknown>
-  ): IAWSAPIGatewayProxyResult {
-    const body = (payload && typeof payload === 'object') ? payload : { payload }; // NOTE: maybe we need change this logic
-    const response: IAWSAPIGatewayProxyResult = {
+  ): APIGatewayProxyResult {
+    let body = '';
+    if (payload) {
+      if (typeof payload === 'object') {
+        body = JSON.stringify(payload);
+      } else if (typeof payload === 'string') {
+        body = payload;
+      }
+    }
+
+    const response: APIGatewayProxyResult = {
       statusCode,
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body
     };
-
-    if (payload) {
-      response.body = JSON.stringify(body);
-    }
 
     return response;
   }

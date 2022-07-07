@@ -1,13 +1,15 @@
-import { APIGatewayProxyResult } from 'aws-lambda';
-
 // Any object in the request body
+
+export type IAbstarctHeaders = Record<string, string>;
+
 export interface IAbstractRequest {
-  body: Record<string, unknown>;
+  headers?: IAbstarctHeaders;
+  body: string | Record<string, unknown>;
 }
 
 export interface IAbstractResponse {
   statusCode: number;
-  body?: Record<string, unknown>;
+  body: string | Record<string, unknown>;
 }
 
 export interface IAbstractRequestHandler {
@@ -21,13 +23,10 @@ export interface IAbstractToEnvHandlerAdapter<IEnvironmentReq, IEnvironmentRes> 
 // Specific object in the request body
 
 export interface IAbstractRequestWithTypedBody<TRequestBody> {
+  headers?: IAbstarctHeaders;
   body: TRequestBody;
 }
 
 export interface IAbstractRequestHandlerWithTypedInput<TRequestBody> {
   (req: IAbstractRequestWithTypedBody<TRequestBody>): Promise<IAbstractResponse>;
-}
-
-export interface IAWSAPIGatewayProxyResult extends Pick<APIGatewayProxyResult, 'statusCode' | 'headers' | 'multiValueHeaders' | 'isBase64Encoded'> {
-  body?: string;
 }
