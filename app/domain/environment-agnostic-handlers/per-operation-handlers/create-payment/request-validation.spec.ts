@@ -24,7 +24,7 @@ describe('createPayment handler', () => {
       savePaymentMethod: false,
       savedPaymentMethodKey: 'savedPaymentMethodKey string value',
       savedPaymentMethodAlias: '',
-      initRequest: '{}'
+      initRequest: '{"refno2": "refno2", "option": { "returnMaskedCardNumber": true }}'
     };
   };
 
@@ -89,7 +89,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
+              'message': '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',
@@ -136,7 +136,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
+              'message': '{"body":{"refno2":"refno2","option":{"returnMaskedCardNumber":true,"createAlias":false},"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"webhook":{"url":"https://webhookUrl.fake"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',

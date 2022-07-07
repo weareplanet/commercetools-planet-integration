@@ -61,5 +61,8 @@ export interface IInitializeTransaction {
     cancelUrl: string;
     errorUrl: string;
   };
+  webhook: {
+    url: string;
+  }
   [key: string]: unknown;
 }
