@@ -1,3 +1,5 @@
+import { ICreatePaymentRequestBodySchemaType } from '../../app/interfaces';
+
 export const RedirectAndLightboxPaymentInitRequestBody = {
   action: 'Create',
   resource: {
@@ -32,7 +34,7 @@ export const RedirectAndLightboxPaymentInitRequestBody = {
       interfaceInteractions: []
     }
   }
-} as any;
+} as unknown as ICreatePaymentRequestBodySchemaType;
 
 export const RedirectAndLightboxPaymentInitResponseBody = {
   statusCode: 200,
