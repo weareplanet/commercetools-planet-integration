@@ -151,6 +151,7 @@ const PaymentSchema = yup.object({
     return true;
   });
 
+type PaymentSchemaType = yup.TypeOf<typeof PaymentSchema>;
 
 const RequestBodySchema = yup.object({
   action: yup.string().required(),
@@ -162,7 +163,6 @@ const RequestBodySchema = yup.object({
 });
 
 type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
-type PaymentSchemaType = yup.TypeOf<typeof PaymentSchema>;
 
 export {
   RequestBodySchema, // This is exported to perform the validation (where handler is leveraged)
