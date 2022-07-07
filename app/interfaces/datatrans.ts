@@ -53,7 +53,7 @@ export interface IInitializeTransaction {
   paymentMethods?: DatatransPaymentMethod[];
   language?: string;
   option?: {
-    createAlias: boolean;
+    createAlias?: boolean;
     [key: string]: unknown;
   };
   redirect?: {

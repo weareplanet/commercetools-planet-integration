@@ -21,9 +21,9 @@ export const toInitializeTransaction = (payment: ICommerceToolsPaymentType, webh
       cancelUrl: custom?.fields?.cancelUrl,
       errorUrl: custom?.fields?.errorUrl,
     }),
-    webhook: () => webhookUrl ? ({
+    webhook: () => ({
       url: webhookUrl
-    }) : undefined,
+    }),
   }, { undefinedValues: { strip: true } }))(payment);
   const option = result.option || payment?.custom?.fields?.initRequest?.option
     ? {
@@ -35,7 +35,7 @@ export const toInitializeTransaction = (payment: ICommerceToolsPaymentType, webh
     : {};
 
   return {
-    ...(payment?.custom?.fields?.initRequest as Record<string, unknown>),
+    ...payment?.custom?.fields?.initRequest,
     ...result,
     ...option
   };
