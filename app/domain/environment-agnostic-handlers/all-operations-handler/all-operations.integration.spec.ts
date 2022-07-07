@@ -68,6 +68,7 @@ describe('Main handler', () => {
       expect(result).toEqual(
         {
           statusCode: HttpStatusCode.OK,
+          body: ''
         }
       );
     });
