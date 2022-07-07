@@ -6,21 +6,24 @@ import {
   DatatransPaymentMethod
 } from '../../../interfaces';
 
-export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IInitializeTransaction => {
+export const toInitializeTransaction = (payment: ICommerceToolsPaymentType, webhookUrl: string): IInitializeTransaction => {
   const result = morphism(createSchema<IInitializeTransaction, ICommerceToolsPaymentType>({
     refno: ({ custom }) => custom?.fields?.merchantId,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
     amount: ({ amountPlanned }) => amountPlanned?.centAmount,
     paymentMethods: ({ paymentMethodInfo }) => paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as DatatransPaymentMethod[],
     language: ({ custom }) => custom?.fields?.language,
-    option: ({ custom }) => custom?.fields?.savePaymentMethod ? ({
+    option: ({ custom }) => custom?.fields?.savePaymentMethod !== undefined ? ({
       createAlias: custom?.fields?.savePaymentMethod
     }) : undefined,
     redirect: ({ custom }) => ({
       successUrl: custom?.fields?.successUrl,
       cancelUrl: custom?.fields?.cancelUrl,
       errorUrl: custom?.fields?.errorUrl,
-    })
+    }),
+    webhook: () => ({
+      url: webhookUrl
+    }),
   }, { undefinedValues: { strip: true } }))(payment);
   const option = result.option || payment?.custom?.fields?.initRequest?.option
     ? {
@@ -29,7 +32,7 @@ export const toInitializeTransaction = (payment: ICommerceToolsPaymentType): IIn
         ...result.option
       }
     }
-    : { option: undefined };
+    : {};
 
   return {
     ...payment?.custom?.fields?.initRequest,

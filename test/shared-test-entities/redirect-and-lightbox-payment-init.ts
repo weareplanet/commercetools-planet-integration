@@ -54,7 +54,7 @@ export const RedirectAndLightboxPaymentInitResponseBody = {
         action: 'addInterfaceInteraction',
         fields: {
           interactionType: 'initRequest',
-          message: '{"body":{"refno":"Test_merchant_id","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"}}}',
+          message: '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"Test_merchant_id","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"}}}',
         },
         type: {
           key: 'pp-datatrans-interface-interaction-type',
@@ -87,6 +87,9 @@ export const CreateInitializeTransactionRequest = {
     successUrl: 'https://google.com',
     cancelUrl: 'https://google.com',
     errorUrl: 'https://google.com'
+  },
+  webhook: {
+    url: 'https://webhookUrl.fake'
   }
 };
 

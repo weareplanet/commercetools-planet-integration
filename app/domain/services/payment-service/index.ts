@@ -7,12 +7,14 @@ import logger from '../log-service';
 import { DatatransService } from '../datatrans-service';
 import { CommerceToolsActionsBuilder } from '../commerce-tools-actions-builder';
 import { toInitializeTransaction } from '../datatrans-service/mapper';
+import configService from '../config-service';
 
 export class PaymentService {
   async initRedirectAndLightboxInit(payment: ICommerceToolsPaymentType): Promise<PaymentUpdateAction[]> {
+    const datatransConfig = configService.getConfig().datatrans;
     const datatransService = new DatatransService();
     const actionsBuilder = new CommerceToolsActionsBuilder();
-    const initializeTransactionPayload = toInitializeTransaction(payment);
+    const initializeTransactionPayload = toInitializeTransaction(payment, datatransConfig.webhookUrl);
     const { data: transaction, headers: { location } } = await datatransService
       .createInitializeTransaction(initializeTransactionPayload);
 

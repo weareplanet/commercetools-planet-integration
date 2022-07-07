@@ -53,7 +53,7 @@ export interface IInitializeTransaction {
   paymentMethods?: DatatransPaymentMethod[];
   language?: string;
   option?: {
-    createAlias: boolean;
+    createAlias?: boolean;
     [key: string]: unknown;
   };
   redirect?: {
@@ -61,5 +61,8 @@ export interface IInitializeTransaction {
     cancelUrl: string;
     errorUrl: string;
   };
+  webhook: {
+    url: string;
+  }
   [key: string]: unknown;
 }
