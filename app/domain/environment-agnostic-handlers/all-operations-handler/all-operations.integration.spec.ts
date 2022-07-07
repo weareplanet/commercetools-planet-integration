@@ -30,42 +30,46 @@ describe('Main handler', () => {
     jest.unmock('axios');
   });
 
-  it('should go through Redirect&Lightbox Payment Init flow', async () => {
-    clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponse);
+  describe('When CommerceTools send request with body which match Redirect&Lightbox Payment Init operation criteria', () => {
+    it('should go through Redirect&Lightbox Payment Init operation', async () => {
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponse);
 
-    const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBody });
+      const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBody });
 
-    expect(clientMock.post).toBeCalledWith(
-      'https://apiUrl.test.fake/transactions',
-      CreateInitializeTransactionRequest,
-      {
-        auth: {
-          password: 'Test_merchant_password',
-          username: 'Test_merchant_id'
-        },
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8'
+      expect(clientMock.post).toBeCalledWith(
+        'https://apiUrl.test.fake/transactions',
+        CreateInitializeTransactionRequest,
+        {
+          auth: {
+            password: 'Test_merchant_password',
+            username: 'Test_merchant_id'
+          },
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+          }
         }
-      }
-    );
-    expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseBody);
+      );
+      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseBody);
+    });
   });
 
-  it('should return response success for not supported flows', async () => {
-    const req = {
-      body: {
-        resource: {
-          obj: {}
+  describe('When CommerceTools send request with body which doesn\'t match any operations criteria', () => {
+    it('should return response success for not supported operation', async () => {
+      const noOperationRequestBody = {
+        body: {
+          resource: {
+            obj: {}
+          }
         }
-      }
-    };
+      };
 
-    const result = await handler(req);
+      const result = await handler(noOperationRequestBody);
 
-    expect(result).toEqual(
-      {
-        statusCode: HttpStatusCode.OK,
-      }
-    );
+      expect(result).toEqual(
+        {
+          statusCode: HttpStatusCode.OK,
+        }
+      );
+    });
   });
 });
