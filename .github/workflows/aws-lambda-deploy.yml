@@ -22,7 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Snooping ENV vars
-        run: echo "github.actor: ${{ github.actor }}"
+        run: |
+          echo "github.actor: ${{ github.actor }}"
       - name: Snooping the GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
