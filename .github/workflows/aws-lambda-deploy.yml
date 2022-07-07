@@ -15,12 +15,29 @@ on:
         - info
         - warning
         - debug 
-
+      branch:
+        description: 'branch to run tests against'
+        type: string
+        required: true
+      tags:
+        description: 'Test scenario tags'
+        required: false 
+        type: boolean
+ 
 jobs:
   lambda-build-zip-bucket-deploy:
     name: deploy lambda function as zip package
     runs-on: ubuntu-latest
     steps:
+      - name: Logging the manual inputs
+        run: |
+          echo "Log level: $LEVEL"
+          echo "Tags: $TAGS"
+          echo "Branch: $BRANCH"
+        env:
+          LEVEL: ${{ inputs.logLevel }}
+          TAGS: ${{ inputs.tags }}
+          BRANCH: ${{ inputs.branch }}
       - name: Get the codebase from the git repo
         uses: actions/checkout@v3
         with:
