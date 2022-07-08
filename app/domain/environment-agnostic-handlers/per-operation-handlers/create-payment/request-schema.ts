@@ -80,7 +80,7 @@ const PaymentSchema = yup.object({
             (value) => !value
           )
         }),
-      savedPaymentMethodKey: yup
+      savedPaymentMethodsKey: yup
         .string()
         .optional()
         .when('savePaymentMethod', {
