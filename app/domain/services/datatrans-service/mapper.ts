@@ -8,7 +8,7 @@ import {
 
 export const toInitializeTransaction = (payment: ICommerceToolsPaymentType, webhookUrl: string): IInitializeTransaction => {
   const result = morphism(createSchema<IInitializeTransaction, ICommerceToolsPaymentType>({
-    refno: ({ custom }) => custom?.fields?.merchantId,
+    refno: ({ key }) => key,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
     amount: ({ amountPlanned }) => amountPlanned?.centAmount,
     paymentMethods: ({ paymentMethodInfo }) => paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as DatatransPaymentMethod[],

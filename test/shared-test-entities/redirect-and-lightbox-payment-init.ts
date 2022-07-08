@@ -23,6 +23,7 @@ export const RedirectAndLightboxPaymentInitRequestBody = {
           id: '89637766-02f9-4391-9c7a-9077d9662daf'
         },
         fields: {
+          key: 'refno',
           cancelUrl: 'https://google.com',
           merchantId: 'Test_merchant_id',
           successUrl: 'https://google.com',
@@ -54,7 +55,7 @@ export const RedirectAndLightboxPaymentInitResponseBody = {
         action: 'addInterfaceInteraction',
         fields: {
           interactionType: 'initRequest',
-          message: '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"Test_merchant_id","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"}}}',
+          message: '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"}}}',
         },
         type: {
           key: 'pp-datatrans-interface-interaction-type',
@@ -79,7 +80,7 @@ export const RedirectAndLightboxPaymentInitResponseBody = {
 };
 
 export const CreateInitializeTransactionRequest = {
-  refno: 'Test_merchant_id',
+  refno: '12345318909876543216',
   currency: 'EUR',
   amount:1555,
   paymentMethods:['VIS','PAP'],
