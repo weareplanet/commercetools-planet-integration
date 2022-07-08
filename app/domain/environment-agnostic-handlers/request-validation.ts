@@ -28,7 +28,14 @@ export const wrapHandlerToValidateInput = <TRequestBody>(lowLevelHandler: IAbstr
         logger.error({ err }, 'Input validation error');
         return {
           statusCode: HttpStatusCode.BAD_REQUEST,
-          body: { message: err.message }
+          body: {
+            message: err.message,
+            errors: [{
+              message: err.message,
+              code: 'InvalidInput',
+              extensionExtraInfo: err,
+            }]
+          }
         };
       }
     }
