@@ -89,7 +89,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
+              'message': '{"body":{"webhook":{"url":"https://webhookUrl.fake"},"refno":"key string value","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',
@@ -136,7 +136,7 @@ describe('createPayment handler', () => {
             'action': 'addInterfaceInteraction',
             'fields': {
               'interactionType': 'initRequest',
-              'message': '{"body":{"refno2":"refno2","option":{"returnMaskedCardNumber":true,"createAlias":false},"refno":"Test_merchant_id","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"webhook":{"url":"https://webhookUrl.fake"}}}',
+              'message': '{"body":{"refno2":"refno2","option":{"returnMaskedCardNumber":true,"createAlias":false},"refno":"key string value","redirect":{"successUrl":"successUrl string value","cancelUrl":"cancelUrl string value","errorUrl":"errorUrl string value"},"webhook":{"url":"https://webhookUrl.fake"}}}',
             },
             'type': {
               'key': 'pp-datatrans-interface-interaction-type',
@@ -166,7 +166,7 @@ describe('createPayment handler', () => {
   describe('when the request body misses a required field - responds with status 400 and the corresponding error message', () => {
     it('key', async () => {
       const requestWithoutPaymentKey = requestWithOnlyRequiredFields();
-      delete (requestWithoutPaymentKey.body as RequestBodySchemaType).resource.obj.key;
+      delete (requestWithoutPaymentKey.body as unknown as RequestBodySchemaType).resource.obj.key;
 
       const response = await handler(requestWithoutPaymentKey);
 

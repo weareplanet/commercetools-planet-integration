@@ -17,13 +17,13 @@ export class DatatransService {
     this.client = axios.create();
   }
 
-  createInitializeTransaction(transaction: IInitializeTransaction) {
-    const merchant = this.config.merchants?.find(({ id }) => transaction.refno === id);
+  createInitializeTransaction(merchantId: string, transaction: IInitializeTransaction) {
+    const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
     const baseUrl = merchant.environment === DatatransEnvironment.TEST
       ? this.config.apiUrls.test
       : this.config.apiUrls.prod;
     const merchantAuth = {
-      username: transaction.refno,
+      username: merchant.id,
       password: merchant.password
     };
 

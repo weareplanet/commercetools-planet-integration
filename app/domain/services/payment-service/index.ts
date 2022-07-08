@@ -15,10 +15,11 @@ export class PaymentService {
     const datatransService = new DatatransService();
     const actionsBuilder = new CommerceToolsActionsBuilder();
     const initializeTransactionPayload = toInitializeTransaction(payment, datatransConfig.webhookUrl);
-    const { data: transaction, headers: { location } } = await datatransService
-      .createInitializeTransaction(initializeTransactionPayload);
-
     logger.debug({ body: initializeTransactionPayload }, 'DataTrans initRequest');
+
+    const { data: transaction, headers: { location } } = await datatransService
+      .createInitializeTransaction(payment.custom?.fields?.merchantId, initializeTransactionPayload);
+
     logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
 
     const actions = actionsBuilder
