@@ -9,7 +9,7 @@ import {
   DatatransPaymentMethod
 } from '../../../interfaces';
 import { DatatransService } from '../datatrans-service';
-import { CommerceToolsActionsBuilder } from '../commerce-tools-actions-builder';
+import { CommerceToolsActionsBuilder } from '../commercetools-service';
 import { toInitializeTransaction } from '../datatrans-service/mapper';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommercetoolsMapper } from './dt-to-ct-mapper';
