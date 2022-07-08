@@ -2,6 +2,6 @@
 export enum CommerceToolsCustomTypeKey {
   PlanetPaymentRedirectPaymentType = 'pp-datatrans-redirect-payment-type',
   PlanetPaymentSecuredFieldPaymentType = 'pp-datatrans-securefields-payment-type',
-  PlanetPaymentCustomInteractionType = 'pp-datatrans-interface-interaction-type',
+  PlanetPaymentInterfaceInteractionType = 'pp-datatrans-interface-interaction-type',
   PlanetPaymentUsedMethodType = 'pp-datatrans-usedmethod-type'
 }

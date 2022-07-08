@@ -1,12 +1,13 @@
-import { PaymentUpdateAction } from '@commercetools/platform-sdk';
+import { type PaymentUpdateAction } from '@commercetools/platform-sdk';
 
 import configService from '../config-service';
 import logger from '../log-service';
 import {
+  CommerceToolsCustomTypeKey,
   CommerceToolsCustomInteractionType,
   ICommerceToolsPayment,
   DatatransTransactionStatus,
-  DatatransPaymentMethod
+  DatatransPaymentMethod,
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPaylod } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
@@ -55,57 +56,32 @@ export class PaymentService {
       .getActions();
   }
 
-  async createAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
-    const commerceToolsService = new CommerceToolsService();
-    const payment = await commerceToolsService.getPayment(opts.paymentKey);
+  async saveAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
+    const payment = await CommerceToolsService.getPayment(opts.paymentKey);
 
-    const currentTime = (new Date()).toISOString(); // UTC date & time in ISO 8601 format (YYYY-MM-DDThh:mm:ss.sssZ)
+    const actionsBuilder = CommerceToolsService.getActionsBuilder();
 
-    // TODO: I order to adjust the approach with one Dmytro used in PR#19 -
-    // instead of passing paymentDraft and transactionDraft to commerceToolsService.addTransactionToPayment:
-    // prepare "actions" using Dmytro's CommerceToolsActionsBuilder (after PR#19 merge) -
-    // and pass them into commerceToolsService.updatePayment.
-    // What will be additionally needed is to extract the "custom type reference factory" from CommerceToolsActionsBuilder.addInterfaceInteraction
-    // into a separate method (likely a static method of CommerceToolsActionsBuilder)
-    // to reuse it in both CommerceToolsActionsBuilder.addInterfaceInteraction and
-    // here for TransactionDraft.custom.type generation.
-    await commerceToolsService.addTransactionToPayment({
-      payment,
-      paymentDraft: {
-        paymentStatus: {
-          interfaceCode: opts.paymentStatus
-        },
-        interfaceInteractions: [ // TODO: Dmytro's CommerceToolsActionsBuilder can be used here to generate the type
-          {
-            type: {
-              typeId: 'type',
-              key: 'pp-datatrans-interface-interaction-type'
-            },
-            interactionType: CommerceToolsCustomInteractionType.webhook,
-            timeStamp: currentTime,
-            message: opts.rawRequestBody
-          }
-        ]
+    actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
+
+    actionsBuilder.addInterfaceInteraction(CommerceToolsCustomInteractionType.webhook, opts.rawRequestBody);
+
+    actionsBuilder.addTransaction({
+      type: 'Authorization',
+      timestamp: (new Date()).toISOString(), // TODO: “date“ from the history entry with "action" : "authorize"
+      amount: {
+        centAmount: payment.amountPlanned.centAmount,
+        currencyCode: payment.amountPlanned.currencyCode
       },
-      transactionDraft: {
-        type: 'Authorization',
-        timestamp: currentTime,
-        amount: {
-          centAmount: payment.amountPlanned.centAmount,
-          currencyCode: payment.amountPlanned.currencyCode
-        },
-        state: DatatransToCommercetoolsMapper.inferCtTransactionState(opts.paymentStatus),
-        interactionId: opts.transactionId,
-        custom: { // TODO: Dmytro's CommerceToolsActionsBuilder can be used here to generate the type
-          type: {
-            typeId: 'type',
-            key: 'pp-datatrans-usedmethod-type'
-          },
-          fields: {
-            paymentMethod: opts.paymentMethod
-          }
+      state: DatatransToCommercetoolsMapper.inferCtTransactionState(opts.paymentStatus),
+      interactionId: opts.transactionId,
+      custom: {
+        type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
+        fields: {
+          paymentMethod: opts.paymentMethod
         }
       }
     });
+
+    await CommerceToolsService.updatePayment(payment, actionsBuilder.getActions());
   }
 }

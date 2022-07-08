@@ -4,10 +4,21 @@ import {
   CommerceToolsCustomInteractionType,
 } from '../../../interfaces';
 
-import { PaymentUpdateAction } from '@commercetools/platform-sdk';
+import {
+  PaymentUpdateAction,
+  TypeResourceIdentifier,
+  TransactionDraft
+} from '@commercetools/platform-sdk';
 
 export class CommerceToolsActionsBuilder {
   private actions: PaymentUpdateAction[] = [];
+
+  makeCustomTypeReference(typeKey: CommerceToolsCustomTypeKey): TypeResourceIdentifier {
+    return {
+      typeId: 'type',
+      key: typeKey,
+    };
+  }
 
   setCustomField(field: string, value: unknown) {
     this.actions.push({
@@ -30,16 +41,24 @@ export class CommerceToolsActionsBuilder {
     return this;
   }
 
-  addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, message: ICommerceToolsCustomInterfaceInteractionInfo) {
+  addTransaction(transactionDraft: TransactionDraft) {
+    this.actions.push({
+      action: 'addTransaction',
+      transaction: transactionDraft
+    });
+
+    return this;
+  }
+
+  addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | ICommerceToolsCustomInterfaceInteractionInfo) {
+    const message = (typeof messageOrObject === 'string') ? messageOrObject : JSON.stringify(messageOrObject);
+
     this.actions.push({
       action: 'addInterfaceInteraction',
-      type: {
-        typeId: 'type',
-        key: CommerceToolsCustomTypeKey.PlanetPaymentCustomInteractionType,
-      },
+      type: this.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentInterfaceInteractionType),
       fields: {
-        message: JSON.stringify(message),
-        timeStamp: new Date().toISOString(),
+        message,
+        timeStamp: (new Date()).toISOString(),
         interactionType
       }
     });

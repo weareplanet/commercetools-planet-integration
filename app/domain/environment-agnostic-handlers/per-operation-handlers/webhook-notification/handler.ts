@@ -23,7 +23,7 @@ export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>)
   /// Process the request body
   // try {
   const paymentService = new PaymentService();
-  paymentService.createAuthorizationTransactionInCommerceTools({
+  paymentService.saveAuthorizationTransactionInCommerceTools({
     paymentKey: req.body.refno,
     paymentStatus: req.body.status,
     transactionId: req.body.transactionId,
