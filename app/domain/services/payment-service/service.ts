@@ -8,9 +8,7 @@ import {
   DatatransTransactionStatus,
   DatatransPaymentMethod
 } from '../../../interfaces';
-import { DatatransService } from '../datatrans-service';
-import { CommerceToolsActionsBuilder } from '../commercetools-service';
-import { toInitializeTransaction } from '../datatrans-service/mapper';
+import { DatatransService, toInitializeTransaction } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommercetoolsMapper } from './dt-to-ct-mapper';
 
@@ -31,7 +29,7 @@ export class PaymentService {
   async initRedirectAndLightboxInit(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
     const datatransConfig = configService.getConfig().datatrans;
     const datatransService = new DatatransService();
-    const actionsBuilder = new CommerceToolsActionsBuilder();
+    const actionsBuilder = CommerceToolsService.getActionsBuilder();
     const initializeTransactionPayload = toInitializeTransaction(payment, datatransConfig.webhookUrl);
 
     logger.debug({ body: initializeTransactionPayload }, 'DataTrans initRequest');
