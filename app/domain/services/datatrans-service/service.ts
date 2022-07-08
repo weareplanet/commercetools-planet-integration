@@ -39,6 +39,7 @@ export class DatatransService {
     this.client = axios.create();
   }
 
+  // TODO: make this method static?
   createInitializeTransaction(merchantId: string, transaction: IDatatransInitializeTransaction) {
     const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
     const baseUrl = merchant.environment === DatatransEnvironment.TEST

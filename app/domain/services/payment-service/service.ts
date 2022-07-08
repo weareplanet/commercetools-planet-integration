@@ -8,7 +8,7 @@ import {
   DatatransTransactionStatus,
   DatatransPaymentMethod
 } from '../../../interfaces';
-import { DatatransService, toInitializeTransaction } from '../datatrans-service';
+import { DatatransService, prepareInitializeTransactionRequestPaylod } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommercetoolsMapper } from './dt-to-ct-mapper';
 
@@ -26,20 +26,21 @@ interface CreateAuthorizationTransactionOptions {
 // - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DtatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
 export class PaymentService {
-  async initRedirectAndLightboxInit(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
-    const datatransConfig = configService.getConfig().datatrans;
-    const datatransService = new DatatransService();
-    const actionsBuilder = CommerceToolsService.getActionsBuilder();
-    const initializeTransactionPayload = toInitializeTransaction(payment, datatransConfig.webhookUrl);
+  async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
+    const initializeTransactionPayload = prepareInitializeTransactionRequestPaylod(
+      payment,
+      configService.getConfig().datatrans.webhookUrl
+    );
 
     logger.debug({ body: initializeTransactionPayload }, 'DataTrans initRequest');
 
+    const datatransService = new DatatransService();
     const { data: transaction, headers: { location } } = await datatransService
-      .createInitializeTransaction(payment.custom?.fields?.merchantId, initializeTransactionPayload);
+      .createInitializeTransaction(payment.custom.fields.merchantId, initializeTransactionPayload);
 
     logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
 
-    const actions = actionsBuilder
+    return CommerceToolsService.getActionsBuilder()
       .setCustomField('transactionId', transaction.transactionId)
       .setCustomField('redirectUrl', location)
       .addInterfaceInteraction(
@@ -52,11 +53,9 @@ export class PaymentService {
       )
       .setStatus({ interfaceCode: 'Initial' })
       .getActions();
-
-    return actions;
   }
 
-  async createAuthorizationTransaction(opts: CreateAuthorizationTransactionOptions) {
+  async createAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
     const commerceToolsService = new CommerceToolsService();
     const payment = await commerceToolsService.getPayment(opts.paymentKey);
 
