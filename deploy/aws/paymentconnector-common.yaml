@@ -99,7 +99,13 @@ Resources:
           CT_PROJECT_ID: "CommerceTools PROJECT ID"
           CT_AUTH_URL: "CommerceTools AUTHENTICATION URL"
           CT_API_URL: "CommerceTools API URL"
+          # CT or DT ? Or both?
           CT_MERCHANTS: "CommerceTools MERCHANTS"
+          DT_MERCHANTS: "Datatrans MERCHANTS"
+          DT_CONNECTOR_WEBHOOK_URL: "Datatrans Connector Webhook"
+          DT_PROD_API_URL: "Datatrans PRODUCTION API URL"
+          DT_TEST_API_URL: "Datatrans TEST API URL"
+          LOG_LEVEL: "debug"
 
   LambdaLogGroupDummy:
     Type: "AWS::Logs::LogGroup"
