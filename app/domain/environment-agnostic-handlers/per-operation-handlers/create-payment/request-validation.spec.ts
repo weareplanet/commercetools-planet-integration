@@ -22,7 +22,7 @@ describe('createPayment handler', () => {
   const optionalCustomFields = () => {
     return {
       savePaymentMethod: false,
-      savedPaymentMethodKey: 'savedPaymentMethodKey string value',
+      savedPaymentMethodsKey: 'savedPaymentMethodKey string value',
       savedPaymentMethodAlias: '',
       initRequest: '{"refno2": "refno2", "option": { "returnMaskedCardNumber": true }}'
     };
@@ -290,11 +290,11 @@ describe('createPayment handler', () => {
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with status 400 and the corresponding error message', async () => {
-          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
 
           expect(response.body).toMatchObject({
-            message: 'Custom field savedPaymentMethodKey is missing in Payment'
+            message: 'Custom field savedPaymentMethodsKey is missing in Payment'
           });
 
           expect(response.statusCode).toEqual(400);
@@ -317,7 +317,7 @@ describe('createPayment handler', () => {
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
@@ -340,7 +340,7 @@ describe('createPayment handler', () => {
 
       describe('and savedPaymentMethodKey is absent', () => {
         it('responds with 200', async () => {
-          delete request.body.resource.obj.custom.fields.savedPaymentMethodKey;
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
 
           expect(response.statusCode).toEqual(200);
