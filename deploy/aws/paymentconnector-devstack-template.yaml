@@ -1,0 +1,115 @@
+
+# it depends on 
+# deploying the "paymentconnector-common" CF stack
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Payment Connector - Lambdas
+
+Parameters:
+  lambdaFunctionNameNoAPI:
+    Type: "String"
+    AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
+    Description: Lambda function name.
+    Default: "STACKNAME-DEVELOPER"
+
+Resources:
+
+  LambdaFunctionNoAPI:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          exports.handler = async function(event, context) {
+            return { statusCode: 200, body: 'Hello World, from STACKNAME-DEVELOPER, the api-less one!' };
+          };
+      Description: Lambda function for Payment Connector, without API Gateway.
+      FunctionName: !Ref "lambdaFunctionNameNoAPI"
+      Handler: index.handler
+      MemorySize: 128
+      Role: !GetAtt LambdaIamRole.Arn
+      Runtime: nodejs16.x
+      Timeout: 60
+      Environment:
+        Variables:
+          CT_CLIENT_ID: "CommerceTools CLIENT ID"
+          CT_CLIENT_SECRET: "CommerceTools CLIENT SECRET"
+          CT_PROJECT_ID: "CommerceTools PROJECT ID"
+          CT_AUTH_URL: "CommerceTools AUTHENTICATION URL"
+          CT_API_URL: "CommerceTools API URL"
+          # CT or DT ? Or both?
+          CT_MERCHANTS: "CommerceTools MERCHANTS"
+          DT_MERCHANTS: "Datatrans MERCHANTS"
+          DT_CONNECTOR_WEBHOOK_URL: "Datatrans Connector Webhook"
+          DT_PROD_API_URL: "Datatrans PRODUCTION API URL"
+          DT_TEST_API_URL: "Datatrans TEST API URL"
+          LOG_LEVEL: "debug"
+
+  LambdaFunctionNoAPIURL:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: "AWS_IAM"
+      TargetFunctionArn: !GetAtt LambdaFunctionNoAPI.Arn
+
+  LambdaIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Effect: "Allow"
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionNameNoAPI}:*"
+          PolicyName: !Join ["", [{"Ref": "AWS::StackName"}, "-lambda-log"]]
+
+  LambdaPermissionNoAPI:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunctionNoAPI.Arn
+      Action: lambda:InvokeFunctionURL
+      Principal: "*"
+      FunctionUrlAuthType: "AWS_IAM"
+
+  LambdaLogGroupNoAPI:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${lambdaFunctionNameNoAPI}"
+      RetentionInDays: 60
+
+  SecretCTClientSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'Holds CT_CLIENT_SECRET'
+      GenerateSecretString:
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        -
+          #Key: !Join ["-", [{"Ref": "lambdaFunctionName"}, "CT_CLIENT_SECRET"]]
+          Key: !Ref "lambdaFunctionNameNoAPI"
+          Value: "CT_CLIENT_SECRET"
+  SecretCTMerchants:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'Holds CT_MERCHANTS (an array of objects, in JSON).'
+      SecretString: "[ {id: 'Test_merchant_id',password: 'Test_merchant_password',environment: 'test',dtHmacKey: 'Test_merchant_dtHmacKey' }]"
+      Tags:
+        -
+          #Key: !Join ["-", [{"Ref": "lambdaFunctionName"}, "CT_CLIENT_SECRET"]]
+          Key: !Ref "lambdaFunctionNameNoAPI"
+          Value: "CT_MERCHANTS"
