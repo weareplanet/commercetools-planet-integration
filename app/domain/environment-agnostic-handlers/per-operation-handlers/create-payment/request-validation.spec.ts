@@ -166,7 +166,7 @@ describe('createPayment handler', () => {
   describe('when the request body misses a required field - responds with status 400 and the corresponding error message', () => {
     it('key', async () => {
       const requestWithoutPaymentKey = requestWithOnlyRequiredFields();
-      delete (requestWithoutPaymentKey.body as unknown as RequestBodySchemaType).resource.obj.key;
+      delete (requestWithoutPaymentKey.body as RequestBodySchemaType).resource.obj.key;
 
       const response = await handler(requestWithoutPaymentKey);
 
