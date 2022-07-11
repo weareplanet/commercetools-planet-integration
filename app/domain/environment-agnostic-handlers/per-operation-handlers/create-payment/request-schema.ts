@@ -5,8 +5,6 @@ import { CommerceToolsPaymentSchema } from '../../../../interfaces';
 const RequestBodySchema = yup.object({
   action: yup.string().required(),
   resource: yup.object({
-    typeId: yup.string().required(),
-    id: yup.string().required(),
     obj: CommerceToolsPaymentSchema
   })
 });
