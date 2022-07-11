@@ -23,7 +23,7 @@ functions:
     events:
       - http:
           method: post
-          path: planet-extension
+          path: redirect-init
 
   webhookNotificationHandler:
     # Use the same allOperationsHandler - it is not a typo, it's done intentionally (see README).
@@ -33,4 +33,4 @@ functions:
     events:
       - http:
           method: post
-          path: webhook-notification
+          path: redirect-webhook
