@@ -71,10 +71,7 @@ Resources:
                   - "logs:PutLogEvents"
                 Effect: "Allow"
                 Resource:
-                  # below is the correct thing to do, but DEVs doesn't have permission to create IAM Roles, so they will share an existing one
-                  # (which isn't recommended by the AWS POLP "Principle Of Least Privilege" )
-                  #- !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionDummy}:*"
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda:*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionDummy}:*"
           PolicyName: !Join ["", [{"Ref": "AWS::StackName"}, "-lambda-log"]]
 
   # cannot have the lambda dummy function with a S3 payload without 
