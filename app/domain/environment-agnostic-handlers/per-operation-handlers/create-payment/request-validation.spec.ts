@@ -33,8 +33,6 @@ describe('createPayment handler', () => {
       body: {
         action: 'Create',
         resource: {
-          typeId: 'typeId',
-          id: 'id',
           obj: {
             key: 'key string value',
             custom: {

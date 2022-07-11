@@ -5,25 +5,21 @@ import {
   IAbstractResponse
 } from '../../../interfaces';
 import { logConnectorVersion } from '../../services/connector-version-service';
-import { UseCase, detectUsecase } from './usecase-detector';
+import { UseCaseDetector, UseCase } from './usecase-detector';
 import '../../services/config-service';
 
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';
 import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
-// import { WebhookRequestBody }  from '../../../interfaces';
 
 ///// PREPARE A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
 
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
-  // Connector initialization phase
   logConnectorVersion();
 
   // Delegate the request to a proper handler depending on the req content
-
-  const operation = detectUsecase(req);
-
-  switch (operation) {
+  const useCase = UseCaseDetector.detectCase(req);
+  switch (useCase) {
     case UseCase.RedirectAndLightboxInit: {
       return createPaymentHandler(req);
     }
