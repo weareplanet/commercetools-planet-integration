@@ -5,7 +5,7 @@ import {
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { RequestBodySchemaType } from './request-schema';
 import logger from '../../../services/log-service';
-import { PaymentService } from '../../../services/payment-service/service';
+// import { PaymentService } from '../../../services/payment-service/service';
 import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<IAbstractResponse> => {
@@ -22,22 +22,22 @@ export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>)
 
   /// Process the request body
   // try {
-  const paymentService = new PaymentService();
-  paymentService.saveAuthorizationTransactionInCommerceTools({
-    paymentKey: req.body.refno,
-    paymentStatus: req.body.status,
-    transactionId: req.body.transactionId,
-    paymentMethod: req.body.paymentMethod,
-    rawRequestBody
-  });
-  // } catch (err) {
+  // const paymentService = new PaymentService();
+  // paymentService.saveAuthorizationTransactionInCommerceTools({
+  //   paymentKey: req.body.refno,
+  //   paymentStatus: req.body.status,
+  //   transactionId: req.body.transactionId,
+  //   paymentMethod: req.body.paymentMethod,
+  //   rawRequestBody
+  // });
+  // // } catch (err) {
 
-  // }
+  // // }
 
-  return {
-    statusCode: HttpStatusCode.OK,
-    body: { message: 'Hello from Webhook DRAFT!' }
-  };
+  // return {
+  //   statusCode: HttpStatusCode.OK,
+  //   body: { message: 'Hello from Webhook DRAFT!' }
+  // };
 
   return {
     statusCode: HttpStatusCode.OK,
