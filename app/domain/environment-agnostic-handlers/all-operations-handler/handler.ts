@@ -1,4 +1,5 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
+import logger from '../../services/log-service';
 import {
   IAbstractRequest,
   IAbstractResponse
@@ -32,6 +33,7 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
     }
 
     default: {
+      logger.warn('Handler not found (no use case was detected)');
       return {
         statusCode: HttpStatusCode.OK,
         body: '',
