@@ -1,4 +1,4 @@
-// import { HttpStatusCode } from 'http-status-code-const-enum';
+import { HttpStatusCode } from 'http-status-code-const-enum';
 
 import {
   IAbstractRequest,
@@ -31,12 +31,10 @@ describe('Main handler', () => {
   });
 
   describe('When CommerceTools send request with body which match Redirect&Lightbox Payment Init operation criteria', () => {
-    it.only('should go through Redirect&Lightbox Payment Init operation', async () => {
+    it('should go through Redirect&Lightbox Payment Init operation', async () => {
       clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponse);
 
       const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBody });
-
-      console.log('---result', result);
 
       expect(clientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
@@ -55,24 +53,24 @@ describe('Main handler', () => {
     });
   });
 
-  // describe('When CommerceTools send request with body which doesn\'t match any operations criteria', () => {
-  //   it('should return response success for not supported operation', async () => {
-  //     const noOperationRequestBody = {
-  //       body: {
-  //         resource: {
-  //           obj: {}
-  //         }
-  //       }
-  //     };
+  describe('When CommerceTools send request with body which doesn\'t match any operations criteria', () => {
+    it('should return response success for not supported operation', async () => {
+      const noOperationRequestBody = {
+        body: {
+          resource: {
+            obj: {}
+          }
+        }
+      };
 
-  //     const result = await handler(noOperationRequestBody);
+      const result = await handler(noOperationRequestBody);
 
-  //     expect(result).toEqual(
-  //       {
-  //         statusCode: HttpStatusCode.OK,
-  //         body: ''
-  //       }
-  //     );
-  //   });
-  // });
+      expect(result).toEqual(
+        {
+          statusCode: HttpStatusCode.OK,
+          body: ''
+        }
+      );
+    });
+  });
 });
