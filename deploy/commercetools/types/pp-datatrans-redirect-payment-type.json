@@ -19,9 +19,9 @@
       "type": {
       	"name":	"Boolean"
       },
-      "name": "saveMethod",
+      "name": "savePaymentMethod",
       "label": {
-        "en": "Save method"
+        "en": "Save payment method"
       },
       "required": false
     },
@@ -29,9 +29,9 @@
       "type": {
       	"name": "String"
       },
-      "name": "savedMethodKey",
+      "name": "savedPaymentMethodsKey",
       "label": {
-      	"en": "Saved method key"
+      	"en": "Saved payment methods key"
       },
       "required": false
     },
@@ -39,9 +39,9 @@
       "type": {
       	"name": "String"
       },
-      "name": "savedMethodIndex",
+      "name": "savedPaymentMethodAlias",
       "label": {
-      	"en": "Saved method index"
+      	"en": "Saved payment method alias"
       },
       "required": false
     },

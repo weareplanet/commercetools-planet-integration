@@ -27,21 +27,31 @@
     },
     {
       "type": {
-        "name": "Boolean"
+      	"name":	"Boolean"
       },
-      "name": "saveMethod",
+      "name": "savePaymentMethod",
       "label": {
-        "en": "Save method"
+        "en": "Save payment method"
       },
       "required": false
     },
     {
       "type": {
-        "name": "String"
+      	"name": "String"
       },
-      "name": "savedMethodsKey",
+      "name": "savedPaymentMethodsKey",
       "label": {
-        "en": "Saved methods key"
+      	"en": "Saved payment methods key"
+      },
+      "required": false
+    },
+    {
+      "type": {
+      	"name": "String"
+      },
+      "name": "savedPaymentMethodAlias",
+      "label": {
+      	"en": "Saved payment method alias"
       },
       "required": false
     },
