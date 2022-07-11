@@ -13,7 +13,7 @@ export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>)
     const paymentService = new PaymentService();
     const payment = req.body.resource?.obj;
 
-    const actions = await paymentService.initRedirectAndLightboxInit(payment);
+    const actions = await paymentService.initRedirectAndLightbox(payment);
 
     return {
       statusCode: HttpStatusCode.OK,

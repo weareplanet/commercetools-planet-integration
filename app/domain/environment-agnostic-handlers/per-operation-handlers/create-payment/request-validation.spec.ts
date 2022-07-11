@@ -22,7 +22,7 @@ describe('createPayment handler', () => {
   const optionalCustomFields = () => {
     return {
       savePaymentMethod: false,
-      savedPaymentMethodsKey: 'savedPaymentMethodKey string value',
+      savedPaymentMethodsKey: 'savedPaymentMethodsKey string value',
       savedPaymentMethodAlias: '',
       initRequest: '{"refno2": "refno2", "option": { "returnMaskedCardNumber": true }}'
     };
@@ -277,7 +277,7 @@ describe('createPayment handler', () => {
     });
   });
 
-  describe('savedPaymentMethodKey specific validations', () => {
+  describe('savedPaymentMethodsKey specific validations', () => {
     let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
     beforeEach(() => {
       request = requestWithOptionalFields();
@@ -288,7 +288,7 @@ describe('createPayment handler', () => {
         request.body.resource.obj.custom.fields.savePaymentMethod = true;
       });
 
-      describe('and savedPaymentMethodKey is absent', () => {
+      describe('and savedPaymentMethodsKey is absent', () => {
         it('responds with status 400 and the corresponding error message', async () => {
           delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
@@ -301,7 +301,7 @@ describe('createPayment handler', () => {
         });
       });
 
-      describe('and savedPaymentMethodKey is present', () => {
+      describe('and savedPaymentMethodsKey is present', () => {
         it('responds with 200', async () => {
           const response = await handler(request);
 
@@ -315,7 +315,7 @@ describe('createPayment handler', () => {
         request.body.resource.obj.custom.fields.savePaymentMethod = false;
       });
 
-      describe('and savedPaymentMethodKey is absent', () => {
+      describe('and savedPaymentMethodsKey is absent', () => {
         it('responds with 200', async () => {
           delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
@@ -324,7 +324,7 @@ describe('createPayment handler', () => {
         });
       });
 
-      describe('and savedPaymentMethodKey is present', () => {
+      describe('and savedPaymentMethodsKey is present', () => {
         it('responds with 200', async () => {
           const response = await handler(request);
 
@@ -338,7 +338,7 @@ describe('createPayment handler', () => {
         delete request.body.resource.obj.custom.fields.savePaymentMethod;
       });
 
-      describe('and savedPaymentMethodKey is absent', () => {
+      describe('and savedPaymentMethodsKey is absent', () => {
         it('responds with 200', async () => {
           delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
           const response = await handler(request);
@@ -347,7 +347,7 @@ describe('createPayment handler', () => {
         });
       });
 
-      describe('and savedPaymentMethodKey is present', () => {
+      describe('and savedPaymentMethodsKey is present', () => {
         it('responds with 200', async () => {
           const response = await handler(request);
 

@@ -1,4 +1,9 @@
-import { DatatransEnvironment } from './interfaces';
+// `app/interfaces` has a (circular) dependency on ConfigService -
+// thus importing DatatransEnvironment from there hinders:
+// import { DatatransEnvironment } from '../../../interfaces';
+// Well, for testing it's not a big deal to not use DatatransEnvironment, but to hardcode the environment value(s) -
+// maybe it's even more "honest" testing.
+
 import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
@@ -49,7 +54,7 @@ describe('Connector config validations', () => {
         prod: 'https://prodUrl.test'
       },
       webhookUrl: 'https://webhookUrl.test',
-      merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }],
+      merchants: [{ id: 'id', password: 'password', environment: 'test', dtHmacKey: 'HMAC key' }],
     }
   };
 
@@ -432,7 +437,7 @@ describe('Connector config validations', () => {
 
     describe('merchants validations', () => {
 
-      describe('should throw validation error about merchants\' id for commerceToolsConfig', () => {
+      describe('should throw validation error about merchants\' id', () => {
         it('when it is absent', async() => {
           expect.assertions(4);
           const logger = await loadLogger();
@@ -482,7 +487,7 @@ describe('Connector config validations', () => {
         });
       });
 
-      describe('should throw validation error about merchants\' password for commerceToolsConfig', () => {
+      describe('should throw validation error about merchants\' password', () => {
         it('when it is absent', async() => {
           expect.assertions(4);
           const logger = await loadLogger();
@@ -492,7 +497,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: '1', environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+              merchants: [{ id: '1', environment: 'test', dtHmacKey: 'HMAC key' }]
             }
           });
 
@@ -515,7 +520,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: '1', password: 123, environment: DatatransEnvironment.TEST, dtHmacKey: 'HMAC key' }]
+              merchants: [{ id: '1', password: 123, environment: 'test', dtHmacKey: 'HMAC key' }]
             }
           });
 
@@ -530,7 +535,7 @@ describe('Connector config validations', () => {
         });
       });
 
-      describe('should throw validation error about merchants\' enviroment for commerceToolsConfig', () => {
+      describe('should throw validation error about merchants\' enviroment', () => {
         it('when it is absent', async() => {
           expect.assertions(4);
           const logger = await loadLogger();
@@ -571,14 +576,14 @@ describe('Connector config validations', () => {
             await import('.');
           } catch (err) {
             expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('merchant\'s enviroment must be one of the following values: prod, stage, test');
+            expect(err.message).toEqual('merchant\'s enviroment must be one of the following values: prod, test');
           }
           expect(logger.info).not.toHaveBeenCalled();
           expect(logger.debug).not.toHaveBeenCalled();
         });
       });
 
-      describe('should throw validation error about merchants\' dtHmacKey for commerceToolsConfig', () => {
+      describe('should throw validation error about merchants\' dtHmacKey', () => {
         it('when it is absent', async() => {
           expect.assertions(4);
           const logger = await loadLogger();
@@ -588,7 +593,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST }]
+              merchants: [{ id: 'id', password: 'password', environment: 'test' }]
             }
           });
 
@@ -603,7 +608,7 @@ describe('Connector config validations', () => {
         });
 
         it('when it is malformed', async() => {
-          // expect.assertions(2);
+          expect.assertions(4);
           const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
@@ -611,7 +616,7 @@ describe('Connector config validations', () => {
               ...testEnvVarsValues.datatrans,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              merchants: [{ id: 'id', password: 'password', environment: DatatransEnvironment.TEST, dtHmacKey: 123 }]
+              merchants: [{ id: 'id', password: 'password', environment: 'test', dtHmacKey: 123 }]
             }
           });
 
@@ -627,4 +632,5 @@ describe('Connector config validations', () => {
       });
     });
   });
+
 });

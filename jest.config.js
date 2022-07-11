@@ -2,6 +2,9 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testRegex: '.spec.ts$',
+  testPathIgnorePatterns: [
+    "<rootDir>/dist/"
+  ],
   collectCoverage: true,
   collectCoverageFrom: [
     'app/**/*.ts',
@@ -21,7 +24,7 @@ module.exports = {
   coverageThreshold: {
     global: {
       branches: 53,
-      functions: 77,
+      functions: 70,
       lines: 73,
       statements: 70
     }
