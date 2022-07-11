@@ -12,7 +12,7 @@ export {
 
 import { ICommerceToolsPayment }  from './payment';
 
-export interface ICommerceToolsExtensionRequestBoby {
+export interface ICommerceToolsExtensionRequestBody {
   action: ExtensionAction,
   resource: {
     obj: ICommerceToolsPayment;
