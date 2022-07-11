@@ -35,7 +35,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@commercetools/platform-sdk": "^2.8.0",
     "@types/aws-lambda": "^8.10.99",
     "@types/jest": "^28.1.1",
     "@types/jest-when": "^3.5.2",
