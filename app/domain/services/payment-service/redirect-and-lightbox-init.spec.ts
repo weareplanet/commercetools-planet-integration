@@ -45,8 +45,10 @@ const expectedResult = [
 
 describe('#initRedirectAndLightbox method', () => {
   let logger: Logger;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let loggingStream: any;
   const originalLogLevel = process.env.LOG_LEVEL;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let paymentService: any;
   const clientMock = {
     post: jest.fn()
@@ -91,6 +93,7 @@ describe('#initRedirectAndLightbox method', () => {
       BON: {
         alias: 'BON test card alias'
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any; // HACK: yup schema not allowed not declared fields
 
     const result = await paymentService.initRedirectAndLightbox(mockPayment);
