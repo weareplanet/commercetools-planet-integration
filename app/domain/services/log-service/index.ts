@@ -2,7 +2,16 @@ import pino from 'pino';
 
 const { LOG_LEVEL = 'debug' } = process.env;
 
-const pinoOptions = {
+const pathsToRedactedFields: string[] = [
+  // related to Payment obj in app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema.ts
+  'body.resource.obj.custom.savedPaymentMethodAlias',
+  'resource.obj.custom.savedPaymentMethodAlias',
+  'custom.savedPaymentMethodAlias',
+  // related to DataTrans transaction request body
+  'body.*.alias',
+];
+
+const pinoOptions: pino.LoggerOptions = {
   level: LOG_LEVEL,
   messageKey: 'message', // Log the string passed to a log method under this key (instead of the default `msg`)
   nestedKey: 'payload',  // Log the object passed to a log method under this key
@@ -16,7 +25,11 @@ const pinoOptions = {
     //   return {};
     // },
   },
-  base: {} // the same effect as of (now commented out) bindings above
+  base: {}, // the same effect as of (now commented out) bindings above
+  redact: {
+    paths: pathsToRedactedFields,
+    censor: '[REDACTED]'
+  }
 };
 
 export default pino(pinoOptions);
