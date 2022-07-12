@@ -7,24 +7,34 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Payment Connector - Lambdas
 
 Parameters:
-  lambdaFunctionNameNoAPI:
+  lambdaFunctionName:
     Type: "String"
     AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
     Description: Lambda function name.
     Default: "STACKNAME-DEVELOPER"
+  apiStageName:
+    Type: "String"
+    Description: API Staging Name.
+    Default: "v1"
+  apiResourcePath:
+    Type: "String"
+    Description: Resource Path for API.
+    Default: "{proxy}"
 
 Resources:
 
-  LambdaFunctionNoAPI:
+##### Lambda
+
+  LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         ZipFile: |
           exports.handler = async function(event, context) {
-            return { statusCode: 200, body: 'Hello World, from STACKNAME-DEVELOPER, the api-less one!' };
+            return { statusCode: 200, body: 'Hello World, from STACKNAME-DEVELOPER, with API-Gateway integration.' };
           };
       Description: Lambda function for Payment Connector, without API Gateway.
-      FunctionName: !Ref "lambdaFunctionNameNoAPI"
+      FunctionName: !Ref "lambdaFunctionName"
       Handler: index.handler
       MemorySize: 128
       Role: !GetAtt LambdaIamRole.Arn
@@ -45,11 +55,11 @@ Resources:
           DT_TEST_API_URL: "Datatrans TEST API URL"
           LOG_LEVEL: "debug"
 
-  LambdaFunctionNoAPIURL:
+  LambdaFunctionURL:
     Type: AWS::Lambda::Url
     Properties:
       AuthType: "AWS_IAM"
-      TargetFunctionArn: !GetAtt LambdaFunctionNoAPI.Arn
+      TargetFunctionArn: !GetAtt LambdaFunction.Arn
 
   LambdaIamRole:
     Type: AWS::IAM::Role
@@ -74,22 +84,151 @@ Resources:
                   - "logs:PutLogEvents"
                 Effect: "Allow"
                 Resource:
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionNameNoAPI}:*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionName}:*"
           PolicyName: !Join ["", [{"Ref": "AWS::StackName"}, "-lambda-log"]]
 
   LambdaPermissionNoAPI:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt LambdaFunctionNoAPI.Arn
+      FunctionName: !GetAtt LambdaFunction.Arn
       Action: lambda:InvokeFunctionURL
       Principal: "*"
       FunctionUrlAuthType: "AWS_IAM"
 
-  LambdaLogGroupNoAPI:
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: 'apigateway.amazonaws.com'
+
+  LambdaLogGroup:
     Type: "AWS::Logs::LogGroup"
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${lambdaFunctionNameNoAPI}"
-      RetentionInDays: 60
+      LogGroupName: !Sub "/aws/lambda/${lambdaFunctionName}"
+      RetentionInDays: 30
+
+##### API Gateway
+
+  ApiKey: 
+    Type: AWS::ApiGateway::ApiKey
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: !Join ["", [{"Ref": "AWS::StackName"}, "api key"]]
+      Enabled: true
+      GenerateDistinctId: false
+
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    DependsOn: ApiGatewayStage
+    Properties:
+      ApiStages: 
+      - ApiId: !Ref ApiGatewayRestApi
+        Stage: !Ref "apiStageName"    
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "API Gateway usage plan"]]
+      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
+
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: "An API Gateway for a Payment Connector Lambda."
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-api"]]
+
+  ApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref ApiGatewayRestApi
+      Schema: {}
+
+  ApiGatewayAccessLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/apigateway/STACKNAME-DEVELOPER-${ApiGatewayRestApi}"
+      RetentionInDays: 30
+
+  ApiGatewayLoggingIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+  ApiGatewayAccountConfig:
+    Type: "AWS::ApiGateway::Account"
+    DependsOn: ApiGatewayLoggingIAMRole
+    Properties:
+      CloudWatchRoleArn: !GetAtt "ApiGatewayLoggingIAMRole.Arn"
+
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      AccessLogSetting:
+        DestinationArn: !Sub ${ApiGatewayAccessLogGroup.Arn}
+        Format: "{ 'requestId':'$context.requestId', 'ip': '$context.identity.sourceIp', 'caller':'$context.identity.caller', 'user':'$context.identity.user','requestTime':'$context.requestTime', 'xrayTraceId':'$context.xrayTraceId', 'wafResponseCode':'$context.wafResponseCode', 'httpMethod':'$context.httpMethod','resourcePath':'$context.resourcePath', 'status':'$context.status','protocol':'$context.protocol', 'responseLength':'$context.responseLength' }"
+      DeploymentId: !Ref ApiGatewayDeployment
+      Description: Lambda API Stage v1
+      MethodSettings:
+        - ResourcePath: "/*"
+          DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: "ERROR"
+          MetricsEnabled: true
+          ThrottlingBurstLimit: 500
+          ThrottlingRateLimit: 1000
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: !Ref "apiStageName"
+      TracingEnabled: true
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ProxyResourceANY
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ProxyResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: !Ref "apiResourcePath"
+
+  ProxyResourceANY:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      ResourceId: !Ref ProxyResource
+      HttpMethod: GET
+      ApiKeyRequired: true
+      AuthorizationType: NONE
+      OperationName: !Ref "apiResourcePath"
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations'
+
+##### Secrets Manager
 
   SecretCTClientSecret:
     Type: AWS::SecretsManager::Secret
@@ -101,7 +240,7 @@ Resources:
       Tags:
         -
           #Key: !Join ["-", [{"Ref": "lambdaFunctionName"}, "CT_CLIENT_SECRET"]]
-          Key: !Ref "lambdaFunctionNameNoAPI"
+          Key: !Ref "lambdaFunctionName"
           Value: "CT_CLIENT_SECRET"
   SecretCTMerchants:
     Type: AWS::SecretsManager::Secret
@@ -111,5 +250,15 @@ Resources:
       Tags:
         -
           #Key: !Join ["-", [{"Ref": "lambdaFunctionName"}, "CT_CLIENT_SECRET"]]
-          Key: !Ref "lambdaFunctionNameNoAPI"
+          Key: !Ref "lambdaFunctionName"
           Value: "CT_MERCHANTS"
+
+Outputs:
+
+  ApiGatewayStageURL:
+    Description: "URL for the API Gateway stage"
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${apiStageName}/"
+  
+  LambdaFunction:
+    Description: "Developer Lambda function name"
+    Value: !Ref "lambdaFunctionName"

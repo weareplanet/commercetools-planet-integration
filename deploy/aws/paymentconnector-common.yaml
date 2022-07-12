@@ -16,7 +16,7 @@ Parameters:
   apiResourcePath:
     Type: "String"
     Description: Resource Path for API.
-    Default: "hello"
+    Default: "{proxy}"
   lambdaFunctionDummy:
     Type: "String"
     AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
@@ -148,8 +148,6 @@ Resources:
       ApiStages: 
       - ApiId: !Ref ApiGatewayRestApi
         Stage: !Ref "apiStageName"    
-      #Quota: 
-      #Throttle: 
       Description: !Join [" ", [{"Ref": "AWS::StackName"}, "API Gateway usage plan"]]
       UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
   ApiUsagePlanKey:
@@ -158,6 +156,34 @@ Resources:
       KeyId: !Ref ApiKey
       KeyType: API_KEY
       UsagePlanId: !Ref ApiUsagePlan
+
+  ApiGatewayAccessLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/apigateway/${lambdaFunctionDummy}"
+      RetentionInDays: 30
+
+  ApiGatewayLoggingIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+  ApiGatewayAccountConfig:
+    Type: "AWS::ApiGateway::Account"
+    DependsOn: ApiGatewayLoggingIAMRole
+    Properties:
+      CloudWatchRoleArn: !GetAtt "ApiGatewayLoggingIAMRole.Arn"
 
   ApiGatewayRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -179,10 +205,22 @@ Resources:
   ApiGatewayStage:
     Type: AWS::ApiGateway::Stage
     Properties:
+      AccessLogSetting:
+        DestinationArn: !Sub ${ApiGatewayAccessLogGroup.Arn}
+        Format: "{ 'requestId':'$context.requestId', 'ip': '$context.identity.sourceIp', 'caller':'$context.identity.caller', 'user':'$context.identity.user','requestTime':'$context.requestTime', 'xrayTraceId':'$context.xrayTraceId', 'wafResponseCode':'$context.wafResponseCode', 'httpMethod':'$context.httpMethod','resourcePath':'$context.resourcePath', 'status':'$context.status','protocol':'$context.protocol', 'responseLength':'$context.responseLength' }"
       DeploymentId: !Ref ApiGatewayDeployment
       Description: Lambda API Stage v1
+      MethodSettings:
+        - ResourcePath: "/*"
+          DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: "ERROR"
+          MetricsEnabled: true
+          ThrottlingBurstLimit: 500
+          ThrottlingRateLimit: 1000
       RestApiId: !Ref ApiGatewayRestApi
       StageName: !Ref "apiStageName"
+      TracingEnabled: true
 
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -267,3 +305,6 @@ Outputs:
       !Ref GitHubIAMUserAccessKey
   SecretKeyforGitHubIAMUserAccessKey:
     Value: !GetAtt GitHubIAMUserAccessKey.SecretAccessKey
+  ApiGatewayStageURL:
+    Description: "URL for the API Gateway stage"
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${apiStageName}/"
