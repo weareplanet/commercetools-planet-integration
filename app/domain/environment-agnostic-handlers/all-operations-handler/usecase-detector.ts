@@ -1,6 +1,7 @@
 import {
   IAbstractRequest,
-  ICommerceToolsExtensionRequestBody
+  ICommerceToolsExtensionRequest,
+  IDatatransWebhookRequest
 } from '../../../interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
@@ -17,18 +18,22 @@ enum PaymentInterface {
 
 export class UseCaseDetector {
 
-  public static isCommerceToolsRequest(req: IAbstractRequest): boolean {
-    return !!req.body && (typeof req.body === 'object') && !!(req.body as unknown as ICommerceToolsExtensionRequestBody).action;
+  // Type quard for ICommerceToolsExtensionRequest
+  public static isCommerceToolsRequest(req: IAbstractRequest | ICommerceToolsExtensionRequest): req is ICommerceToolsExtensionRequest {
+    const request = req as ICommerceToolsExtensionRequest;
+    return !!request.body && (typeof request.body === 'object') && !!request.body.action;
   }
 
-  public static isDatatransRequest(req: IAbstractRequest): boolean {
-    return !!req.headers && !!req.headers['Datatrans-Signature'];
+  // Type quard for IDatatransWebhookRequest
+  public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
+    const request = req as IDatatransWebhookRequest;
+    return !!request.headers && !!request.headers['Datatrans-Signature'];
   }
 
   public static detectCase = (req: IAbstractRequest) => {
 
     if (this.isCommerceToolsRequest(req)) {
-      const reqBody: ICommerceToolsExtensionRequestBody = req.body as unknown as ICommerceToolsExtensionRequestBody;
+      const reqBody = req.body;
       const payment = reqBody.resource.obj;
       const isRedirectLightboxPaymentFlow =
         reqBody.action === 'Create'
