@@ -1,15 +1,16 @@
 // Any object in the request body
 
-export type IAbstarctHeaders = Record<string, string>;
+export type IAbstractHeaders = Record<string, string>;
+export type IAbstractBody = string | Record<string, unknown>;
 
 export interface IAbstractRequest {
-  headers?: IAbstarctHeaders;
-  body: string | Record<string, unknown>;
+  headers?: IAbstractHeaders;
+  body: IAbstractBody;
 }
 
 export interface IAbstractResponse {
   statusCode: number;
-  body: string | Record<string, unknown>;
+  body: IAbstractBody;
 }
 
 export interface IAbstractRequestHandler {
@@ -23,7 +24,7 @@ export interface IAbstractToEnvHandlerAdapter<IEnvironmentReq, IEnvironmentRes> 
 // Specific object in the request body
 
 export interface IAbstractRequestWithTypedBody<TRequestBody> {
-  headers?: IAbstarctHeaders;
+  headers?: IAbstractHeaders;
   body: TRequestBody;
 }
 

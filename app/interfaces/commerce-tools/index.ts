@@ -1,6 +1,6 @@
-///// Re-export types of CommerceTools entities
 export * from './payment';
 export * from './interface-interaction';
 export * from './custom-type-keys';
-export * from './request-interfaces';
+// export * from './request-to-ct';
+export * from './request-from-ct';
 export * from './error';

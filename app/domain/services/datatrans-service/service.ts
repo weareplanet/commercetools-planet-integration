@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import configService from '../config-service';
 import { IDatatransConfig } from '../config-service/schema';
 import {
-  type IAbstarctHeaders,
+  type IAbstractHeaders,
   IDatatransInitializeTransaction,
   DatatransEnvironment
 } from '../../../interfaces';
@@ -16,7 +16,7 @@ export class DatatransService {
   private config: IDatatransConfig;
   private client: AxiosInstance;
 
-  public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstarctHeaders, requestBody: string) {
+  public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstractHeaders, requestBody: string) {
     // Datatrans-Signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
     const { groups: { timestamp, signature } } = reqHeaders['Datatrans-Signature'].match(/t=(?<timestamp>\d+),s0=(?<signature>.+)$/);
 

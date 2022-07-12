@@ -1,14 +1,14 @@
+import { HttpStatusCode } from 'http-status-code-const-enum';
+import logger from '../../../services/log-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
 } from '../../../../interfaces';
-import { HttpStatusCode } from 'http-status-code-const-enum';
-import { RequestBodySchemaType } from './request-schema';
-import logger from '../../../services/log-service';
+import { IDatatransWebhookRequestBody } from './request-schema';
 // import { PaymentService } from '../../../services/payment-service/service';
 // import { DatatransService } from '../../../services/datatrans-service';
 
-export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<IAbstractResponse> => {
+export default async (req: IAbstractRequestWithTypedBody<IDatatransWebhookRequestBody>): Promise<IAbstractResponse> => {
   logger.debug(req, 'Request from Datatrans');
 
   // const rawRequestBody = JSON.stringify(req.body);
