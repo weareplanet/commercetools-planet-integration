@@ -1,36 +1,31 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 
 import {
-  IAbstractRequest,
-  IAbstractResponse,
-} from '../../../interfaces';
-import {
   RedirectAndLightboxPaymentInitRequestBodyFactory,
   RedirectAndLightboxPaymentInitResponseBodyFactory,
   CreateInitializeTransactionRequestFactory,
   CreateInitializeTransactionMockResponseFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
-describe('Main handler', () => {
-  let handler: (req: IAbstractRequest) => Promise<IAbstractResponse>;
-  const clientMock = {
-    post: jest.fn()
-  };
-  const axiosMockFactory = () => ({
+const clientMock = {
+  post: jest.fn()
+};
+jest.mock('axios', () => {
+  return {
     create: () => clientMock
+  };
+});
+
+import handler from '.';
+
+
+describe('Main handler', () => {
+
+  afterEach(() => {
+    clientMock.post.mockReset();
   });
 
-  beforeAll(async () => {
-    jest.mock('axios', axiosMockFactory);
-
-    handler = (await import('./handler')).default;
-  });
-
-  afterAll(() => {
-    jest.unmock('axios');
-  });
-
-  describe('When CommerceTools send request with body which match Redirect&Lightbox Payment Init operation criteria', () => {
+  describe('When CommerceTools sends a request with body which matches Redirect&Lightbox Payment Init operation criteria', () => {
     it('should go through Redirect&Lightbox Payment Init operation', async () => {
       clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
 
@@ -53,9 +48,9 @@ describe('Main handler', () => {
     });
   });
 
-  describe('When CommerceTools send request with body which doesn\'t match any operations criteria', () => {
-    it('should return response success for not supported operation', async () => {
-      const noOperationRequestBody = {
+  describe('When CommerceTools sends a request with body which doesn\'t match any usecase criteria', () => {
+    it('should return 200 response with empty body', async () => {
+      const notSupportedUseCaseRequest = {
         body: {
           resource: {
             obj: {}
@@ -63,7 +58,7 @@ describe('Main handler', () => {
         }
       };
 
-      const result = await handler(noOperationRequestBody);
+      const result = await handler(notSupportedUseCaseRequest);
 
       expect(result).toEqual(
         {
