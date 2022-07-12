@@ -2,6 +2,7 @@ import pino from 'pino';
 
 describe('Redacted fields', () => {
   let logger: pino.Logger;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let loggingStream: any;
   let originalLogLevel: string;
 
