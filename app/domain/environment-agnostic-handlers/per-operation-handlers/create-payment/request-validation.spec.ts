@@ -491,8 +491,6 @@ describe('createPayment handler', () => {
           }
         });
 
-        console.log('response: ', response);
-
         expect(response.statusCode).toEqual(200);
       });
     });

@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '.spec.ts$',
   testPathIgnorePatterns: [
-    "<rootDir>/dist/"
+    '<rootDir>/dist/'
   ],
   collectCoverage: true,
   collectCoverageFrom: [
