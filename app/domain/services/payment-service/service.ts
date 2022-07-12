@@ -59,6 +59,8 @@ export class PaymentService {
   async saveAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
     const payment = await CommerceToolsService.getPayment(opts.paymentKey);
 
+    logger.debug(payment, 'Payment fetched from CT, before update');
+
     const actionsBuilder = CommerceToolsService.getActionsBuilder();
 
     actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
@@ -77,7 +79,8 @@ export class PaymentService {
       custom: {
         type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
         fields: {
-          paymentMethod: opts.paymentMethod
+          paymentMethod: opts.paymentMethod,
+          info: JSON.stringify({ paymentMethod: opts.paymentMethod })
         }
       }
     });

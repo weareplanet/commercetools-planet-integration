@@ -19,7 +19,7 @@ import configService from '../config-service';
 const appConfig = configService.getConfig();
 const projectKey = appConfig.commerceTools.projectId;
 
-const scopes = [ 'view_payments:' + projectKey ];
+const scopes = [ 'manage_payments:' + projectKey ]; // TODO: maybe we will need other scopes as well
 const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: appConfig.commerceTools.authUrl,
   projectKey: projectKey,
@@ -42,7 +42,6 @@ const ctpClient = new ClientBuilder()
   .withHttpMiddleware(httpMiddlewareOptions)
   // .withLoggerMiddleware()
   .build();
-
 
 // Create apiRoot from ClientBuilder
 // In the official tutorial (https://docs.commercetools.com/sdk/js-sdk-getting-started#create-the-client)

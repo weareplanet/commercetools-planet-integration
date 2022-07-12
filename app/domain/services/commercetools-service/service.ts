@@ -3,6 +3,7 @@ import {
   type PaymentUpdateAction
 } from '@commercetools/platform-sdk';
 
+import logger from './../log-service';
 import { ctApiRoot } from './commerce-tools-client';
 import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
 import configService from '../config-service';
@@ -26,7 +27,9 @@ export class CommerceToolsService {
   }
 
   public static async updatePayment(payment: Payment, actions: PaymentUpdateAction[]) {
-    return ctApiRoot
+    logger.debug(actions, `Actions prepared to update Payment ${payment.key}`);
+
+    const res = await ctApiRoot
       .withProjectKey({ projectKey: configService.getConfig().commerceTools.projectId })
       .payments()
       .withKey({ key: payment.key })
@@ -37,5 +40,8 @@ export class CommerceToolsService {
         }
       })
       .execute();
+
+    logger.debug(res.body, 'Response from CommerceTools');
+    return res;
   }
 }
