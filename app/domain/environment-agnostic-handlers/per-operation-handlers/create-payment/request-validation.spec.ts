@@ -1,6 +1,6 @@
 import handler from '.';
 import { IAbstractRequestWithTypedBody } from '../../../../interfaces';
-import { RequestBodySchemaType } from './request-schema';
+import { IRequestBody } from './request-schema';
 import configService from '../../../services/config-service';
 
 jest.mock('axios', () => ({
@@ -44,7 +44,7 @@ describe('createPayment handler', () => {
     };
   };
 
-  const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<RequestBodySchemaType> => {
+  const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<IRequestBody> => {
     return {
       body: {
         action: 'Create',
@@ -164,7 +164,7 @@ describe('createPayment handler', () => {
   describe('when the request body misses a required field - responds with status 400 and the corresponding error message', () => {
     it('key', async () => {
       const requestWithoutPaymentKey = requestWithOnlyRequiredFields();
-      delete (requestWithoutPaymentKey.body as RequestBodySchemaType).resource.obj.key;
+      delete (requestWithoutPaymentKey.body as IRequestBody).resource.obj.key;
 
       const response = await handler(requestWithoutPaymentKey);
 
@@ -176,7 +176,7 @@ describe('createPayment handler', () => {
     });
 
     describe('custom.fields:', () => {
-      let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+      let request: IAbstractRequestWithTypedBody<IRequestBody>;
 
       beforeEach(() => {
         request = requestWithOptionalFields();
@@ -205,7 +205,7 @@ describe('createPayment handler', () => {
   });
 
   describe('merchantId specific validations', () => {
-    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<IRequestBody>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });
@@ -241,7 +241,7 @@ describe('createPayment handler', () => {
   });
 
   describe('Payment key specific validations', () => {
-    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<IRequestBody>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });
@@ -276,7 +276,7 @@ describe('createPayment handler', () => {
   });
 
   describe('savedPaymentMethodsKey specific validations', () => {
-    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<IRequestBody>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });
@@ -356,7 +356,7 @@ describe('createPayment handler', () => {
   });
 
   describe('savePaymentMethod specific validations', () => {
-    let request: IAbstractRequestWithTypedBody<RequestBodySchemaType>;
+    let request: IAbstractRequestWithTypedBody<IRequestBody>;
     beforeEach(() => {
       request = requestWithOptionalFields();
     });

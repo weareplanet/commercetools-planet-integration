@@ -1,17 +1,7 @@
-import * as yup from 'yup';
-
-import { CommerceToolsPaymentSchema } from '../../../../interfaces';
-
-const RequestBodySchema = yup.object({
-  action: yup.string().required(),
-  resource: yup.object({
-    obj: CommerceToolsPaymentSchema
-  })
-});
-
-type RequestBodySchemaType = yup.TypeOf<typeof RequestBodySchema>;
-
+// In case of necessity something specific individually for exactly this handler
+// should be exported instead of
+// CommerceToolsExtensionRequestBodySchema and ICommerceToolsExtensionRequest from 'app/interfaces'
 export {
-  RequestBodySchema, // This is exported to perform the validation (where handler is leveraged)
-  RequestBodySchemaType, // This is exported to be used as a type variable for generics
-};
+  CommerceToolsExtensionRequestBodySchema as RequestBodySchema, // This is exported to perform the validation (where handler is leveraged)
+  ICommerceToolsExtensionRequestBody as IRequestBody // This is exported to be used as a type variable for generics
+} from '../../../../interfaces';

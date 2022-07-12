@@ -4,11 +4,11 @@ import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
 } from '../../../../interfaces';
-import { IDatatransWebhookRequestBody } from './request-schema';
+import { IRequestBody } from './request-schema';
 // import { PaymentService } from '../../../services/payment-service/service';
 // import { DatatransService } from '../../../services/datatrans-service';
 
-export default async (req: IAbstractRequestWithTypedBody<IDatatransWebhookRequestBody>): Promise<IAbstractResponse> => {
+export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
   logger.debug(req, 'Request from Datatrans');
 
   // const rawRequestBody = JSON.stringify(req.body);
