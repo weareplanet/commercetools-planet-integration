@@ -1,6 +1,6 @@
 import { DatatransPaymentMethod, ICreatePaymentRequestBodySchemaType, IDatatransInitializeTransaction } from '../../app/interfaces';
 
-export const getRedirectAndLightboxPaymentInitRequestBody = () =>  ({
+export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  ({
   action: 'Create',
   resource: {
     id: '123',
@@ -37,7 +37,7 @@ export const getRedirectAndLightboxPaymentInitRequestBody = () =>  ({
   }
 } as unknown as ICreatePaymentRequestBodySchemaType);
 
-export const getRedirectAndLightboxPaymentInitResponseBody = () => ({
+export const RedirectAndLightboxPaymentInitResponseBodyFactory = () => ({
   statusCode: 200,
   body: {
     actions: [
@@ -79,7 +79,7 @@ export const getRedirectAndLightboxPaymentInitResponseBody = () => ({
   }
 });
 
-export const getCreateInitializeTransactionRequest = (): IDatatransInitializeTransaction => ({
+export const CreateInitializeTransactionRequestFactory = (): IDatatransInitializeTransaction => ({
   refno: '12345318909876543216',
   currency: 'EUR',
   amount:1555,
@@ -94,7 +94,7 @@ export const getCreateInitializeTransactionRequest = (): IDatatransInitializeTra
   }
 });
 
-export const getCreateInitializeTransactionMockResponse = () => ({
+export const CreateInitializeTransactionMockResponseFactory = () => ({
   headers: {
     location: 'https://example.com'
   },

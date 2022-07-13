@@ -1,9 +1,9 @@
 import { Logger } from 'pino';
 
 import {
-  getRedirectAndLightboxPaymentInitRequestBody,
-  getCreateInitializeTransactionMockResponse,
-  getCreateInitializeTransactionRequest
+  RedirectAndLightboxPaymentInitRequestBodyFactory,
+  CreateInitializeTransactionMockResponseFactory,
+  CreateInitializeTransactionRequestFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
 const expectedResult = [
@@ -87,8 +87,8 @@ describe('#initRedirectAndLightbox method', () => {
   });
 
   it('should create transaction and return right actions for Redirect And Lightbox Init operation', async () => {
-    clientMock.post.mockResolvedValue(getCreateInitializeTransactionMockResponse());
-    const mockPayment = getRedirectAndLightboxPaymentInitRequestBody().resource.obj;
+    clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+    const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
     mockPayment.custom.fields.initRequest = {
       BON: {
         alias: 'BON test card alias'
@@ -101,7 +101,7 @@ describe('#initRedirectAndLightbox method', () => {
     expect(clientMock.post).toBeCalledWith(
       'https://apiUrl.test.fake/transactions',
       {
-        ...getCreateInitializeTransactionRequest(),
+        ...CreateInitializeTransactionRequestFactory(),
         BON: {
           alias: 'BON test card alias'
         }
