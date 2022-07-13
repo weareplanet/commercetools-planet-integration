@@ -1,6 +1,6 @@
-import { ICreatePaymentRequestBodySchemaType } from '../../app/interfaces';
+import { DatatransPaymentMethod, ICreatePaymentRequestBodySchemaType, IDatatransInitializeTransaction } from '../../app/interfaces';
 
-export const RedirectAndLightboxPaymentInitRequestBody = {
+export const getRedirectAndLightboxPaymentInitRequestBody = () =>  ({
   action: 'Create',
   resource: {
     id: '123',
@@ -35,9 +35,9 @@ export const RedirectAndLightboxPaymentInitRequestBody = {
       interfaceInteractions: []
     }
   }
-} as unknown as ICreatePaymentRequestBodySchemaType;
+} as unknown as ICreatePaymentRequestBodySchemaType);
 
-export const RedirectAndLightboxPaymentInitResponseBody = {
+export const getRedirectAndLightboxPaymentInitResponseBody = () => ({
   statusCode: 200,
   body: {
     actions: [
@@ -77,13 +77,13 @@ export const RedirectAndLightboxPaymentInitResponseBody = {
       }
     ]
   }
-};
+});
 
-export const CreateInitializeTransactionRequest = {
+export const getCreateInitializeTransactionRequest = (): IDatatransInitializeTransaction => ({
   refno: '12345318909876543216',
   currency: 'EUR',
   amount:1555,
-  paymentMethods:['VIS','PAP'],
+  paymentMethods:['VIS','PAP'] as DatatransPaymentMethod[],
   redirect: {
     successUrl: 'https://google.com',
     cancelUrl: 'https://google.com',
@@ -92,13 +92,13 @@ export const CreateInitializeTransactionRequest = {
   webhook: {
     url: 'https://webhookUrl.fake'
   }
-};
+});
 
-export const CreateInitializeTransactionMockResponse = {
+export const getCreateInitializeTransactionMockResponse = () => ({
   headers: {
     location: 'https://example.com'
   },
   data: {
     transactionId: 'transactionId123'
   }
-};
+});

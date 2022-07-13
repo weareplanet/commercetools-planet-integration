@@ -1,7 +1,7 @@
 import pino from 'pino';
 
-import { RedirectAndLightboxPaymentInitRequestBody, CreateInitializeTransactionRequest } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
-import { ICreatePaymentRequestBodySchemaType, IDatatransInitializeTransaction } from '../../../interfaces';
+import { getRedirectAndLightboxPaymentInitRequestBody, getCreateInitializeTransactionRequest } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
+import { ICreatePaymentRequestBodySchemaType } from '../../../interfaces';
 
 describe('Redacted fields', () => {
   let logger: pino.Logger;
@@ -33,12 +33,12 @@ describe('Redacted fields', () => {
   });
 
   it('should redact all configured fields', () => {
-    const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = JSON.parse(JSON.stringify(RedirectAndLightboxPaymentInitRequestBody));
+    const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = getRedirectAndLightboxPaymentInitRequestBody();
     redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
     const commerceToolsExtensionRequestWithBodyOnly = {
       body: redirectAndLightboxPaymentInitRequestBody,
     };
-    const createInitializeTransactionRequest: IDatatransInitializeTransaction = JSON.parse(JSON.stringify(CreateInitializeTransactionRequest));
+    const createInitializeTransactionRequest = getCreateInitializeTransactionRequest();
     createInitializeTransactionRequest.card = { alias: 'card alias' };
     createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
