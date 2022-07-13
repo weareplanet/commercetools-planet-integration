@@ -2,13 +2,17 @@ import pino from 'pino';
 
 const { LOG_LEVEL = 'debug' } = process.env;
 
+const getPossiblePaths = (path: string): string[] => path.split('.').reduce((acc, _, index, arr) => {
+  acc.push(arr.slice(index).join('.'));
+
+  return acc;
+}, []);
+
 const pathsToRedactedFields: string[] = [
   // related to Payment obj in app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema.ts
-  'body.resource.obj.custom.fields.savedPaymentMethodAlias',
-  'resource.obj.custom.fields.savedPaymentMethodAlias',
-  'custom.fields.savedPaymentMethodAlias',
+  ...getPossiblePaths('body.resource.obj.custom.fields.savedPaymentMethodAlias'),
   // related to DataTrans transaction request body
-  'body.*.alias',
+  ...getPossiblePaths('body.*.alias'),
 ];
 
 const pinoOptions: pino.LoggerOptions = {

@@ -5,10 +5,10 @@ import {
   IAbstractResponse,
 } from '../../../interfaces';
 import {
-  getRedirectAndLightboxPaymentInitRequestBody,
-  getRedirectAndLightboxPaymentInitResponseBody,
-  getCreateInitializeTransactionRequest,
-  getCreateInitializeTransactionMockResponse
+  RedirectAndLightboxPaymentInitRequestBodyFactory,
+  RedirectAndLightboxPaymentInitResponseBodyFactory,
+  CreateInitializeTransactionRequestFactory,
+  CreateInitializeTransactionMockResponseFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
 describe('Main handler', () => {
@@ -32,13 +32,13 @@ describe('Main handler', () => {
 
   describe('When CommerceTools send request with body which match Redirect&Lightbox Payment Init operation criteria', () => {
     it('should go through Redirect&Lightbox Payment Init operation', async () => {
-      clientMock.post.mockResolvedValue(getCreateInitializeTransactionMockResponse());
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
 
-      const result = await handler({ body: getRedirectAndLightboxPaymentInitRequestBody() });
+      const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBodyFactory() });
 
       expect(clientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
-        getCreateInitializeTransactionRequest(),
+        CreateInitializeTransactionRequestFactory(),
         {
           auth: {
             password: 'Test_merchant_password',
@@ -49,7 +49,7 @@ describe('Main handler', () => {
           }
         }
       );
-      expect(result).toMatchObject(getRedirectAndLightboxPaymentInitResponseBody());
+      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseBodyFactory());
     });
   });
 
