@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '16'
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --production
       - name: Check code quality (ESLint)
         run: npm run lint
       - name: Run tests
@@ -35,9 +35,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1 
+      - name: Preparing package
+        run: |
+          mkdir newpackage-${{ steps.date.outputs.date }} \
+          && cp -fr ./node_modules newpackage-${{ steps.date.outputs.date }}/ \
+          && cp -fr dist/* newpackage-${{ steps.date.outputs.date }}/ \
+          && cp -fr pckage.json newpackage-${{ steps.date.outputs.date }}/ 
       - name: Zipping package
         run: |
-          zip -j paymentconnector-${{ steps.date.outputs.date }}.zip ./* 
+          cd newpackage-${{ steps.date.outputs.date }} \
+          && zip -r9 paymentconnector-${{ steps.date.outputs.date }}.zip 
       - name: Pushing package to S3
         run: |
           aws s3 cp paymentconnector-${{ steps.date.outputs.date }}.zip  \
