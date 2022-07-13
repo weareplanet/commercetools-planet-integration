@@ -9,7 +9,8 @@ import {
 export const DatatransWebhookRequestBodySchema = yup.object({
   merchantId: yup // so far it's only our dream that Datatrans provides this field
     .string()
-    .required(),
+    // .required(),
+    .optional(),
   refno: yup  // Corresponds to Payment.key in CommerceTools
     .string()
     .required(),

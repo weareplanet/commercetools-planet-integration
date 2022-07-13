@@ -1,5 +1,6 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import logger from '../../../services/log-service';
+import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
@@ -17,7 +18,9 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
 
   // Validate the signature of the received notification
   try {
-    DatatransService.validateIncomingRequestSignature(req.body.merchantId, req.headers, rawRequestBody);
+    // DatatransService.validateIncomingRequestSignature(req.body.merchantId, req.headers, rawRequestBody);
+    const tempMerchantId = configService.getConfig().datatrans.merchants[0].id;
+    DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, rawRequestBody);
   } catch (err) {
     logger.debug(err, 'Error of Datatrans signature validation');
     return {
