@@ -17,8 +17,8 @@ export class DatatransService {
   private client: AxiosInstance;
 
   public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstractHeaders, requestBody: string) {
-    // Datatrans-Signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
-    const { groups: { timestamp, signature } } = reqHeaders['Datatrans-Signature'].match(/t=(?<timestamp>\d+),s0=(?<signature>.+)$/);
+    // datatrans-signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
+    const { groups: { timestamp, signature } } = reqHeaders['datatrans-signature'].match(/t=(?<timestamp>\d+),s0=(?<signature>.+)$/);
 
     const reCalculatedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
     if (reCalculatedSignature != signature) {

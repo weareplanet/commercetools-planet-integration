@@ -27,7 +27,7 @@ export class UseCaseDetector {
   // Type quard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
-    return !!request.headers && !!request.headers['Datatrans-Signature'];
+    return !!request.headers && !!request.headers['datatrans-signature'];
   }
 
   public static detectCase = (req: IAbstractRequest) => {

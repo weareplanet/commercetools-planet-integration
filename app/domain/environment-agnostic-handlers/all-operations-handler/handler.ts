@@ -17,8 +17,11 @@ import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notif
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
   logConnectorVersion();
 
+  logger.debug(req, 'Incoming request');
+
   // Delegate the request to a proper handler depending on the req content
   const useCase = UseCaseDetector.detectCase(req);
+
   switch (useCase) {
     case UseCase.RedirectAndLightboxInit: {
       return createPaymentHandler(req);

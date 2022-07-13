@@ -32,7 +32,7 @@ describe('UseCaseDetector', () => {
     it('should return "Redirect And Lightbox Webhook" when its criteria are detected', () => {
       const req = {
         headers: {
-          'Datatrans-Signature': 'timestamp=TS,s0=SIGNATURE'
+          'datatrans-signature': 'timestamp=TS,s0=SIGNATURE'
         },
         body: {}
       };
