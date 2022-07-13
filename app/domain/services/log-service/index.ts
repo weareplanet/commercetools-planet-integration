@@ -4,9 +4,9 @@ const { LOG_LEVEL = 'debug' } = process.env;
 
 const pathsToRedactedFields: string[] = [
   // related to Payment obj in app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema.ts
-  'body.resource.obj.custom.savedPaymentMethodAlias',
-  'resource.obj.custom.savedPaymentMethodAlias',
-  'custom.savedPaymentMethodAlias',
+  'body.resource.obj.custom.fields.savedPaymentMethodAlias',
+  'resource.obj.custom.fields.savedPaymentMethodAlias',
+  'custom.fields.savedPaymentMethodAlias',
   // related to DataTrans transaction request body
   'body.*.alias',
 ];
