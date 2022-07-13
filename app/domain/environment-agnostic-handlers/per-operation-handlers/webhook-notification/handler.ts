@@ -1,13 +1,13 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import logger from '../../../services/log-service';
-import configService from '../../../services/config-service';
+// import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import { PaymentService } from '../../../services/payment-service/service';
-import { DatatransService } from '../../../services/datatrans-service';
+// import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
   logger.debug(req, 'Request from Datatrans');
@@ -17,22 +17,22 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const rawRequestBody = JSON.stringify(req.body);
 
   // Validate the signature of the received notification
-  try {
-    // DatatransService.validateIncomingRequestSignature(req.body.merchantId, req.headers, rawRequestBody);
-    const tempMerchantId = configService.getConfig().datatrans.merchants[0].id;
-    DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, rawRequestBody);
-  } catch (err) {
-    logger.debug(err, 'Error of Datatrans signature validation');
-    return {
-      statusCode: HttpStatusCode.BAD_REQUEST, // TODO: According to INC-57 we should return INTERNAL_SERVER_ERROR ?
-      body: { message: err.message }
-    };
-  }
+  // try {
+  //   // DatatransService.validateIncomingRequestSignature(req.body.merchantId, req.headers, rawRequestBody);
+  //   const tempMerchantId = configService.getConfig().datatrans.merchants[0].id;
+  //   DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, rawRequestBody);
+  // } catch (err) {
+  //   logger.debug(err, 'Error of Datatrans signature validation');
+  //   return {
+  //     statusCode: HttpStatusCode.BAD_REQUEST, // TODO: According to INC-57 we should return INTERNAL_SERVER_ERROR ?
+  //     body: { message: err.message }
+  //   };
+  // }
 
   // Process the request body
   try {
     const paymentService = new PaymentService();
-    paymentService.saveAuthorizationTransactionInCommerceTools({
+    await paymentService.saveAuthorizationTransactionInCommerceTools({
       paymentKey: req.body.refno,
       paymentStatus: req.body.status,
       transactionId: req.body.transactionId,
