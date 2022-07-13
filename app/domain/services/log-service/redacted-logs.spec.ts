@@ -1,5 +1,8 @@
 import pino from 'pino';
 
+import { RedirectAndLightboxPaymentInitRequestBody, CreateInitializeTransactionRequest } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
+import { ICreatePaymentRequestBodySchemaType, IDatatransInitializeTransaction } from '../../../interfaces';
+
 describe('Redacted fields', () => {
   let logger: pino.Logger;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,35 +33,31 @@ describe('Redacted fields', () => {
   });
 
   it('should redact all configured fields', () => {
-    const logPayloadWithRedactedFiled = {
-      body: {
-        resource: {
-          obj: {
-            custom: {
-              savedPaymentMethodAlias: 'savedPaymentMethodAlias'
-            }
-          }
-        },
-        card: {
-          alias: 'alias'
-        }
-      },
-      resource: {
-        obj: {
-          custom: {
-            savedPaymentMethodAlias: 'savedPaymentMethodAlias'
-          }
-        }
-      },
-      custom: {
-        savedPaymentMethodAlias: 'savedPaymentMethodAlias'
-      }
+    const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = JSON.parse(JSON.stringify(RedirectAndLightboxPaymentInitRequestBody));
+    redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
+    const commerceToolsExtensionRequestWithBodyOnly = {
+      body: redirectAndLightboxPaymentInitRequestBody,
     };
+    const createInitializeTransactionRequest: IDatatransInitializeTransaction = JSON.parse(JSON.stringify(CreateInitializeTransactionRequest));
+    createInitializeTransactionRequest.card = { alias: 'card alias' };
+    createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
-    logger.info(logPayloadWithRedactedFiled);
+    logger.info(commerceToolsExtensionRequestWithBodyOnly);
+    logger.info(commerceToolsExtensionRequestWithBodyOnly.body);
+    logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj);
+    logger.info({ body: createInitializeTransactionRequest });
 
     expect(loggingStream.write).toBeCalledWith(
-      expect.stringContaining('"payload":{"body":{"resource":{"obj":{"custom":{"savedPaymentMethodAlias":"[REDACTED]"}}},"card":{"alias":"[REDACTED]"}},"resource":{"obj":{"custom":{"savedPaymentMethodAlias":"[REDACTED]"}}},"custom":{"savedPaymentMethodAlias":"[REDACTED]"}}')
+      expect.stringContaining('"payload":{"body":{"action":"Create","resource":{"id":"123","typeId":"typeId","obj":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}}}}')
+    );
+    expect(loggingStream.write).toBeCalledWith(
+      expect.stringContaining('"payload":{"action":"Create","resource":{"id":"123","typeId":"typeId","obj":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}}}')
+    );
+    expect(loggingStream.write).toBeCalledWith(
+      expect.stringContaining('"payload":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}')
+    );
+    expect(loggingStream.write).toBeCalledWith(
+      expect.stringContaining('"payload":{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]"},"BON":{"alias":"[REDACTED]"}}}')
     );
   });
 });
