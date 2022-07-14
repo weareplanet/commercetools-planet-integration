@@ -16,16 +16,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - name: Install extra packages
-        run: npm install --location=global husky eslint @typescript-eslint/eslint-plugin@latest --save-dev
-      - name: Install dependencies
-        run: npm ci --production
+
+      - name: Install dependencies (development)
+        run: npm ci 
       - name: Check code quality (ESLint)
         run: npm run lint
       - name: Run tests
         run: npm run test
       - name: Run build
         run: npm run build
+      - name: Clean-up node_modules (extra-safe-measure :P)
+        run: rm -rf node_modules
+      - name: Install dependencies (production)
+        run: npm ci --production
 
       - name: Get formatted date
         id: date
@@ -42,7 +45,7 @@ jobs:
           mkdir newpackage-${{ steps.date.outputs.date }} \
           && cp -fr ./node_modules newpackage-${{ steps.date.outputs.date }}/ \
           && cp -fr dist/* newpackage-${{ steps.date.outputs.date }}/ \
-          && cp -fr pckage.json newpackage-${{ steps.date.outputs.date }}/ 
+          && cp -fr package.json newpackage-${{ steps.date.outputs.date }}/ 
       - name: Zipping package
         run: |
           cd newpackage-${{ steps.date.outputs.date }} \
