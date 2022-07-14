@@ -9,7 +9,7 @@ import {
   DatatransTransactionStatus,
   DatatransPaymentMethod,
 } from '../../../interfaces';
-import { DatatransService, prepareInitializeTransactionRequestPaylod } from '../datatrans-service';
+import { DatatransService, prepareInitializeTransactionRequestPaylod as prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommercetoolsMapper } from './dt-to-ct-mapper';
 
@@ -23,12 +23,12 @@ interface CreateAuthorizationTransactionOptions {
 
 // This service implements DOMAIN LOGIC FLOWS.
 // It is abstracted from HTTP communications and 3-parties:
-// - from the higher level - a request handler should use this service to perform busines flows.
+// - from the higher level - a request handler should use this service to perform business flows.
 // - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DtatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
 export class PaymentService {
   async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
-    const initializeTransactionPayload = prepareInitializeTransactionRequestPaylod(
+    const initializeTransactionPayload = prepareInitializeTransactionRequestPayload(
       payment,
       configService.getConfig().datatrans.webhookUrl
     );
