@@ -43,16 +43,16 @@ jobs:
       - name: Preparing package
         run: |
           mkdir newpackage-${{ steps.date.outputs.date }} \
-          && cp -frv ./node_modules newpackage-${{ steps.date.outputs.date }}/ \
-          && cp -frv dist/* newpackage-${{ steps.date.outputs.date }}/ \
-          && cp -frv package.json newpackage-${{ steps.date.outputs.date }}/ 
+          && cp -fr ./node_modules newpackage-${{ steps.date.outputs.date }}/ \
+          && cp -fr dist/* newpackage-${{ steps.date.outputs.date }}/ \
+          && cp -fr package.json newpackage-${{ steps.date.outputs.date }}/ 
       - name: Zipping package
         run: |
           cd newpackage-${{ steps.date.outputs.date }} \
-          && zip -r9 paymentconnector-${{ steps.date.outputs.date }}.zip *
+          && zip -r9q paymentconnector-${{ steps.date.outputs.date }}.zip *
       - name: Pushing package to S3
         run: |
-          aws s3 cp paymentconnector-${{ steps.date.outputs.date }}.zip  \
+          aws s3 newpackage-${{ steps.date.outputs.date }}/paymentconnector-${{ steps.date.outputs.date }}.zip  \
             s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip
       - name: Updating lambda
         run: |
