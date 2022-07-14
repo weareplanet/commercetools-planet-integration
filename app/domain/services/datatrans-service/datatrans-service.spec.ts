@@ -43,7 +43,7 @@ describe('DatatransService', () => {
 
       expect(() => {
         DatatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
-      }).toThrow('Datatrans Signature validation error: looks like the request payload is tampered');
+      }).toThrow('Datatrans Signature validation failed');
     });
 
   });

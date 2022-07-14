@@ -22,7 +22,7 @@ export class DatatransService {
 
     const reCalculatedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
     if (reCalculatedSignature != signature) {
-      throw new Error('Datatrans Signature validation error: looks like the request payload is tampered');
+      throw new Error('Datatrans Signature validation failed');
     }
   }
 

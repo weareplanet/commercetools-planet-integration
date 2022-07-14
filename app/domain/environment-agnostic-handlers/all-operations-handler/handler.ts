@@ -35,7 +35,7 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
       logger.warn('Handler not found (no use case was detected)');
       return {
         statusCode: HttpStatusCode.OK,
-        body: '',
+        body: '', // For CT it's OK: https://docs.commercetools.com/api/projects/api-extensions#validation-successful--no-updates-requested
       };
     }
   }
