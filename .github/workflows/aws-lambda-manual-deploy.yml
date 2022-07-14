@@ -49,10 +49,11 @@ jobs:
       - name: Zipping package
         run: |
           cd newpackage-${{ steps.date.outputs.date }} \
-          && zip -r9q paymentconnector-${{ steps.date.outputs.date }}.zip *
+          && zip -r9q paymentconnector-${{ steps.date.outputs.date }}.zip * \
+          && ls -lha paymentconnector-${{ steps.date.outputs.date }}.zip
       - name: Pushing package to S3
         run: |
-          aws s3 newpackage-${{ steps.date.outputs.date }}/paymentconnector-${{ steps.date.outputs.date }}.zip  \
+          aws s3 cp newpackage-${{ steps.date.outputs.date }}/paymentconnector-${{ steps.date.outputs.date }}.zip  \
             s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip
       - name: Updating lambda
         run: |
