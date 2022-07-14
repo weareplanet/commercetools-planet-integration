@@ -10,8 +10,6 @@ import { PaymentService, DatatransToCommercetoolsMapper } from '../../../service
 // import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-  logger.debug(req, 'Request from Datatrans');
-
   // At a higher level the raw request body was already a string -
   // but that would look strange to pass it to here - so JSON.stringify the parsed body again...
   const rawRequestBody = JSON.stringify(req.body);
@@ -36,7 +34,9 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       paymentKey: req.body.refno,
       paymentStatus: req.body.status,
       transactionId: req.body.transactionId,
+      transactionHistory: req.body.history,
       paymentMethod: req.body.paymentMethod,
+      // It would be good to hide DatatransToCommercetoolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
       paymentMethodInfo: DatatransToCommercetoolsMapper.inferCtPaymentInfo(req.body),
       rawRequestBody
     });

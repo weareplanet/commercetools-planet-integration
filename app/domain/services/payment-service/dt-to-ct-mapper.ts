@@ -4,14 +4,13 @@ import {
 
 import {
   DatatransTransactionStatus,
-  // DatatransPaymentMethod
-  IDatatransWebhookRequestBody
+  DatatransHistoryAction,
+  IDatatransWebhookRequestBody,
+  IDatatransTransactionHistory
 } from '../../../interfaces';
 
-// import { IRequestBody } from './request-schema';
-
 export class DatatransToCommercetoolsMapper {
-  static inferCtTransactionState(dtTransactionStatus: DatatransTransactionStatus): TransactionState {
+  public static inferCtTransactionState(dtTransactionStatus: DatatransTransactionStatus): TransactionState {
     switch (dtTransactionStatus) {
       case DatatransTransactionStatus.initialized:
         return 'Initial';
@@ -35,8 +34,14 @@ export class DatatransToCommercetoolsMapper {
   // so it was easier to pass the entire request body.
   // Strongly saying, IRequestBody exported from app/domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification/request-schema.ts
   // should be used, but we try to keep this class anaware of any handlers...
-  static inferCtPaymentInfo(reqBody: IDatatransWebhookRequestBody): string {
+  public static inferCtPaymentInfo(reqBody: IDatatransWebhookRequestBody): string {
     const infoObj = reqBody.card || reqBody[reqBody.paymentMethod];
     return infoObj ? JSON.stringify(infoObj) : '';
+  }
+
+  public static inferCtTransactionTimestamp(history: IDatatransTransactionHistory): string {
+    return history
+      .find((t) => t.action === DatatransHistoryAction.authorize)
+      ?.date;
   }
 }

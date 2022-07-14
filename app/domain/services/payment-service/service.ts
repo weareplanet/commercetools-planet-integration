@@ -8,6 +8,7 @@ import {
   ICommerceToolsPayment,
   DatatransTransactionStatus,
   DatatransPaymentMethod,
+  IDatatransTransactionHistory
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPaylod as prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
@@ -17,6 +18,7 @@ interface CreateAuthorizationTransactionOptions {
   paymentKey: string;
   paymentStatus: DatatransTransactionStatus;
   transactionId: string;
+  transactionHistory: IDatatransTransactionHistory;
   paymentMethod: DatatransPaymentMethod;
   paymentMethodInfo: string;
   rawRequestBody: string;
@@ -70,7 +72,7 @@ export class PaymentService {
 
     actionsBuilder.addTransaction({
       type: 'Authorization',
-      timestamp: (new Date()).toISOString(), // TODO: “date“ from the history entry with "action" : "authorize"
+      timestamp: DatatransToCommercetoolsMapper.inferCtTransactionTimestamp(opts.transactionHistory),
       amount: {
         centAmount: payment.amountPlanned.centAmount,
         currencyCode: payment.amountPlanned.currencyCode

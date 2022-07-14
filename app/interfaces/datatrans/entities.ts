@@ -62,3 +62,13 @@ export enum DatatransTransactionStatus {
   transmitted = 'transmitted',
   failed = 'failed'
 }
+
+export enum DatatransHistoryAction {
+  init = 'init',
+  authenticate = 'authenticate',
+  authorize = 'authorize',
+  settle = 'settle',
+  credit = 'credit',
+  cancel = 'cancel',
+  change_details = 'change_details'
+}
