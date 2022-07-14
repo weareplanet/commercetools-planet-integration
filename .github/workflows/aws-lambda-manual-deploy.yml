@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '16'
       - name: Install extra packages
-        run: npm install -g husky
+        run: npm install --location=global husky eslint @typescript-eslint/eslint-plugin@latest --save-dev
       - name: Install dependencies
         run: npm ci --production
       - name: Check code quality (ESLint)
