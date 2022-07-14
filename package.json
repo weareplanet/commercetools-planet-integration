@@ -27,6 +27,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "http-status-code-const-enum": "^1.0.2",
+    "husky": "^8.0.1",
     "morphism": "^1.12.3",
     "pino": "^8.0.0",
     "yup": "^0.32.11"
@@ -44,7 +45,6 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
     "eslint": "^8.17.0",
-    "husky": "^8.0.0",
     "jest": "^28.1.0",
     "jest-when": "^3.5.1",
     "lint-staged": "^13.0.1",
