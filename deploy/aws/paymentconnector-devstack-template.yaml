@@ -219,7 +219,7 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
       ResourceId: !Ref ProxyResource
-      HttpMethod: GET
+      HttpMethod: POST
       ApiKeyRequired: true
       AuthorizationType: NONE
       OperationName: !Ref "apiResourcePath"
