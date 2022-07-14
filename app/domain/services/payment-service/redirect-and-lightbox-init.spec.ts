@@ -86,39 +86,57 @@ describe('#initRedirectAndLightbox method', () => {
     jest.unmock('axios');
   });
 
-  it('should create transaction and return right actions for Redirect And Lightbox Init operation', async () => {
-    clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
-    const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
-    mockPayment.custom.fields.initRequest = {
-      BON: {
-        alias: 'BON test card alias'
-      },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any; // HACK: yup schema not allowed not declared fields
-
-    const result = await paymentService.initRedirectAndLightbox(mockPayment);
-
-    expect(clientMock.post).toBeCalledWith(
-      'https://apiUrl.test.fake/transactions',
-      {
-        ...CreateInitializeTransactionRequestFactory(),
+  describe('actions creations for Redirect And Lightbox Init operation', () => {
+    it('should return actions', async () => {
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      mockPayment.custom.fields.initRequest = {
         BON: {
           alias: 'BON test card alias'
-        }
-      },
-      {
-        auth: {
-          password: 'Test_merchant_password',
-          username: 'Test_merchant_id'
         },
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any; // HACK: yup schema not allowed not declared fields
+
+      const result = await paymentService.initRedirectAndLightbox(mockPayment);
+
+      expect(clientMock.post).toBeCalledWith(
+        'https://apiUrl.test.fake/transactions',
+        {
+          ...CreateInitializeTransactionRequestFactory(),
+          BON: {
+            alias: 'BON test card alias'
+          }
+        },
+        {
+          auth: {
+            password: 'Test_merchant_password',
+            username: 'Test_merchant_id'
+          },
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+          }
         }
-      }
-    );
-    expect(result).toMatchObject(expectedResult);
-    expect(loggingStream.write).toHaveBeenCalledWith(
-      expect.stringContaining('"payload":{"body":{"BON":{"alias":"[REDACTED]"},"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"}}},"message":"DataTrans initRequest"}')
-    );
+      );
+      expect(result).toMatchObject(expectedResult);
+    });
+  });
+
+  describe('the redaction of logs for Redirect And Lightbox Init operation', () => {
+    it('should redact logs', async () => {
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      mockPayment.custom.fields.initRequest = {
+        BON: {
+          alias: 'BON test card alias'
+        },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any; // HACK: yup schema not allowed not declared fields
+
+      await paymentService.initRedirectAndLightbox(mockPayment);
+
+      expect(loggingStream.write).toHaveBeenCalledWith(
+        expect.stringContaining('"payload":{"body":{"BON":{"alias":"[REDACTED]"},"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"}}},"message":"DataTrans initRequest"}')
+      );
+    });
   });
 });
