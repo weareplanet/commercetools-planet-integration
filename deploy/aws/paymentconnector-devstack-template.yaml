@@ -20,6 +20,10 @@ Parameters:
     Type: "String"
     Description: Resource Path for API.
     Default: "{proxy}"
+  apiRestApiName:
+    Type: "String"
+    Description: API-Gateway REST API Name.
+    Default: "STACKNAME-DEVELOPER-api"
 
 Resources:
 
@@ -35,7 +39,7 @@ Resources:
           };
       Description: Lambda function for Payment Connector, without API Gateway.
       FunctionName: !Ref "lambdaFunctionName"
-      Handler: index.handler
+      Handler: "app/environment-specific-handlers/aws-http/index.allOperationsHandler"
       MemorySize: 128
       Role: !GetAtt LambdaIamRole.Arn
       Runtime: nodejs16.x
@@ -101,6 +105,7 @@ Resources:
       FunctionName: !GetAtt LambdaFunction.Arn
       Action: lambda:InvokeFunction
       Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/POST/*"
 
   LambdaLogGroup:
     Type: "AWS::Logs::LogGroup"
@@ -143,7 +148,7 @@ Resources:
       EndpointConfiguration:
         Types:
           - REGIONAL
-      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-api"]]
+      Name: !Ref "apiRestApiName"
 
   ApiGatewayModel:
     Type: AWS::ApiGateway::Model
@@ -227,6 +232,7 @@ Resources:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations'
+        TimeoutInMillis: 29000
 
 ##### Secrets Manager
 

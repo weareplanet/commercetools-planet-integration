@@ -87,7 +87,7 @@ Resources:
           };
       Description: Lambda function for Payment Connector, without API Gateway.
       FunctionName: !Ref "lambdaFunctionDummy"
-      Handler: index.handler
+      Handler: "app/environment-specific-handlers/aws-http/index.allOperationsHandler"
       MemorySize: 128
       Role: !GetAtt LambdaIamRole.Arn
       Runtime: nodejs16.x
@@ -133,6 +133,7 @@ Resources:
       FunctionName: !GetAtt LambdaFunctionDummy.Arn
       Action: lambda:InvokeFunction
       Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/POST/*"
 
   ApiKey: 
     Type: AWS::ApiGateway::ApiKey
@@ -249,6 +250,7 @@ Resources:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionDummy.Arn}/invocations'
+        TimeoutInMillis: 29000
 
   GitHubIAMUser:
     Type: AWS::IAM::User
