@@ -6,7 +6,7 @@ import {
   IAbstractResponse
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
-import { PaymentService } from '../../../services/payment-service/service';
+import { PaymentService, DatatransToCommercetoolsMapper } from '../../../services/payment-service';
 // import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
@@ -37,6 +37,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       paymentStatus: req.body.status,
       transactionId: req.body.transactionId,
       paymentMethod: req.body.paymentMethod,
+      paymentMethodInfo: DatatransToCommercetoolsMapper.inferCtPaymentInfo(req.body),
       rawRequestBody
     });
   } catch (err) {

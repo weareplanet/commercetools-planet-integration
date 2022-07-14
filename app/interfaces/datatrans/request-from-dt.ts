@@ -27,7 +27,8 @@ export const DatatransWebhookRequestBodySchema = yup.object({
     .required()
 });
 
-export type IDatatransWebhookRequestBody = yup.TypeOf<typeof DatatransWebhookRequestBodySchema>;
+type AnyExtraFields = Record<string, unknown>;
+export type IDatatransWebhookRequestBody = yup.TypeOf<typeof DatatransWebhookRequestBodySchema> & AnyExtraFields;
 
 export interface IDatatransWebhookRequest /*extends IAbstractRequest*/ {
   headers?: IAbstractHeaders;

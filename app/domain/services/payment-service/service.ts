@@ -18,6 +18,7 @@ interface CreateAuthorizationTransactionOptions {
   paymentStatus: DatatransTransactionStatus;
   transactionId: string;
   paymentMethod: DatatransPaymentMethod;
+  paymentMethodInfo: string;
   rawRequestBody: string;
 }
 
@@ -80,7 +81,7 @@ export class PaymentService {
         type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
         fields: {
           paymentMethod: opts.paymentMethod,
-          info: JSON.stringify({ paymentMethod: opts.paymentMethod })
+          info: opts.paymentMethodInfo
         }
       }
     });
