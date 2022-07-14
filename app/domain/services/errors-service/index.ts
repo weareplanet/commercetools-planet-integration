@@ -2,7 +2,7 @@ import { InvalidInputError } from '@commercetools/platform-sdk';
 
 import { ICommerceToolsError, ICommerceToolsErrorCode } from '../../../interfaces';
 
-export class FailedValidationError implements InvalidInputError {
+export class ErrorForCommerceTools implements InvalidInputError {
   readonly code = ICommerceToolsErrorCode.InvalidInput;
   message: string;
   extensionExtraInfo?: Record<string, unknown>;
@@ -19,6 +19,6 @@ export class FailedValidationError implements InvalidInputError {
   }
 }
 
-export function isDataTransError(err: ICommerceToolsError) {
-  return err instanceof FailedValidationError;
+export function isErrorForCommerceTools(err: ICommerceToolsError) {
+  return err instanceof ErrorForCommerceTools;
 }

@@ -5,9 +5,7 @@ import {
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
-  ICommerceToolsError
 } from '../../interfaces';
-import { isDataTransError } from '../../domain/services/errors-service';
 
 function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
@@ -21,7 +19,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
         const agnosticResponse = await handler(agnosticRequest);
         return this.abstractResponseToCloud(agnosticResponse);
       } catch (err) {
-        return this.errorHandling(err);
+        return this.handleError(err);
       }
     };
   }
@@ -63,8 +61,8 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     return response;
   }
 
-  private errorHandling(err: Error | ICommerceToolsError) {
-    if (bodyParsingError(err as Error)) {
+  private handleError(err: Error) {
+    if (bodyParsingError(err)) {
       return this.abstractResponseToCloud({
         statusCode: HttpStatusCode.BAD_REQUEST,
         body: {
@@ -75,19 +73,9 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
       });
     }
 
-    if (isDataTransError(err as ICommerceToolsError)) {
-      return this.abstractResponseToCloud({
-        statusCode: HttpStatusCode.BAD_REQUEST,
-        body: {
-          message: err.message,
-          errors: [err]
-        }
-      });
-    }
-
     return this.abstractResponseToCloud({
       statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
-      body: {}
+      body: ''
     });
   }
 }
