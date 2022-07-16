@@ -6,7 +6,8 @@ import { IDatatransConfig } from '../config-service/schema';
 import {
   type IAbstractHeaders,
   IDatatransInitializeTransaction,
-  DatatransEnvironment
+  DatatransEnvironment,
+  DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
@@ -19,10 +20,17 @@ export class DatatransService {
 
   public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstractHeaders, requestBody: string) {
     // datatrans-signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
-    const { groups: { timestamp, signature } } = reqHeaders['datatrans-signature'].match(/t=(?<timestamp>\d+),s0=(?<signature>.+)$/);
+    const headerValue = reqHeaders[DATATRANS_SIGNATURE_HEADER_NAME] || '';
+    const matchResult = headerValue.match(/t=(?<timestamp>\d+),s0=(?<actualSignature>.+)$/);
+    if (!matchResult) {
+      logger.debug({ headerValue }, `Missed expected ${DATATRANS_SIGNATURE_HEADER_NAME} header`);
+      throw new Error('Datatrans Signature validation failed');
+    }
 
-    const reCalculatedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
-    if (reCalculatedSignature != signature) {
+    const { groups: { timestamp, actualSignature } } = matchResult;
+    const expectedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
+    if (expectedSignature != actualSignature) {
+      logger.debug({ actualSignature, timestamp, requestBody, expectedSignature }, 'Error of Datatrans signature validation');
       throw new Error('Datatrans Signature validation failed');
     }
   }

@@ -1,7 +1,8 @@
 import {
   IAbstractRequest,
   ICommerceToolsExtensionRequest,
-  IDatatransWebhookRequest
+  IDatatransWebhookRequest,
+  DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
@@ -27,7 +28,7 @@ export class UseCaseDetector {
   // Type quard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
-    return !!request.headers && !!request.headers['datatrans-signature'];
+    return !!request.headers && !!request.headers[DATATRANS_SIGNATURE_HEADER_NAME];
   }
 
   public static detectCase = (req: IAbstractRequest) => {

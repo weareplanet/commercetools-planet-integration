@@ -10,6 +10,8 @@ import {
   DatatransHistoryAction
 } from './entities';
 
+export const DATATRANS_SIGNATURE_HEADER_NAME = 'datatrans-signature';
+
 const DatatransTransactionHistorySchema = yup
   .array()
   .of(yup
