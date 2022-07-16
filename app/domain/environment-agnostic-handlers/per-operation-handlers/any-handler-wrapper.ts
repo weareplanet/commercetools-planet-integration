@@ -22,12 +22,8 @@ import { ErrorForCommerceTools } from '../../services/errors-service';
 // This wrpper also performs some logic (input validation, errror handling etc.) common for any low-level business handler.
 export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): IAbstractRequestHandler => {
   return async (req: IAbstractRequest): Promise<IAbstractResponse> => {
-
-    /// Validate input
     const validateInput = () => {
-      if (!inputSchema) {
-        req.body = {}; // TODO: think more about correctness of this
-      } else {
+      if (inputSchema) {
         try {
           const validationService = new InputValidationService();
           req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
@@ -44,7 +40,6 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
     } catch (err) {
       return handleError(err);
     }
-
   };
 
   function handleError(err: Error | ICommerceToolsError) {
