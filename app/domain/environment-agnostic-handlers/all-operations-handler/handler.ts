@@ -5,7 +5,7 @@ import {
   IAbstractResponse
 } from '../../../interfaces';
 import { logConnectorVersion } from '../../services/connector-version-service';
-import { UseCaseDetector, UseCase } from './usecase-detector';
+import { OperationDetector, Operation } from './operation-detector';
 import '../../services/config-service';
 
 // Import all possible operation handlers
@@ -20,21 +20,21 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
   logger.debug(req, 'Incoming request');
 
   // Delegate the request to a proper handler depending on the req content
-  const useCase = UseCaseDetector.detectCase(req);
+  const operation = OperationDetector.detectOperation(req);
 
-  switch (useCase) {
-    case UseCase.RedirectAndLightboxInit: {
+  switch (operation) {
+    case Operation.RedirectAndLightboxInit: {
       return createPaymentHandler(req);
     }
 
-    case UseCase.RedirectAndLightboxWebhook: {
+    case Operation.RedirectAndLightboxWebhook: {
       return createPaymentWebhookHandler(req);
     }
 
     default: {
       logger.warn({
-        isCommerceToolsRequest: UseCaseDetector.isCommerceToolsRequest(req),
-        isDatatransRequest: UseCaseDetector.isDatatransRequest(req)
+        isCommerceToolsRequest: OperationDetector.isCommerceToolsRequest(req),
+        isDatatransRequest: OperationDetector.isDatatransRequest(req)
       }, 'Handler not found (no supported use case was detected)');
 
       return {

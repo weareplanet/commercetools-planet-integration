@@ -58,7 +58,7 @@ In the initial design (at least for MVP) this single `all-operations-handler` fu
 
 > This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
 Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).
-In case of necessity, any usecase-specific handler from `app/domain/environment-agnostic-handlers` can be used for an individual deploy. At the moment of the initial design it was considered redundant.
+In case of necessity, any operation-specific handler from `app/domain/environment-agnostic-handlers` can be used for an individual deploy. At the moment of the initial design it was considered redundant.
 
 
 ## Programming language

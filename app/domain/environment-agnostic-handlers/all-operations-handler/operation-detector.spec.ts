@@ -1,7 +1,7 @@
-import { UseCaseDetector } from './usecase-detector';
+import { OperationDetector } from './operation-detector';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 
-describe('UseCaseDetector', () => {
+describe('OperationDetector', () => {
 
   describe('detectCase, isCommerceToolsRequest, isDatatransRequest', () => {
     it('should return "Redirect And Lightbox Init" when its criteria are detected', () => {
@@ -20,12 +20,12 @@ describe('UseCaseDetector', () => {
         }
       });
 
-      const result = UseCaseDetector.detectCase(req);
+      const result = OperationDetector.detectOperation(req);
 
       expect(result).toEqual('Redirect And Lightbox Init');
 
-      expect(UseCaseDetector.isCommerceToolsRequest(req)).toBe(true);
-      expect(UseCaseDetector.isDatatransRequest(req)).toBe(false);
+      expect(OperationDetector.isCommerceToolsRequest(req)).toBe(true);
+      expect(OperationDetector.isDatatransRequest(req)).toBe(false);
     });
 
     it('should return "Redirect And Lightbox Webhook" when its criteria are detected', () => {
@@ -33,23 +33,23 @@ describe('UseCaseDetector', () => {
         'datatrans-signature': 'timestamp=TS,s0=SIGNATURE' // this header is the criterion
       });
 
-      const result = UseCaseDetector.detectCase(req);
+      const result = OperationDetector.detectOperation(req);
 
       expect(result).toEqual('Redirect And Lightbox Webhook');
 
-      expect(UseCaseDetector.isCommerceToolsRequest(req)).toBe(false);
-      expect(UseCaseDetector.isDatatransRequest(req)).toBe(true);
+      expect(OperationDetector.isCommerceToolsRequest(req)).toBe(false);
+      expect(OperationDetector.isDatatransRequest(req)).toBe(true);
     });
 
     it('should return an empty string if no any supported caswe is detected', () => {
       const req = abstractRequestFactory({}); // no headers
 
-      const result = UseCaseDetector.detectCase(req);
+      const result = OperationDetector.detectOperation(req);
 
       expect(result).toEqual('');
 
-      expect(UseCaseDetector.isCommerceToolsRequest(req)).toBe(false);
-      expect(UseCaseDetector.isDatatransRequest(req)).toBe(false);
+      expect(OperationDetector.isCommerceToolsRequest(req)).toBe(false);
+      expect(OperationDetector.isDatatransRequest(req)).toBe(false);
     });
   });
 });

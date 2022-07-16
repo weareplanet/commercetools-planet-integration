@@ -28,7 +28,7 @@ describe('Main handler', () => {
   });
 
   describe('When CommerceTools sends a request with body which matches Redirect&Lightbox Payment Init operation criteria', () => {
-    it('should go through Redirect&Lightbox Payment Init operation', async () => {
+    it('should go through Redirect&Lightbox Payment Init flow', async () => {
       clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
 
       const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
@@ -51,9 +51,9 @@ describe('Main handler', () => {
     });
   });
 
-  describe('When CommerceTools sends a request with body which doesn\'t match any usecase criteria', () => {
+  describe('When CommerceTools sends a request with body which doesn\'t match any operation criteria', () => {
     it('should return 200 response with empty body', async () => {
-      const notSupportedUseCaseRequest = {
+      const notSupportedOperationRequest = {
         body: {
           resource: {
             obj: {}
@@ -61,7 +61,7 @@ describe('Main handler', () => {
         }
       };
 
-      const req = abstractRequestFactory(notSupportedUseCaseRequest);
+      const req = abstractRequestFactory(notSupportedOperationRequest);
       const result = await handler(req);
 
       expect(result).toEqual(

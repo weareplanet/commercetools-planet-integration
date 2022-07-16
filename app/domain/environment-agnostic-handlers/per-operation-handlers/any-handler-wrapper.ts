@@ -46,7 +46,7 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
     if (isErrorForCommerceTools(err as ICommerceToolsError)) {
     // `isErrorForCommerceTools` logic (based on the error type/constitution) can be replaced with
     // differentiating "Error for Datatrans" from "Error for Commercetools"
-    // based on from where was the request (UseCaseDetector.isCommerceToolsRequest/isDatatransRequest).
+    // based on from where was the request (OperationDetector.isCommerceToolsRequest/isDatatransRequest).
     // Such change could simplify the logic of error throwing in low-level handlers
     // (for example, app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/handler.ts would then not create `ValidationErrorForCommerceTools`).
     // !? The only anti-argument is that while such a multi-client logic looks natural for app/domain/environment-agnostic-handlers/all-operations-handler,
