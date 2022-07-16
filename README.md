@@ -19,7 +19,7 @@ Also functions from `app/handlers/environment-agnostic` can be used directly in 
 
 ## Repository structure
 
-Basic parts of the repository:
+Basic parts of the codebase:
 
 ```
 app
@@ -38,32 +38,46 @@ The most interesting part is `app/domain`.
 
 #### Environment-agnostic handlers
 
-`app/domain/environment-agnostic-handlers` subfolder provides functions, every of which is implemented in the environment-agnostic manner - it takes `AbstractRequest` and returns `AbstractResponse` (see `app/interfaces`).
+`app/domain/environment-agnostic-handlers` subfolder provides functions, every of which is implemented in the environment-independent manner - it takes `IAbstractRequest` and returns `AbstractResponse` (see `app/interfaces`).
 
-Every such function is **aware of the expected request body structure** (specific for its use case), but is not adapted to any execution environment (particularly, is not aware of where exactly the body of `AbstractRequest` is taken from - it should be done somewhere outside).
+Every such function is **aware of the expected request body structure** (specific for its use case), but is not aware of any execution environment (AWS, GCP etc.) specificity.
 
 #### Environment-specific adapters
 
-For a few most popular execution environments (AWS Lambda, GCP function etc.) environment-specific adapters are implemented (see `app/environment-specific-handlers`).
+To allow environment-agnostic handlers (described above) to work in the same manner regardless to which environment it's deployed to,
+every such handler should be used via an environment-specific adapter.
 
-Every such adapter is, vise versa, **aware of the environment-specific request/response format** (for example, the adapter implemented in `app/environment-specific-handlers/aws-http` is aware of the shape of AWS API Gateway event for AWS Lambda and the shape of the expected response for AWS API Gateway),
+This repository provides adapters for a few most popular execution environments (see `app/environment-specific-handlers`).
+
+Every such adapter is **aware of the environment-specific request/response format** (for example, the adapter implemented in `app/environment-specific-handlers/aws-http` is aware of the shape of AWS API Gateway event for AWS Lambda function and the shape of the expected response from the AWS Lambda function to AWS API Gateway),
 but is not aware of the request body structure specific for every use case.
 
-##### More details
+An adapter does not implement any business logic.
+
+#### Design principles of environment-agnostic handlers
+
+##### Per-operation handlers
 
 Every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` implements a handler for **one specific business operation** (one use case of the Connector).
 
-`app/domain/environment-agnostic-handlers/all-operations-handler` provides a higher-level handler for all possible cases - **it combines all lower-level handlers into a single function** which knows criteria when to use which of them for every real request processing.
-In the initial design (at least for MVP) this single `all-operations-handler` function is considered enough and reasonable (taking into account the mupti-environment deploy target) for the outer consumption - and thus it is the only function exported from `app/domain/environment-agnostic-handlers/index.ts` (the standart Nodejs directory root).
+##### All-operations handler
 
-> This approach allows to drastically simplify the deployment (only one function should be deployed for everything).
-Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into different AWS Lambdas etc. (with some codebase overhead, but still with a simplified deployment scenario).
-In case of necessity, any operation-specific handler from `app/domain/environment-agnostic-handlers` can be used for an individual deploy. At the moment of the initial design it was considered redundant.
+`app/domain/environment-agnostic-handlers/all-operations-handler` provides **a higher-level handler for all possible cases - it combines all lower-level handlers into a single function** which knows criteria when to use which of them for the request processing.
+
+This handler does not implement any business logicm it only orchestrates per-operation handlers.
+
+In the initial design (at least for MVP) this single `all-operations-handler` function is considered enough and reasonable for the outer consumption - and thus it is the only function exported from `app/domain/environment-agnostic-handlers/index.ts` (the standart Nodejs directory root).
+
+> This "single all-operation function" approach allows to drastically simplify the deployment (only one function should be deployed for everything).
+Pay attention - if you need a separate scaling for different use cases - you can just deploy the same function into a few separate AWS Lambda functions etc. (yes, you will have some overhead on the deploy package size, but you will always use the same deploy package and thus - simplified deployment scenarios).
+
+> If the "single all-operation function" approach described above is not acceptable for you, any operation-specific handler (from `app/domain/environment-agnostic-handlers/per-operation-handlers`) can be deployed individually.
+In order to keep this ability every such handler, by its design, must be self-sufficient (able to completely process an `IAbstractRequest` obtained from an anvironment-specific adapter). It means that, particularly, all necessary input validation and error handling must be implemented within a function exported from any subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` rather than in `app/domain/environment-agnostic-handlers/all-operations-handler` (the latter must be just an orchestrator).
 
 
 ## Programming language
 
-The application is implemented on [Typescript](https://www.typescriptlang.org/) in order to increzase the reliability.
+The application is implemented on [Typescript](https://www.typescriptlang.org/) in order to increase the reliability.
 
 It means that, at least for production environment, the program must be compiled into Javascript (see "Deployment" section).
 
@@ -84,34 +98,33 @@ After the building the same structure as was before in `app` directory (but alre
 
 > You can take some extra insights from `serverless.yml` file...
 
+## Deployment
+
+A deploy script should execute `npm install`, `npm run build` commands and then create a deployment package (zip file) containing:
+- the content of `dist` directory (the build result);
+- `package.json` file;
+- `node_modules` directory (produced by a separate `npm ci --production` after the build).
+
+> In a local deevlopment environment you can use `npm run build && npm run package:aws-dev` command for a deploy artifact preparation.
+The generated `dist/package/v1/allOperationsHandler.zip` is a file which you can upload to AWS Lambda.
+
 ### Enviroment configuration
 
-The program is using environment variables to initialize application configuration. We have following enviroment veriables:
+The program uses environment variables as the source of the application configuration.
 
 | Variable name            | Value format                                                                                        | Required  | Default | Semantics |
 |--------------------------|-----------------------------------------------------------------------------------------------------|-----------|---------|-----------|
-| LOG_LEVEL                |  `string` one of: `trace, debug, info, warn, error, fatal, silent  `                                |    -      | debug   | Level of logs which application will show |
-| CT_CLIENT_ID             |  `string` Example: `4XmKDlB_Vb4jU7a93EcJwsHj`                                                       |    +      |         | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
-| CT_CLIENT_SECRET         |  `string` Example: `sUEvUKiJ-LQGGj3P6uvmrbk8UV4Odrtc`                                               |    +      |         | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
-| CT_PROJECT_ID            |  `string`                                                                                           |    +      |         | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
-| CT_AUTH_URL              |  `URL`. Example: `https://auth.us-central1.gcp.commercetools.com`                                   |    +      |         | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
-| CT_API_URL               |  `URL`. Example: `https://api.us-central1.gcp.commercetools.com`                                    |    +      |         | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
-| DT_MERCHANTS             |  `Stringified JSON array of objects` which containes merchant `id`, `password` and `enviroment`     |    +      |         | Every object in this array contains the [credentials](https://api-reference.datatrans.ch/#section/Authentication) necessary for communication with DataTrans |
-| DT_TEST_API_URL          |  `URL`. Example: `https://api.sandbox.datatrans.com/v1`                                            |    +      |         | DataTrans has two environments |
-| DT_PROD_API_URL          |  `URL`. Example: `https://api.datatrans.com/v1`                                                    |    +      |         | DataTrans has two environments |
-| DT_CONNECTOR_WEBHOOK_URL |  `URL`. Example: `https://example.com`                                                             |    +      |         | The [URL to be used by Datatrans for Webhook requests](https://api-reference.datatrans.ch/#section/Webhook) |
+| LOG_LEVEL                |  `string` one of: `trace, debug, info, warn, error, fatal, silent  `                                |    No     | debug   | Level of logs which application will show |
+| CT_CLIENT_ID             |  `string` Example: `4XmKDlB_Vb4jU7a93EcJwsHj`                                                       |    Yes    |    -    | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
+| CT_CLIENT_SECRET         |  `string` Example: `sUEvUKiJ-LQGGj3P6uvmrbk8UV4Odrtc`                                               |    Yes    |    -    | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
+| CT_PROJECT_ID            |  `string`                                                                                           |    Yes    |    -    | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
+| CT_AUTH_URL              |  `URL`. Example: `https://auth.us-central1.gcp.commercetools.com`                                   |    Yes    |    -    | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
+| CT_API_URL               |  `URL`. Example: `https://api.us-central1.gcp.commercetools.com`                                    |    Yes    |    -    | [Credentials](https://docs.commercetools.com/getting-started/create-api-client) which are needed for the communication with CommerceTools |
+| DT_MERCHANTS             |  `Stringified JSON array of objects` which containes merchant `id`, `password` and `enviroment`     |    Yes    |    -    | Every object in this array contains the [credentials](https://api-reference.datatrans.ch/#section/Authentication) necessary for communication with DataTrans |
+| DT_TEST_API_URL          |  `URL`. Example: `https://api.sandbox.datatrans.com/v1`                                             |    Yes    |    -    | DataTrans has two environments |
+| DT_PROD_API_URL          |  `URL`. Example: `https://api.datatrans.com/v1`                                                     |    Yes    |    -    | DataTrans has two environments |
+| DT_CONNECTOR_WEBHOOK_URL |  `URL`. Example: `https://example.com`                                                              |    Yes    |    -    | The [URL to be used by Datatrans for Webhook requests](https://api-reference.datatrans.ch/#section/Webhook) |
 
-## Deployment
-
-### In local dev
-
-> TODO: deploy script should execute `npm install`, `npm run build` commands and then create a deployment package (zip file) containing:
-> - the content of `dist` directory;
-> `package.json` file;
-> `node_modules` directory produced by `npm ci --production`)).
-
-In a local deevlopment environment you can use `npm run build && npm run package:aws-dev` command for a deploy artifact preparation.
-The generated `dist/package/v1/allOperationsHandler.zip` is a file which you can upload to AWS Lambda.
 
 ## Running
 
@@ -156,11 +169,11 @@ index.ts
 ```
 
 - `request-schema.ts` exports the expected **request body schema** (declared in the [Yup schema format](https://github.com/jquense/yup#object)) for this handler.
-- `handler.ts` exports the handler function (`AbstractRequestHandlerWithTypedInput`). The handler is provided the request schema, thus it relies on the scheme to access the request body internals. But it does not know how to validate the input against that schema.
-- `index.ts` takes the exports of both `request-schema.ts` and `handler.ts` and wraps the imported `AbstractRequestHandlerWithTypedInput` handler into `AbstractRequestHandler` which **internally** cares about request shape validation.
+- `handler.ts` exports the handler function (`IAbstractRequestHandlerWithTypedInput`). The handler is provided the request schema, thus it relies on the scheme to access the request body internals. But it does not know how to validate the input against that schema.
+- `index.ts` takes the exports of both `request-schema.ts` and `handler.ts` and wraps the imported `IAbstractRequestHandlerWithTypedInput` handler into `IAbstractRequestHandler` which **internally** cares about request shape validation.
 - `<aspect-1>.spec.ts`, `<aspect-2>.spec.ts` etc. files contain unit tests which check any aspects of the handler exported from `index.ts` (i.e. which has the request validation facility).
 
-Eventually every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` exports **`AbstractRequestHandler` which allows the consumer to not carry about the input validation.**
+Eventually every subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` exports **`IAbstractRequestHandler` which allows the consumer to not carry about the input validation.**
 
 
 `app/domain/environment-agnostic-handlers/all-operations-handler` is a kind of such consumer - it just orchestrates lower-level handlers (exported from `app/domain/environment-agnostic-handlers/per-operation-handlers`) and does not carry about the input validation - thus it does not need its own request schema declaration.
