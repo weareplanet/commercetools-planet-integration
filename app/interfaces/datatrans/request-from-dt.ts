@@ -1,4 +1,7 @@
-import { IAbstractHeaders } from '../handler-interfaces';
+import { IAnyObjectWithStringKeys } from '../../interfaces';
+import {
+  IAbstractHeaders
+} from '../handler-interfaces';
 
 import * as yup from 'yup';
 import {
@@ -40,8 +43,7 @@ export const DatatransWebhookRequestBodySchema = yup.object({
   history: DatatransTransactionHistorySchema
 });
 
-type AnyExtraFields = Record<string, unknown>;
-export type IDatatransWebhookRequestBody = yup.TypeOf<typeof DatatransWebhookRequestBodySchema> & AnyExtraFields;
+export type IDatatransWebhookRequestBody = yup.TypeOf<typeof DatatransWebhookRequestBodySchema> & IAnyObjectWithStringKeys;
 
 export interface IDatatransWebhookRequest /*extends IAbstractRequest*/ {
   headers?: IAbstractHeaders;

@@ -1,25 +1,24 @@
 import { UseCaseDetector } from './usecase-detector';
+import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 
 describe('UseCaseDetector', () => {
 
   describe('detectCase, isCommerceToolsRequest, isDatatransRequest', () => {
     it('should return "Redirect And Lightbox Init" when its criteria are detected', () => {
-      const req = {
-        body: {
-          action: 'Create',
-          resource: {
-            obj: {
-              paymentMethodInfo: {
-                paymentInterface: 'pp-datatrans-redirect-integration',
-              },
-              custom: {
-                fields: {}
-              },
-              paymentStatus: {}
-            }
+      const req = abstractRequestFactory({
+        action: 'Create',
+        resource: {
+          obj: {
+            paymentMethodInfo: {
+              paymentInterface: 'pp-datatrans-redirect-integration',
+            },
+            custom: {
+              fields: {}
+            },
+            paymentStatus: {}
           }
         }
-      };
+      });
 
       const result = UseCaseDetector.detectCase(req);
 
@@ -30,12 +29,9 @@ describe('UseCaseDetector', () => {
     });
 
     it('should return "Redirect And Lightbox Webhook" when its criteria are detected', () => {
-      const req = {
-        headers: {
-          'datatrans-signature': 'timestamp=TS,s0=SIGNATURE'
-        },
-        body: {}
-      };
+      const req = abstractRequestFactory({}, {
+        'datatrans-signature': 'timestamp=TS,s0=SIGNATURE' // this header is the criterion
+      });
 
       const result = UseCaseDetector.detectCase(req);
 
@@ -46,9 +42,7 @@ describe('UseCaseDetector', () => {
     });
 
     it('should return an empty string if no any supported caswe is detected', () => {
-      const req = {
-        body: {}
-      };
+      const req = abstractRequestFactory({}); // no headers
 
       const result = UseCaseDetector.detectCase(req);
 

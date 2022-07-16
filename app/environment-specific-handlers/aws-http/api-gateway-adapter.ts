@@ -27,6 +27,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
   private cloudRequestToAbstract(event: APIGatewayEvent) {
     return {
       headers: event.headers,
+      rawBody: event.body,
       // TODO: move the JSON parsing (and the corresponding error handling)
       // into app/domain/environment-agnostic-handlers
       body: JSON.parse(event.body)

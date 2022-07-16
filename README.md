@@ -79,7 +79,7 @@ The program is written in Typescript which is a "virtual language". **To be exec
 
 `npm run build`
 
-The buiuld result is saved into `dist` directory at the repository root.
+The build result is saved into `dist` directory at the repository root.
 After the building the same structure as was before in `app` directory (but already compiled to Javascript) will appear in `dist` directory. That will be the deployable program code.
 
 > You can take some extra insights from `serverless.yml` file...
@@ -103,15 +103,15 @@ The program is using environment variables to initialize application configurati
 
 ## Deployment
 
-> TODO: deploy script should execute `npm install`, `npm run build` commands and then use the `dist` content (together with `node_modules` and maybe `serverless.yml`) to produce a deployment package.
-In a local deevlopment environment you can use `npm run build && npm run package:local-dev` for a quick deploy artifact preparation.
+### In local dev
 
-This repository uses [Serverless Framework](https://www.serverless.com/) at least for local development.
+> TODO: deploy script should execute `npm install`, `npm run build` commands and then create a deployment package (zip file) containing:
+> - the content of `dist` directory;
+> `package.json` file;
+> `node_modules` directory produced by `npm ci --production`)).
 
-It is also a good choice as a multi-cloud deployment tool. If you like - you can use it (see `serverless.yml`).
-> TODO: discuss, if we're really going to provide ready-for-use deploy scripts (there will be some challenge for DevOps)...
-
-If you prefer to use another deployment tool - you are free to ignore `serverless.yml` and deploy functions from `app/handlers/cloud/index` via your favorite tool.
+In a local deevlopment environment you can use `npm run build && npm run package:aws-dev` command for a deploy artifact preparation.
+The generated `dist/package/v1/allOperationsHandler.zip` is a file which you can upload to AWS Lambda.
 
 ## Running
 
@@ -121,12 +121,8 @@ In a local development environment the connector can be running with use of Serv
 
 #### Steps to run the application locally
 
-1. Before run the project you need provide all enviroment veriables into app. For making it, you need create `.env` and provide all necessary values from [Enviroment configuration](#enviroment-configuration) or you can simply rename `.env.example` to `.env` and fill with correct values.
-2. Run the app.
-
-`npm run start:local-dev`
-
-This npm script runs the connector without the explicit building - with use of `ts-node-dev` (on-fly complilation + hot reload).
+1. Before run the application you need to provide all necessary enviroment veriables: copy `.env.example` to `.env` and fill with correct values.
+2. Run the app: `npm run start:local-dev`. This npm script runs the connector without the explicit building - with use of `ts-node-dev` (on-fly complilation + hot reload).
 
 ### In a target environment
 
@@ -138,9 +134,9 @@ When this connector is used inside some monolith application - it will be runnin
 
 The repository contains unit and integration tests which are implemented with [Jest](https://jestjs.io/) as a tool (Test Runner, mocking and assertion library).
 
-
 The command to run them:
-`npm run test`s
+`npm run test`
+
 
 ## Input validation
 

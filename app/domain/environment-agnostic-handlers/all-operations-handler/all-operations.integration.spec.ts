@@ -7,6 +7,8 @@ import {
   CreateInitializeTransactionMockResponseFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
+import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+
 const clientMock = {
   post: jest.fn()
 };
@@ -29,7 +31,8 @@ describe('Main handler', () => {
     it('should go through Redirect&Lightbox Payment Init operation', async () => {
       clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
 
-      const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBodyFactory() });
+      const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
+      const result = await handler(req);
 
       expect(clientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
@@ -58,7 +61,8 @@ describe('Main handler', () => {
         }
       };
 
-      const result = await handler(notSupportedUseCaseRequest);
+      const req = abstractRequestFactory(notSupportedUseCaseRequest);
+      const result = await handler(req);
 
       expect(result).toEqual(
         {

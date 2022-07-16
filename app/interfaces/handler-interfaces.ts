@@ -1,9 +1,17 @@
-// Any object in the request body
+///////////////// RAW Request
+// with NOT PARSED (string) headers/body
+export interface IRawAbstractRequest {
+  // rawHeaders?: // so far we assume this is not needed
+  rawBody: string; // sometimes the string which was originally in the HTTP request body is needed for some lower-level modules
+}
+
+///////////////// Abstract Request/Response
+// with PARSED headers and body (UNKNOWN STRUCTURED)
 
 export type IAbstractHeaders = Record<string, string>;
 export type IAbstractBody = string | Record<string, unknown>;
 
-export interface IAbstractRequest {
+export type IAbstractRequest = IRawAbstractRequest & {
   headers?: IAbstractHeaders;
   body: IAbstractBody;
 }
@@ -21,9 +29,10 @@ export interface IAbstractToEnvHandlerAdapter<IEnvironmentReq, IEnvironmentRes> 
   createEnvSpecificHandler(handler: IAbstractRequestHandler): (req: IEnvironmentReq) => Promise<IEnvironmentRes>
 }
 
-// Specific object in the request body
+///////////////// TYPED Request/Response
+// (with PARSED headers and body (of type TRequestBody)
 
-export interface IAbstractRequestWithTypedBody<TRequestBody> {
+export type IAbstractRequestWithTypedBody<TRequestBody> = IRawAbstractRequest & {
   headers?: IAbstractHeaders;
   body: TRequestBody;
 }

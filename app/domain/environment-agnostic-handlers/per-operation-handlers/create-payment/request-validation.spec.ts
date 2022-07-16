@@ -1,7 +1,10 @@
 import handler from '.';
-import { IAbstractRequestWithTypedBody } from '../../../../interfaces';
+import {
+  IAbstractRequestWithTypedBody
+} from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import configService from '../../../services/config-service';
+import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
 
 jest.mock('axios', () => ({
   create: () => ({ post: () => Promise.resolve({ data: {}, headers: {} }) })
@@ -29,42 +32,38 @@ describe('createPayment handler', () => {
   };
 
   const requestWithOnlyRequiredFields = () => {
-    return {
-      body: {
-        action: 'Create',
-        resource: {
-          obj: {
-            key: 'key string value',
-            custom: {
-              fields: requiredCustomFields()
-            }
+    return abstractRequestFactory({
+      action: 'Create',
+      resource: {
+        obj: {
+          key: 'key string value',
+          custom: {
+            fields: requiredCustomFields()
           }
         }
       }
-    };
+    });
   };
 
   const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<IRequestBody> => {
-    return {
-      body: {
-        action: 'Create',
-        resource: {
-          typeId: 'typeId',
-          id: 'id',
-          obj: {
-            key: 'key string value',
-            custom: {
-              /* eslint-disable @typescript-eslint/ban-ts-comment */
-              /* @ts-ignore */
-              fields: { // TODO: if this goes more crazy - use lodash.merge
-                ...requiredCustomFields(),
-                ...optionalCustomFields()
-              }
+    return abstractRequestFactory({
+      action: 'Create',
+      resource: {
+        typeId: 'typeId',
+        id: 'id',
+        obj: {
+          key: 'key string value',
+          custom: {
+            /* eslint-disable @typescript-eslint/ban-ts-comment */
+            /* @ts-ignore */
+            fields: { // TODO: if this goes more crazy - use lodash.merge
+              ...requiredCustomFields(),
+              ...optionalCustomFields()
             }
           }
         }
       }
-    };
+    }) as IAbstractRequestWithTypedBody<IRequestBody>;
   };
 
   describe('when the request body contains only the required part', () => {
@@ -470,24 +469,24 @@ describe('createPayment handler', () => {
       it('responds with 200', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              id: 'id',
-              typeId: 'typeId',
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            id: 'id',
+            typeId: 'typeId',
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
                 }
               }
             }
           }
         });
+
+        const response = await handler(req);
 
         expect(response.statusCode).toEqual(200);
       });
@@ -497,24 +496,23 @@ describe('createPayment handler', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                    autoSettle: false,
-                    authneticationOnly: false
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
+                  autoSettle: false,
+                  authneticationOnly: false
                 }
               }
             }
           }
         });
+        const response = await handler(req);
 
         expect(response.body).toMatchObject({
           message: 'Values autoSettle,authneticationOnly specified in initRequest are duplicated'
@@ -528,22 +526,21 @@ describe('createPayment handler', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":false }';
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
                 }
               }
             }
           }
         });
+        const response = await handler(req);
 
         expect(response.body).toMatchObject({
           message: 'Feature autoSettle disabling not supported'
@@ -557,22 +554,21 @@ describe('createPayment handler', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "authneticationOnly":true }';
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
                 }
               }
             }
           }
         });
+        const response = await handler(req);
 
         expect(response.body).toMatchObject({
           message: 'Feature authneticationOnly not supported'
@@ -586,22 +582,21 @@ describe('createPayment handler', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = `{ "${fieldName}":"something" }`;
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
                 }
               }
             }
           }
         });
+        const response = await handler(req);
 
         expect(response.body).toMatchObject({
           message: `Feature ${fieldName} not supported`
@@ -615,22 +610,21 @@ describe('createPayment handler', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "webhook":"something" }';
-        const response = await handler({
-          body: {
-            action: 'Create',
-            resource: {
-              obj: {
-                key: 'key string value',
-                custom: {
-                  fields: {
-                    ...requiredCustomFields(),
-                    ...optCustomFields,
-                  }
+        const req = abstractRequestFactory({
+          action: 'Create',
+          resource: {
+            obj: {
+              key: 'key string value',
+              custom: {
+                fields: {
+                  ...requiredCustomFields(),
+                  ...optCustomFields,
                 }
               }
             }
           }
         });
+        const response = await handler(req);
 
         expect(response.body).toMatchObject({
           message: 'Webhook is a connector wide setting; setting it individually per request is not supported'
