@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
+import logger from '../log-service';
 import configService from '../config-service';
 import { IDatatransConfig } from '../config-service/schema';
 import {
@@ -40,7 +41,9 @@ export class DatatransService {
   }
 
   // TODO: make this method static?
-  createInitializeTransaction(merchantId: string, transaction: IDatatransInitializeTransaction) {
+  async createInitializeTransaction(merchantId: string, transactionData: IDatatransInitializeTransaction) {
+    logger.debug({ body: transactionData }, 'DataTrans initRequest');
+
     const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
     const baseUrl = merchant.environment === DatatransEnvironment.TEST
       ? this.config.apiUrls.test
@@ -50,9 +53,9 @@ export class DatatransService {
       password: merchant.password
     };
 
-    return this.client.post(
+    const { data: transaction, headers: { location } } = await this.client.post(
       `${baseUrl}/transactions`,
-      transaction,
+      transactionData,
       {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8'
@@ -60,5 +63,12 @@ export class DatatransService {
         auth: merchantAuth
       }
     );
+
+    logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
+
+    return {
+      transaction,
+      location
+    };
   }
 }

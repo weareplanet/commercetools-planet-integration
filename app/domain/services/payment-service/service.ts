@@ -1,7 +1,6 @@
 import { type PaymentUpdateAction } from '@commercetools/platform-sdk';
 
 import configService from '../config-service';
-import logger from '../log-service';
 import {
   CommerceToolsCustomTypeKey,
   CommerceToolsCustomInteractionType,
@@ -36,13 +35,9 @@ export class PaymentService {
       configService.getConfig().datatrans.webhookUrl
     );
 
-    logger.debug({ body: initializeTransactionPayload }, 'DataTrans initRequest');
-
     const datatransService = new DatatransService();
-    const { data: transaction, headers: { location } } = await datatransService
+    const { transaction, location } = await datatransService
       .createInitializeTransaction(payment.custom.fields.merchantId, initializeTransactionPayload);
-
-    logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
 
     return CommerceToolsService.getActionsBuilder()
       .setCustomField('transactionId', transaction.transactionId)
@@ -61,8 +56,6 @@ export class PaymentService {
 
   async saveAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
     const payment = await CommerceToolsService.getPayment(opts.paymentKey);
-
-    logger.debug(payment, 'Payment fetched from CT, before update');
 
     const actionsBuilder = CommerceToolsService.getActionsBuilder();
 

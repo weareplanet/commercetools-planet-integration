@@ -27,7 +27,7 @@ export class CommerceToolsService {
   }
 
   public static async updatePayment(payment: Payment, actions: PaymentUpdateAction[]) {
-    logger.debug(actions, `Actions prepared to update Payment ${payment.key}`);
+    logger.debug(actions, `Updating Payment ${payment.key} in CommerceTools...`);
 
     const res = await ctApiRoot
       .withProjectKey({ projectKey: configService.getConfig().commerceTools.projectId })
@@ -41,7 +41,8 @@ export class CommerceToolsService {
       })
       .execute();
 
-    logger.debug(res.body, 'Response from CommerceTools');
+    logger.debug(res.body, 'Response from CommerceTools after the payment update.');
+
     return res;
   }
 }
