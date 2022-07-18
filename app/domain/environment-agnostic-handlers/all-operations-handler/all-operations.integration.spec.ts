@@ -2,9 +2,9 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 
 import {
   RedirectAndLightboxPaymentInitRequestBodyFactory,
-  RedirectAndLightboxPaymentInitResponseBodyFactory,
+  RedirectAndLightboxPaymentInitResponseFactory,
   CreateInitializeTransactionRequestFactory,
-  CreateInitializeTransactionMockResponseFactory
+  CreateInitializeTransactionResponseFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
@@ -29,7 +29,7 @@ describe('Main handler', () => {
 
   describe('When CommerceTools sends a request with body which matches Redirect&Lightbox Payment Init operation criteria', () => {
     it('should go through Redirect&Lightbox Payment Init flow', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
 
       const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
       const result = await handler(req);
@@ -47,7 +47,7 @@ describe('Main handler', () => {
           }
         }
       );
-      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseBodyFactory());
+      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseFactory());
     });
   });
 

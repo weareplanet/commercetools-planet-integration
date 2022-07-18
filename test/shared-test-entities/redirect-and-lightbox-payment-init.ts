@@ -45,7 +45,7 @@ export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  {
   } as unknown as ICommerceToolsExtensionRequestBody;
 };
 
-export const RedirectAndLightboxPaymentInitResponseBodyFactory = () => ({
+export const RedirectAndLightboxPaymentInitResponseFactory = () => ({
   statusCode: 200,
   body: {
     actions: [
@@ -102,7 +102,7 @@ export const CreateInitializeTransactionRequestFactory = (): IDatatransInitializ
   }
 });
 
-export const CreateInitializeTransactionMockResponseFactory = () => ({
+export const CreateInitializeTransactionResponseFactory = () => ({
   headers: {
     location: 'https://example.com'
   },
