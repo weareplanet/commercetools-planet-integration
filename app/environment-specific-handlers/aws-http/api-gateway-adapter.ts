@@ -50,6 +50,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
         body = payload;
       }
     }
+    console.log('createApiGatewayResponse: ', statusCode, body);
 
     const response: APIGatewayProxyResult = {
       statusCode,

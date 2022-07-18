@@ -39,7 +39,7 @@ export class OperationDetector {
       const isRedirectLightboxPaymentFlow =
         reqBody.action === 'Create'
         && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
-        && !hasProperties(payment?.custom?.fields, ['transactionId', 'savedPaymentMethodAlias'])
+        && !hasProperties(payment?.custom?.fields, ['transactionId'])
         && !payment?.paymentStatus?.interfaceCode;
 
       if (isRedirectLightboxPaymentFlow) {

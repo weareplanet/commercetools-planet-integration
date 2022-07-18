@@ -9,7 +9,7 @@ import {
   IDatatransTransactionHistory
 } from '../../../interfaces';
 
-export class DatatransToCommercetoolsMapper {
+export class DatatransToCommerceToolsMapper {
   public static inferCtTransactionState(dtTransactionStatus: DatatransTransactionStatus): TransactionState {
     switch (dtTransactionStatus) {
       case DatatransTransactionStatus.initialized:

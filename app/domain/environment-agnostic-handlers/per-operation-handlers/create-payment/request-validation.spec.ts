@@ -468,7 +468,7 @@ describe('createPayment handler', () => {
     describe('When initRequest has a correct content', () => {
       it('responds with 200', async () => {
         const optCustomFields = optionalCustomFields();
-        optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
+        optCustomFields.initRequest = '{ "autoSettle":true, "authenticationOnly":false }';
         const req = abstractRequestFactory({
           action: 'Create',
           resource: {
@@ -495,7 +495,7 @@ describe('createPayment handler', () => {
     describe('when some initRequest fields are also present somewhere outside of initRequest', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
-        optCustomFields.initRequest = '{ "autoSettle":true, "authneticationOnly":false }';
+        optCustomFields.initRequest = '{ "autoSettle":true, "authenticationOnly":false }';
         const req = abstractRequestFactory({
           action: 'Create',
           resource: {
@@ -506,7 +506,7 @@ describe('createPayment handler', () => {
                   ...requiredCustomFields(),
                   ...optCustomFields,
                   autoSettle: false,
-                  authneticationOnly: false
+                  authenticationOnly: false
                 }
               }
             }
@@ -515,7 +515,7 @@ describe('createPayment handler', () => {
         const response = await handler(req);
 
         expect(response.body).toMatchObject({
-          message: 'Values autoSettle,authneticationOnly specified in initRequest are duplicated'
+          message: 'Values autoSettle,authenticationOnly specified in initRequest are duplicated'
         });
 
         expect(response.statusCode).toEqual(400);
@@ -550,10 +550,10 @@ describe('createPayment handler', () => {
       });
     });
 
-    describe('When initRequest.authneticationOnly is false', () => {
+    describe('When initRequest.authenticationOnly is false', () => {
       it('responds with status 400 and the corresponding error message', async () => {
         const optCustomFields = optionalCustomFields();
-        optCustomFields.initRequest = '{ "authneticationOnly":true }';
+        optCustomFields.initRequest = '{ "authenticationOnly":true }';
         const req = abstractRequestFactory({
           action: 'Create',
           resource: {
@@ -571,7 +571,7 @@ describe('createPayment handler', () => {
         const response = await handler(req);
 
         expect(response.body).toMatchObject({
-          message: 'Feature authneticationOnly not supported'
+          message: 'Feature authenticationOnly not supported'
         });
 
         expect(response.statusCode).toEqual(400);

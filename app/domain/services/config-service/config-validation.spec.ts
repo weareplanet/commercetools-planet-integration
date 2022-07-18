@@ -25,7 +25,7 @@ describe('Connector config validations', () => {
   const originalEnvVarsValues = {
     commerceTools: {
       clientId: CT_CLIENT_ID,
-      clientSercet: CT_CLIENT_SECRET,
+      clientSecret: CT_CLIENT_SECRET,
       projectId: CT_PROJECT_ID,
       authUrl: CT_AUTH_URL,
       apiUrl: CT_API_URL,
@@ -43,7 +43,7 @@ describe('Connector config validations', () => {
   const testEnvVarsValues = {
     commerceTools: {
       clientId: 'clientId',
-      clientSercet: 'clientSercet',
+      clientSecret: 'clientSercet',
       projectId: 'projectId',
       authUrl: 'https://authUrl.test',
       apiUrl: 'https://apiUrl.test',
@@ -64,8 +64,8 @@ describe('Connector config validations', () => {
     } else {
       delete process.env.CT_CLIENT_ID;
     }
-    if (envVars.commerceTools.clientSercet) {
-      process.env.CT_CLIENT_SECRET = envVars.commerceTools.clientSercet;
+    if (envVars.commerceTools.clientSecret) {
+      process.env.CT_CLIENT_SECRET = envVars.commerceTools.clientSecret;
     } else {
       delete process.env.CT_CLIENT_SECRET;
     }
@@ -166,7 +166,7 @@ describe('Connector config validations', () => {
       expect(logger.debug).not.toHaveBeenCalled();
     });
 
-    it('should throw validation error about clientSercet', async () => {
+    it('should throw validation error about clientSecret', async () => {
       expect.assertions(4);
       const logger = await loadLogger();
       setProcessEnvVars({
@@ -175,7 +175,7 @@ describe('Connector config validations', () => {
           ...testEnvVarsValues.commerceTools,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          clientSercet: undefined
+          clientSecret: undefined
         }
       });
 

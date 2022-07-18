@@ -7,11 +7,12 @@ import {
   ICommerceToolsPayment,
   DatatransTransactionStatus,
   DatatransPaymentMethod,
-  IDatatransTransactionHistory
+  IDatatransTransactionHistory,
+  CommerceToolsPaymentMethod
 } from '../../../interfaces';
-import { DatatransService, prepareInitializeTransactionRequestPaylod as prepareInitializeTransactionRequestPayload } from '../datatrans-service';
+import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
-import { DatatransToCommercetoolsMapper } from './dt-to-ct-mapper';
+import { DatatransToCommerceToolsMapper } from './dt-to-ct-mapper';
 
 interface CreateAuthorizationTransactionOptions {
   paymentKey: string;
@@ -26,10 +27,17 @@ interface CreateAuthorizationTransactionOptions {
 // This service implements DOMAIN LOGIC FLOWS.
 // It is abstracted from HTTP communications and 3-parties:
 // - from the higher level - a request handler should use this service to perform business flows.
-// - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DtatransService correspondingly.
+// - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DatatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
 export class PaymentService {
   async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
+    const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
+    const withSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
+
+    if (withSavedPaymentMethod) {
+      await this.findPaymentMethod(savedPaymentMethodsKey, savedPaymentMethodAlias);
+    }
+
     const initializeTransactionPayload = prepareInitializeTransactionRequestPayload(
       payment,
       configService.getConfig().datatrans.webhookUrl
@@ -37,7 +45,7 @@ export class PaymentService {
 
     const datatransService = new DatatransService();
     const { transaction, location } = await datatransService
-      .createInitializeTransaction(payment.custom.fields.merchantId, initializeTransactionPayload);
+      .createInitializeTransaction(merchantId, initializeTransactionPayload);
 
     return CommerceToolsService.getActionsBuilder()
       .setCustomField('transactionId', transaction.transactionId)
@@ -65,12 +73,12 @@ export class PaymentService {
 
     actionsBuilder.addTransaction({
       type: 'Authorization',
-      timestamp: DatatransToCommercetoolsMapper.inferCtTransactionTimestamp(opts.transactionHistory),
+      timestamp: DatatransToCommerceToolsMapper.inferCtTransactionTimestamp(opts.transactionHistory),
       amount: {
         centAmount: payment.amountPlanned.centAmount,
         currencyCode: payment.amountPlanned.currencyCode
       },
-      state: DatatransToCommercetoolsMapper.inferCtTransactionState(opts.paymentStatus),
+      state: DatatransToCommerceToolsMapper.inferCtTransactionState(opts.paymentStatus),
       interactionId: opts.transactionId,
       custom: {
         type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
@@ -82,5 +90,21 @@ export class PaymentService {
     });
 
     await CommerceToolsService.updatePayment(payment, actionsBuilder.getActions());
+  }
+
+  private async findPaymentMethod(key: string, alias: string): Promise<CommerceToolsPaymentMethod> {
+    const paymentMethods = await CommerceToolsService.getCustomObjects('savedPaymentMethods', key);
+    const paymentMethod = paymentMethods?.value?.find((method) => {
+      const paymentDetails = method.card;
+
+      return paymentDetails?.alias === alias;
+    });
+
+    if (!paymentMethod) {
+      // TODO: think about making specific errors. It will allow use different code in commerce tools error
+      throw new Error('savedPaymentMethodAlias not found');
+    }
+
+    return paymentMethod;
   }
 }

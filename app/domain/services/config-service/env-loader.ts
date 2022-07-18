@@ -3,7 +3,7 @@ import { IAppConfig } from './schema';
 const configFromEnv: IAppConfig = {
   commerceTools: {
     clientId: process.env.CT_CLIENT_ID,
-    clientSercet: process.env.CT_CLIENT_SECRET,
+    clientSecret: process.env.CT_CLIENT_SECRET,
     projectId: process.env.CT_PROJECT_ID,
     authUrl: process.env.CT_AUTH_URL,
     apiUrl: process.env.CT_API_URL,

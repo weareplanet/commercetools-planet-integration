@@ -6,7 +6,7 @@ import {
   DatatransPaymentMethod
 } from '../../../interfaces';
 
-export const prepareInitializeTransactionRequestPaylod = (payment: ICommerceToolsPayment, webhookUrl: string): IDatatransInitializeTransaction => {
+export const prepareInitializeTransactionRequestPayload = (payment: ICommerceToolsPayment, webhookUrl: string): IDatatransInitializeTransaction => {
   const result = morphism(createSchema<IDatatransInitializeTransaction, ICommerceToolsPayment>({
     refno: ({ key }) => key,
     currency: ({ amountPlanned }) => amountPlanned?.currencyCode,

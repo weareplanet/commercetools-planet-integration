@@ -6,10 +6,11 @@ import {
 import logger from './../log-service';
 import { ctApiRoot } from './commerce-tools-client';
 import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
+import { CommerceToolsPaymentMethodsObject } from '../../../interfaces';
 import configService from '../config-service';
 
 // Only this service knows how to communicate with CommerceTools.
-// It is anaware of business flows.
+// It is unaware of business flows.
 export class CommerceToolsService {
   public static getActionsBuilder() {
     return new CommerceToolsActionsBuilder();
@@ -44,5 +45,16 @@ export class CommerceToolsService {
     logger.debug(res.body, 'Response from CommerceTools after the payment update.');
 
     return res;
+  }
+
+  public static async getCustomObjects(containerName: string, key: string): Promise<CommerceToolsPaymentMethodsObject> {
+    const res = await ctApiRoot
+      .withProjectKey({ projectKey: configService.getConfig().commerceTools.projectId })
+      .customObjects()
+      .withContainerAndKey({ container: containerName, key })
+      .get()
+      .execute();
+
+    return res.body;
   }
 }
