@@ -139,4 +139,30 @@ describe('#initRedirectAndLightbox method', () => {
       );
     });
   });
+
+  describe('payment method validation in Redirect And Lightbox Init operation', () => {
+    it('should pass validation', async () => {
+      expect.assertions(1);
+      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      mockPayment.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+      mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
+
+      const result = await paymentService.initRedirectAndLightbox(mockPayment);
+
+      expect(result).toBeInstanceOf(Array);
+    });
+
+    it('should throw an error', async () => {
+      expect.assertions(1);
+      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
+      mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
+
+      try {
+        await paymentService.initRedirectAndLightbox(mockPayment);
+      } catch (e) {
+        expect(e.message).toEqual('savedPaymentMethodAlias not found');
+      }
+    });
+  });
 });

@@ -5,7 +5,7 @@ jest.mock('./env-loader', () => {
   fakeConfigValues = {
     commerceTools: {
       clientId: 'clientId',
-      clientSercet: 'clientSercet',
+      clientSecret: 'clientSercet',
       projectId: 'projectId',
       authUrl: 'https://authUrl.test',
       apiUrl: 'https://apiUrl.test',

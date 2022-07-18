@@ -7,7 +7,7 @@ const CommerceToolsConfigSchema = yup.object({
     .string()
     .typeError('CT_CLIENT_ID must be a string')
     .required('CT_CLIENT_ID is required'),
-  clientSercet: yup
+  clientSecret: yup
     .string()
     .typeError('CT_CLIENT_SECRET must be a string')
     .required('CT_CLIENT_SECRET is required'),

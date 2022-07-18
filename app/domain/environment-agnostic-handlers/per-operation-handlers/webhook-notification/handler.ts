@@ -6,7 +6,7 @@ import {
   IAbstractResponse
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
-import { PaymentService, DatatransToCommercetoolsMapper } from '../../../services/payment-service';
+import { PaymentService, DatatransToCommerceToolsMapper } from '../../../services/payment-service';
 import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
@@ -32,8 +32,8 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       transactionId: req.body.transactionId,
       transactionHistory: req.body.history,
       paymentMethod: req.body.paymentMethod,
-      // It would be good to hide DatatransToCommercetoolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
-      paymentMethodInfo: DatatransToCommercetoolsMapper.inferCtPaymentInfo(req.body),
+      // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
+      paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
       rawRequestBody: req.rawBody
     });
   } catch (err) {

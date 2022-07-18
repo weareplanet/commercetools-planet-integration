@@ -19,13 +19,13 @@ import configService from '../config-service';
 const appConfig = configService.getConfig();
 const projectKey = appConfig.commerceTools.projectId;
 
-const scopes = [ 'manage_payments:' + projectKey ]; // TODO: maybe we will need other scopes as well
+const scopes = [ 'manage_project:' + projectKey ]; // TODO: maybe we will need other scopes as well
 const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: appConfig.commerceTools.authUrl,
   projectKey: projectKey,
   credentials: {
     clientId: appConfig.commerceTools.clientId,
-    clientSecret: appConfig.commerceTools.clientSercet,
+    clientSecret: appConfig.commerceTools.clientSecret,
   },
   scopes,
   fetch,

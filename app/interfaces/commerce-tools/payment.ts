@@ -70,7 +70,7 @@ export const CommerceToolsPaymentSchema = yup.object({
         .object({
           option: yup.object().optional(),
           autoSettle: yup.boolean().optional(),
-          authneticationOnly: yup.boolean().optional(),
+          authenticationOnly: yup.boolean().optional(),
           returnMobileToken: yup.boolean().optional(),
           webhook: yup.object().optional(),
           mcp: yup.object().optional(),
@@ -86,8 +86,8 @@ export const CommerceToolsPaymentSchema = yup.object({
             .validateSync(initRequestObj.autoSettle);
 
           yup.boolean()
-            .test('boolean', ErrorMessages.featureNotSupported('authneticationOnly'), (value) => !value)
-            .validateSync(initRequestObj.authneticationOnly);
+            .test('boolean', ErrorMessages.featureNotSupported('authenticationOnly'), (value) => !value)
+            .validateSync(initRequestObj.authenticationOnly);
 
           yup.mixed()
             .test('mixed', ErrorMessages.featureNotSupported('mcp'), (value) => value === undefined)
@@ -107,7 +107,7 @@ export const CommerceToolsPaymentSchema = yup.object({
     }).required()
   }).required()
 }).required()
-  .test('initRequest fields duplicaction validator', (rootObj, context) => {
+  .test('initRequest fields duplication validator', (rootObj, context) => {
     const initRequest = rootObj.custom.fields.initRequest;
     if (!initRequest) {
       return true;

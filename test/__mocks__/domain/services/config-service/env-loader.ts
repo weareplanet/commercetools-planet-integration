@@ -1,7 +1,7 @@
 export default {
   commerceTools: {
     clientId: 'Test clientId',
-    clientSercet: 'Test clientSercet',
+    clientSecret: 'Test clientSercet',
     projectId: 'Test projectId',
     authUrl: 'https://authUrl.fake',
     apiUrl: 'https://apiUrl.fake',
