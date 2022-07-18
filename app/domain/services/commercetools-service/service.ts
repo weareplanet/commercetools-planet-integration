@@ -9,7 +9,7 @@ import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
 import configService from '../config-service';
 
 // Only this service knows how to communicate with CommerceTools.
-// It is anaware of business flows.
+// It is unaware of business flows.
 export class CommerceToolsService {
   public static getActionsBuilder() {
     return new CommerceToolsActionsBuilder();
@@ -42,7 +42,5 @@ export class CommerceToolsService {
       .execute();
 
     logger.debug(res.body, 'Response from CommerceTools after the payment update.');
-
-    return res;
   }
 }

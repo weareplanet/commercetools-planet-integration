@@ -12,21 +12,25 @@ import {
 
 export const DATATRANS_SIGNATURE_HEADER_NAME = 'datatrans-signature';
 
+const DatatransTransactionHistoryItemSchema = yup
+  .object({
+    action: yup.mixed<DatatransHistoryAction>().oneOf(Object.values(DatatransHistoryAction)),
+    date: yup.string()
+  }).required();
+
+export type IDatatransTransactionHistoryItem = yup.TypeOf<typeof DatatransTransactionHistoryItemSchema> & IAnyObjectWithStringKeys;
+
 const DatatransTransactionHistorySchema = yup
   .array()
-  .of(yup
-    .object({
-      action: yup.mixed<DatatransHistoryAction>().oneOf(Object.values(DatatransHistoryAction)),
-      date: yup.string()
-    })
-    .required()
-  );
-export type IDatatransTransactionHistory = yup.TypeOf<typeof DatatransTransactionHistorySchema>;
+  .of(DatatransTransactionHistoryItemSchema);
+
+// export type IDatatransTransactionHistory = yup.TypeOf<typeof DatatransTransactionHistorySchema>;
+export type IDatatransTransactionHistory = IDatatransTransactionHistoryItem[];
 
 export const DatatransWebhookRequestBodySchema = yup.object({
-  merchantId: yup // so far it's only our dream that Datatrans provides this field
+  merchantId: yup
     .string()
-    // .required(),
+    // .required(), TODO: uncomment this when Datatrans starts to provide this field
     .optional(),
   refno: yup  // Corresponds to Payment.key in CommerceTools
     .string()

@@ -3,7 +3,7 @@ import { abstractRequestFactory } from '../../../../test/shared-test-entities/ab
 
 describe('OperationDetector', () => {
 
-  describe('detectCase, isCommerceToolsRequest, isDatatransRequest', () => {
+  describe('detectOperation, isCommerceToolsRequest, isDatatransRequest', () => {
     it('should return "Redirect And Lightbox Init" when its criteria are detected', () => {
       const req = abstractRequestFactory({
         action: 'Create',
@@ -30,7 +30,7 @@ describe('OperationDetector', () => {
 
     it('should return "Redirect And Lightbox Webhook" when its criteria are detected', () => {
       const req = abstractRequestFactory({}, {
-        'datatrans-signature': 'timestamp=TS,s0=SIGNATURE' // this header is the criterion
+        'datatrans-signature': 't=TS,s0=SIGNATURE' // this header presence is the criterion
       });
 
       const result = OperationDetector.detectOperation(req);
@@ -41,7 +41,7 @@ describe('OperationDetector', () => {
       expect(OperationDetector.isDatatransRequest(req)).toBe(true);
     });
 
-    it('should return an empty string if no any supported caswe is detected', () => {
+    it('should return an empty string if no any supported operation is detected', () => {
       const req = abstractRequestFactory({}); // no headers
 
       const result = OperationDetector.detectOperation(req);

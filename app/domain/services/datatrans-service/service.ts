@@ -13,7 +13,7 @@ import {
 import { CryptoService } from '../crypto-service';
 
 // Only this service knows how to communicate with Datatrans.
-// It is anaware of business flows.
+// It is unaware of business flows.
 export class DatatransService {
   private config: IDatatransConfig;
   private client: AxiosInstance;
