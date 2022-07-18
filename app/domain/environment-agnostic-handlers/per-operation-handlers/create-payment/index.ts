@@ -1,5 +1,5 @@
 import handler from './handler';
-import { RequestBodySchema, RequestBodySchemaType } from './request-schema';
-import { wrapHandlerToValidateInput } from '../../request-validation';
+import { RequestBodySchema, IRequestBody } from './request-schema';
+import { wrapHandlerWithCommonLogic } from '../any-handler-wrapper';
 
-export default wrapHandlerToValidateInput<RequestBodySchemaType>(handler, RequestBodySchema);
+export default wrapHandlerWithCommonLogic<IRequestBody>(handler, RequestBodySchema);

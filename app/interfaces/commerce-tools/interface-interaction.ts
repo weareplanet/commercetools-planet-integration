@@ -3,8 +3,6 @@ import {
   type TypeResourceIdentifier
 } from '@commercetools/platform-sdk';
 
-import { IAbstractRequest }  from '../handler-interfaces';
-
 export enum CommerceToolsCustomInteractionType {
   initRequest = 'initRequest',
   initResponse = 'initResponse',
@@ -18,10 +16,6 @@ export enum CommerceToolsCustomInteractionType {
   settleResponse = 'settleResponse',
   cancelRequest = 'cancelRequest',
   cancelResponse = 'cancelResponse'
-}
-
-export type ICommerceToolsCustomInterfaceInteractionInfo = IAbstractRequest & {
-  [key: string]: unknown;
 }
 
 export interface ICommerceToolsCustomInterfaceInteraction extends CustomFieldsDraft {

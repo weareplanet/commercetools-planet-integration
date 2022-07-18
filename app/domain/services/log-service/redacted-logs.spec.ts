@@ -1,7 +1,6 @@
 import pino from 'pino';
 
 import { RedirectAndLightboxPaymentInitRequestBodyFactory, CreateInitializeTransactionRequestFactory } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
-import { ICreatePaymentRequestBodySchemaType } from '../../../interfaces';
 
 describe('Redacted fields', () => {
   let logger: pino.Logger;
@@ -20,7 +19,7 @@ describe('Redacted fields', () => {
   });
 
   beforeAll(() => {
-    originalLogLevel = process.env.LOG_LEVEL;
+    originalLogLevel = process.env.LOG_LEVEL as string;
     process.env.LOG_LEVEL = 'info';
   });
 
@@ -33,7 +32,7 @@ describe('Redacted fields', () => {
   });
   describe('should redact "savedPaymentMethodAlias" on different level of depth', () => {
     it('should redact "body.resource.obj.custom.fields.savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,
@@ -47,7 +46,7 @@ describe('Redacted fields', () => {
     });
 
     it('should redact "resource.obj.custom.fields.savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,
@@ -61,7 +60,7 @@ describe('Redacted fields', () => {
     });
 
     it('should redact "obj.custom.fields.savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,
@@ -75,7 +74,7 @@ describe('Redacted fields', () => {
     });
 
     it('should redact "custom.fields.savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,
@@ -89,7 +88,7 @@ describe('Redacted fields', () => {
     });
 
     it('should redact "fields.savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,
@@ -103,7 +102,7 @@ describe('Redacted fields', () => {
     });
 
     it('should redact "savedPaymentMethodAlias" filed', () => {
-      const redirectAndLightboxPaymentInitRequestBody: ICreatePaymentRequestBodySchemaType = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
         body: redirectAndLightboxPaymentInitRequestBody,

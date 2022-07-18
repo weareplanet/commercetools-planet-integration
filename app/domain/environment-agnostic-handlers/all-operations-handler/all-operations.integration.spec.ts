@@ -1,40 +1,38 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 
 import {
-  IAbstractRequest,
-  IAbstractResponse,
-} from '../../../interfaces';
-import {
   RedirectAndLightboxPaymentInitRequestBodyFactory,
-  RedirectAndLightboxPaymentInitResponseBodyFactory,
+  RedirectAndLightboxPaymentInitResponseFactory,
   CreateInitializeTransactionRequestFactory,
-  CreateInitializeTransactionMockResponseFactory
+  CreateInitializeTransactionResponseFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
-describe('Main handler', () => {
-  let handler: (req: IAbstractRequest) => Promise<IAbstractResponse>;
-  const clientMock = {
-    post: jest.fn()
-  };
-  const axiosMockFactory = () => ({
+import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+
+const clientMock = {
+  post: jest.fn()
+};
+jest.mock('axios', () => {
+  return {
     create: () => clientMock
+  };
+});
+
+import handler from '.';
+
+
+describe('Main handler', () => {
+
+  afterEach(() => {
+    clientMock.post.mockReset();
   });
 
-  beforeAll(async () => {
-    jest.mock('axios', axiosMockFactory);
+  describe('When CommerceTools sends a request with body which matches Redirect&Lightbox Payment Init operation criteria', () => {
+    it('should go through Redirect&Lightbox Payment Init flow', async () => {
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
 
-    handler = (await import('./handler')).default;
-  });
-
-  afterAll(() => {
-    jest.unmock('axios');
-  });
-
-  describe('When CommerceTools send request with body which match Redirect&Lightbox Payment Init operation criteria', () => {
-    it('should go through Redirect&Lightbox Payment Init operation', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
-
-      const result = await handler({ body: RedirectAndLightboxPaymentInitRequestBodyFactory() });
+      const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
+      const result = await handler(req);
 
       expect(clientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
@@ -49,13 +47,13 @@ describe('Main handler', () => {
           }
         }
       );
-      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseBodyFactory());
+      expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseFactory());
     });
   });
 
-  describe('When CommerceTools send request with body which doesn\'t match any operations criteria', () => {
-    it('should return response success for not supported operation', async () => {
-      const noOperationRequestBody = {
+  describe('When CommerceTools sends a request with body which doesn\'t match any operation criteria', () => {
+    it('should return 200 response with empty body', async () => {
+      const notSupportedOperationRequest = {
         body: {
           resource: {
             obj: {}
@@ -63,7 +61,8 @@ describe('Main handler', () => {
         }
       };
 
-      const result = await handler(noOperationRequestBody);
+      const req = abstractRequestFactory(notSupportedOperationRequest);
+      const result = await handler(req);
 
       expect(result).toEqual(
         {

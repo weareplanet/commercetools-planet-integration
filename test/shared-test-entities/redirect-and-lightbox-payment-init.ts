@@ -1,43 +1,51 @@
-import { DatatransPaymentMethod, ICreatePaymentRequestBodySchemaType, IDatatransInitializeTransaction } from '../../app/interfaces';
 
-export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  ({
-  action: 'Create',
-  resource: {
-    id: '123',
-    typeId: 'typeId',
-    obj: {
-      key: '12345318909876543216',
-      amountPlanned: {
-        type: 'centPrecision',
-        currencyCode: 'EUR',
-        centAmount: 1555,
-        fractionDigits: 2
-      },
-      paymentMethodInfo: {
-        paymentInterface: 'pp-datatrans-redirect-integration',
-        method: 'VIS, PAP'
-      },
-      custom: {
-        type: {
-          typeId: 'type',
-          id: '89637766-02f9-4391-9c7a-9077d9662daf'
+import {
+  DatatransPaymentMethod,
+  IDatatransInitializeTransaction,
+  ICommerceToolsExtensionRequestBody
+} from '../../app/interfaces';
+
+
+export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  {
+  return {
+    action: 'Create',
+    resource: {
+      id: '123',
+      typeId: 'typeId',
+      obj: {
+        key: '12345318909876543216',
+        amountPlanned: {
+          type: 'centPrecision',
+          currencyCode: 'EUR',
+          centAmount: 1555,
+          fractionDigits: 2
         },
-        fields: {
-          key: 'refno',
-          cancelUrl: 'https://google.com',
-          merchantId: 'Test_merchant_id',
-          successUrl: 'https://google.com',
-          errorUrl: 'https://google.com'
-        }
-      },
-      paymentStatus: {},
-      transactions: [],
-      interfaceInteractions: []
+        paymentMethodInfo: {
+          paymentInterface: 'pp-datatrans-redirect-integration',
+          method: 'VIS, PAP'
+        },
+        custom: {
+          type: {
+            typeId: 'type',
+            id: '89637766-02f9-4391-9c7a-9077d9662daf'
+          },
+          fields: {
+            key: 'refno',
+            cancelUrl: 'https://google.com',
+            merchantId: 'Test_merchant_id',
+            successUrl: 'https://google.com',
+            errorUrl: 'https://google.com'
+          }
+        },
+        paymentStatus: {},
+        transactions: [],
+        interfaceInteractions: []
+      }
     }
-  }
-} as unknown as ICreatePaymentRequestBodySchemaType);
+  } as unknown as ICommerceToolsExtensionRequestBody;
+};
 
-export const RedirectAndLightboxPaymentInitResponseBodyFactory = () => ({
+export const RedirectAndLightboxPaymentInitResponseFactory = () => ({
   statusCode: 200,
   body: {
     actions: [
@@ -94,7 +102,7 @@ export const CreateInitializeTransactionRequestFactory = (): IDatatransInitializ
   }
 });
 
-export const CreateInitializeTransactionMockResponseFactory = () => ({
+export const CreateInitializeTransactionResponseFactory = () => ({
   headers: {
     location: 'https://example.com'
   },

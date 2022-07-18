@@ -3,10 +3,6 @@ export enum DatatransEnvironment {
   TEST = 'test'
 }
 
-export {
-  type RequestBodySchemaType as IWebhookRequestBody
-} from '../domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification/request-schema';
-
 export enum DatatransPaymentMethod {
   ACC = 'ACC',
   ALP = 'ALP',
@@ -67,23 +63,12 @@ export enum DatatransTransactionStatus {
   failed = 'failed'
 }
 
-export interface IDatatransInitializeTransaction {
-  currency: string; // 3 letter ISO-4217
-  refno: string; // [1...20]
-  amount?: number;
-  paymentMethods?: DatatransPaymentMethod[];
-  language?: string;
-  option?: {
-    createAlias?: boolean;
-    [key: string]: unknown;
-  };
-  redirect?: {
-    successUrl: string;
-    cancelUrl: string;
-    errorUrl: string;
-  };
-  webhook: {
-    url: string;
-  }
-  [key: string]: unknown;
+export enum DatatransHistoryAction {
+  init = 'init',
+  authenticate = 'authenticate',
+  authorize = 'authorize',
+  settle = 'settle',
+  credit = 'credit',
+  cancel = 'cancel',
+  change_details = 'change_details'
 }

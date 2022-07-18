@@ -1,6 +1,6 @@
 import {
+  IAnyObjectWithStringKeys,
   CommerceToolsCustomTypeKey,
-  ICommerceToolsCustomInterfaceInteractionInfo,
   CommerceToolsCustomInteractionType,
 } from '../../../interfaces';
 
@@ -50,7 +50,7 @@ export class CommerceToolsActionsBuilder {
     return this;
   }
 
-  addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | ICommerceToolsCustomInterfaceInteractionInfo) {
+  addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | IAnyObjectWithStringKeys) {
     const message = (typeof messageOrObject === 'string') ? messageOrObject : JSON.stringify(messageOrObject);
 
     this.actions.push({

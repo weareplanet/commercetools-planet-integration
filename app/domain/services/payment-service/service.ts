@@ -1,13 +1,13 @@
 import { type PaymentUpdateAction } from '@commercetools/platform-sdk';
 
 import configService from '../config-service';
-import logger from '../log-service';
 import {
   CommerceToolsCustomTypeKey,
   CommerceToolsCustomInteractionType,
   ICommerceToolsPayment,
   DatatransTransactionStatus,
   DatatransPaymentMethod,
+  IDatatransTransactionHistory
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPaylod as prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
@@ -17,7 +17,9 @@ interface CreateAuthorizationTransactionOptions {
   paymentKey: string;
   paymentStatus: DatatransTransactionStatus;
   transactionId: string;
+  transactionHistory: IDatatransTransactionHistory;
   paymentMethod: DatatransPaymentMethod;
+  paymentMethodInfo: string;
   rawRequestBody: string;
 }
 
@@ -33,13 +35,9 @@ export class PaymentService {
       configService.getConfig().datatrans.webhookUrl
     );
 
-    logger.debug({ body: initializeTransactionPayload }, 'DataTrans initRequest');
-
     const datatransService = new DatatransService();
-    const { data: transaction, headers: { location } } = await datatransService
+    const { transaction, location } = await datatransService
       .createInitializeTransaction(payment.custom.fields.merchantId, initializeTransactionPayload);
-
-    logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
 
     return CommerceToolsService.getActionsBuilder()
       .setCustomField('transactionId', transaction.transactionId)
@@ -67,7 +65,7 @@ export class PaymentService {
 
     actionsBuilder.addTransaction({
       type: 'Authorization',
-      timestamp: (new Date()).toISOString(), // TODO: “date“ from the history entry with "action" : "authorize"
+      timestamp: DatatransToCommercetoolsMapper.inferCtTransactionTimestamp(opts.transactionHistory),
       amount: {
         centAmount: payment.amountPlanned.centAmount,
         currencyCode: payment.amountPlanned.currencyCode
@@ -77,7 +75,8 @@ export class PaymentService {
       custom: {
         type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
         fields: {
-          paymentMethod: opts.paymentMethod
+          paymentMethod: opts.paymentMethod,
+          info: opts.paymentMethodInfo
         }
       }
     });

@@ -2,7 +2,7 @@ import { Logger } from 'pino';
 
 import {
   RedirectAndLightboxPaymentInitRequestBodyFactory,
-  CreateInitializeTransactionMockResponseFactory,
+  CreateInitializeTransactionResponseFactory,
   CreateInitializeTransactionRequestFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
@@ -88,7 +88,7 @@ describe('#initRedirectAndLightbox method', () => {
 
   describe('actions creations for Redirect And Lightbox Init operation', () => {
     it('should return actions', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.initRequest = {
         BON: {
@@ -123,7 +123,7 @@ describe('#initRedirectAndLightbox method', () => {
 
   describe('the redaction of logs for Redirect And Lightbox Init operation', () => {
     it('should redact logs', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionMockResponseFactory());
+      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.initRequest = {
         BON: {

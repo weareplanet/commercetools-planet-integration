@@ -28,7 +28,7 @@ describe('DatatransService', () => {
 
     it('when signature validation passes - does not throw an error', () => {
       const reqHeaders = {
-        'Datatrans-Signature': `t=${timestamp},s0=${expectedSignature}`
+        'datatrans-signature': `t=${timestamp},s0=${expectedSignature}`
       };
 
       expect(() => {
@@ -38,12 +38,12 @@ describe('DatatransService', () => {
 
     it('when signature validation fails - throws an error', () => {
       const reqHeaders = {
-        'Datatrans-Signature': `t=${timestamp},s0=UNexpectedSignature`
+        'datatrans-signature': `t=${timestamp},s0=UNexpectedSignature`
       };
 
       expect(() => {
         DatatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
-      }).toThrow('Datatrans Signature validation error: looks like the request payload is tampered');
+      }).toThrow('Datatrans Signature validation failed');
     });
 
   });

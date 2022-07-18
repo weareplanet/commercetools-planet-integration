@@ -1,11 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 
+import logger from '../log-service';
 import configService from '../config-service';
 import { IDatatransConfig } from '../config-service/schema';
 import {
-  type IAbstarctHeaders,
+  type IAbstractHeaders,
   IDatatransInitializeTransaction,
-  DatatransEnvironment
+  DatatransEnvironment,
+  DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
@@ -16,13 +18,20 @@ export class DatatransService {
   private config: IDatatransConfig;
   private client: AxiosInstance;
 
-  public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstarctHeaders, requestBody: string) {
-    // Datatrans-Signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
-    const { groups: { timestamp, signature } } = reqHeaders['Datatrans-Signature'].match(/t=(?<timestamp>\d+),s0=(?<signature>.+)$/);
+  public static validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstractHeaders, requestBody: string) {
+    // datatrans-signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
+    const headerValue = reqHeaders[DATATRANS_SIGNATURE_HEADER_NAME] || '';
+    const matchResult = headerValue.match(/t=(?<timestamp>\d+),s0=(?<actualSignature>.+)$/);
+    if (!matchResult) {
+      logger.debug({ headerValue }, `Missed expected ${DATATRANS_SIGNATURE_HEADER_NAME} header`);
+      throw new Error('Datatrans Signature validation failed');
+    }
 
-    const reCalculatedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
-    if (reCalculatedSignature != signature) {
-      throw new Error('Datatrans Signature validation error: looks like the request payload is tampered');
+    const { groups: { timestamp, actualSignature } } = matchResult;
+    const expectedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
+    if (expectedSignature != actualSignature) {
+      logger.debug({ actualSignature, timestamp, requestBody, expectedSignature }, 'Error of Datatrans signature validation');
+      throw new Error('Datatrans Signature validation failed');
     }
   }
 
@@ -40,7 +49,9 @@ export class DatatransService {
   }
 
   // TODO: make this method static?
-  createInitializeTransaction(merchantId: string, transaction: IDatatransInitializeTransaction) {
+  async createInitializeTransaction(merchantId: string, transactionData: IDatatransInitializeTransaction) {
+    logger.debug({ body: transactionData }, 'DataTrans initRequest');
+
     const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
     const baseUrl = merchant.environment === DatatransEnvironment.TEST
       ? this.config.apiUrls.test
@@ -50,9 +61,9 @@ export class DatatransService {
       password: merchant.password
     };
 
-    return this.client.post(
+    const { data: transaction, headers: { location } } = await this.client.post(
       `${baseUrl}/transactions`,
-      transaction,
+      transactionData,
       {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8'
@@ -60,5 +71,12 @@ export class DatatransService {
         auth: merchantAuth
       }
     );
+
+    logger.debug({ body: transaction, headers: { location } }, 'DataTrans initResponse');
+
+    return {
+      transaction,
+      location
+    };
   }
 }

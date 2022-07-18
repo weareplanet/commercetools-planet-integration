@@ -4,11 +4,11 @@ import {
   IAbstractResponse
 } from '../../../../interfaces';
 import { PaymentService } from '../../../services/payment-service';
-import { FailedValidationError } from '../../../services/errors-service';
+import { ErrorForCommerceTools } from '../../../services/errors-service';
 import logger from '../../../services/log-service';
-import { RequestBodySchemaType } from './request-schema';
+import { IRequestBody } from './request-schema';
 
-export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>): Promise<IAbstractResponse> => {
+export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
   try {
     const paymentService = new PaymentService();
     const payment = req.body.resource?.obj;
@@ -23,6 +23,6 @@ export default async (req: IAbstractRequestWithTypedBody<RequestBodySchemaType>)
     };
   } catch (err) {
     logger.error(err);
-    throw new FailedValidationError((err as Error).message, err);
+    throw new ErrorForCommerceTools(err.message, err);
   }
 };

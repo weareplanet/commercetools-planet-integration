@@ -32,14 +32,15 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
       it('and the lower-level handler responds 200', async () => {
         const event: APIGatewayProxyEvent = {
           httpMethod: 'POST',
-          headers: {},
+          headers: { 'header1': 'header-1-value' },
           body: '{ "payload": "something" }' // serialized JSON
-        } as APIGatewayProxyEvent;
+        } as unknown as APIGatewayProxyEvent;
 
         const response = await allOperationsApiGatewayHandler(event);
 
         expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
           expect.objectContaining({
+            headers: { 'header1': 'header-1-value' },
             body: { 'payload': 'something' } // JSON parsed into object
           })
         );
@@ -51,37 +52,32 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
       });
     });
 
-    describe('when the request body is parsable to JSON', () => {
+    it('and the lower-level handler responds 400', async () => {
       const fakeAbstractResponse400: IAbstractResponse = {
         statusCode: 400,
         body: {
           message: 'Something is wrong in the request'
         }
       };
+      (fakeAllOpsAgnosticHandler as jest.Mock).mockImplementation(async (): Promise<IAbstractResponse> => fakeAbstractResponse400);
 
-      beforeEach(() => {
-        (fakeAllOpsAgnosticHandler as jest.Mock).mockImplementation(async (): Promise<IAbstractResponse> => fakeAbstractResponse400);
-      });
+      const event: APIGatewayProxyEvent = {
+        httpMethod: 'POST',
+        headers: {},
+        body: '{ "payload": "something" }' // serialized JSON
+      } as APIGatewayProxyEvent;
 
-      it('and the lower-level handler responds 400', async () => {
-        const event: APIGatewayProxyEvent = {
-          httpMethod: 'POST',
-          headers: {},
-          body: '{ "payload": "something" }' // serialized JSON
-        } as APIGatewayProxyEvent;
+      const response = await allOperationsApiGatewayHandler(event);
 
-        const response = await allOperationsApiGatewayHandler(event);
+      expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { 'payload': 'something' } // JSON parsed into object
+        })
+      );
 
-        expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
-          expect.objectContaining({
-            body: { 'payload': 'something' } // JSON parsed into object
-          })
-        );
-
-        expect(response).toMatchObject({
-          statusCode: 400,
-          body: JSON.stringify(fakeAbstractResponse400.body)
-        });
+      expect(response).toMatchObject({
+        statusCode: 400,
+        body: JSON.stringify(fakeAbstractResponse400.body)
       });
     });
 
