@@ -15,10 +15,10 @@ import handler from '..';
 
 describe('Main handler', () => {
 
-  // An attempt to make an END-to-END test (i.e. to mock 'node-fetch' and check what it was called with)
-  // appeared TOO MESSY - at least due to necessity to stub the Authentication request to CT (hidden inside Commercetools sdk).
-  // So a simpler, "narrower" test is implemented here - it ends one step earlier -
-  // on the checking what CommerceToolsService.updatePayment was called with (what covers the majority of the logic).
+  // An attempt to make an END-to-END test (i.e. to mock 'node-fetch' and check its call with the expected actions) appeared TOO MESSY -
+  // I couln'd find a way to stub the CT response to /oauth/token (which is tricky hidden inside Commercetools sdk).
+  // So a simpler, "narrower" test is implemented here - it ends
+  // on the checking of what CommerceToolsService.updatePayment was called with (that covers the majority of our logic).
   describe('When a request matches Redirect&Lightbox Webhook operation criteria', () => {
     beforeEach(() => { // Stub Signature validation
       /* eslint-disable @typescript-eslint/no-empty-function */
@@ -36,8 +36,11 @@ describe('Main handler', () => {
         fractionDigits: 2
       }
     };
-    beforeEach(() => {
+    beforeEach(() => { // Stub CommerceToolsService.getPayment
       jest.spyOn(CommerceToolsService, 'getPayment').mockResolvedValue(paymentFetchedFromCT as Payment);
+    });
+
+    beforeEach(() => { // Mock CommerceToolsService.updatePayment
       jest.spyOn(CommerceToolsService, 'updatePayment').mockResolvedValue();
     });
 
@@ -52,43 +55,43 @@ describe('Main handler', () => {
 
       const dateFromDtHistoryAuthorizeTransaction = (req.body as IDatatransWebhookRequestBody).history?.[1].date;
 
-      expect(CommerceToolsService.updatePayment).toBeCalledWith(paymentFetchedFromCT, [{
-        action: 'setStatusInterfaceCode', interfaceCode: 'authorized' },
-      {
-        action: 'addInterfaceInteraction',
-        type: { typeId: 'type', key: 'pp-datatrans-interface-interaction-type' },
-        fields: {
-          message: req.rawBody,
-          timeStamp: fakeCurrentDate,
-          interactionType: 'webhook'
-        }
-      },
-      {
-        action: 'addTransaction',
-        transaction: {
-          type: 'Authorization',
-          state: 'Success',
-          interactionId: 'Test transactionId',
-          timestamp: dateFromDtHistoryAuthorizeTransaction,
-          amount: {
-            centAmount: 12345,
-            currencyCode: 'EUR',
-          },
-          custom: {
-            fields: {
-              info: '',
-              paymentMethod: 'VIS',
+      const expectedActions = [
+        { action: 'setStatusInterfaceCode', interfaceCode: 'authorized' },
+        {
+          action: 'addInterfaceInteraction',
+          type: { typeId: 'type', key: 'pp-datatrans-interface-interaction-type' },
+          fields: {
+            message: req.rawBody,
+            timeStamp: fakeCurrentDate,
+            interactionType: 'webhook'
+          }
+        },
+        {
+          action: 'addTransaction',
+          transaction: {
+            type: 'Authorization',
+            state: 'Success',
+            interactionId: 'Test transactionId',
+            timestamp: dateFromDtHistoryAuthorizeTransaction,
+            amount: {
+              centAmount: 12345,
+              currencyCode: 'EUR',
             },
-            type: {
-              key: 'pp-datatrans-usedmethod-type',
-              typeId: 'type',
+            custom: {
+              fields: {
+                info: '',
+                paymentMethod: 'VIS',
+              },
+              type: {
+                key: 'pp-datatrans-usedmethod-type',
+                typeId: 'type',
+              }
             }
           }
         }
-      }
-      ]);
+      ];
 
-      // expect(result).toMatchObject();
+      expect(CommerceToolsService.updatePayment).toBeCalledWith(paymentFetchedFromCT, expectedActions);
     });
   });
 });
