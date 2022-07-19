@@ -19,7 +19,7 @@ import configService from '../config-service';
 const appConfig = configService.getConfig();
 const projectKey = appConfig.commerceTools.projectId;
 
-const scopes = [ 'manage_project:' + projectKey ]; // TODO: maybe we will need other scopes as well
+const scopes = [ 'manage_project:' + projectKey ]; // TODO: in production version must be used only: manage_payments, manage_key_value_documents
 const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: appConfig.commerceTools.authUrl,
   projectKey: projectKey,
