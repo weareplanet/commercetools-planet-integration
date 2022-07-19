@@ -1,5 +1,12 @@
 import { Logger } from 'pino';
 
+import { commerceToolsClientFactory  } from '../../../../test/shared-test-entities/commercetools-client';
+jest.mock('../commercetools-service/commerce-tools-client', () => {
+  return {
+    ctApiRoot: commerceToolsClientFactory()
+  };
+});
+
 import {
   RedirectAndLightboxPaymentInitRequestBodyFactory,
   CreateInitializeTransactionResponseFactory,
@@ -42,6 +49,8 @@ const expectedResult = [
     interfaceCode: 'Initial',
   }
 ];
+
+
 
 describe('#initRedirectAndLightbox method', () => {
   let logger: Logger;

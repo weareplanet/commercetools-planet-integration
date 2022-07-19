@@ -55,6 +55,7 @@ class CustomObjectsApi {
 
 class ApiRoot {
   withProjectKey() {
+    console.info('--- withProjectKey ', this);
     return this;
   }
 
@@ -67,4 +68,6 @@ class ApiRoot {
   }
 }
 
-export const ctApiRoot = new ApiRoot();
+export const commerceToolsClientFactory = () => {
+  return new ApiRoot();
+};

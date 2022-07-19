@@ -1,14 +1,22 @@
-import handler from '.';
 import {
   IAbstractRequestWithTypedBody
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import configService from '../../../services/config-service';
 import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
+import { commerceToolsClientFactory  } from '../../../../../test/shared-test-entities/commercetools-client';
 
 jest.mock('axios', () => ({
   create: () => ({ post: () => Promise.resolve({ data: {}, headers: {} }) })
 }));
+
+jest.mock('../../../services/commercetools-service/commerce-tools-client', () => {
+  return {
+    ctApiRoot: commerceToolsClientFactory()
+  };
+});
+
+import handler from '.';
 
 describe('createPayment handler', () => {
 
