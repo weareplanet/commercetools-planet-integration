@@ -16,7 +16,14 @@ const mockPathFor = (dir: string, file: string) => {
   return path.join(globalMocksLocationRoot, dir.replace(rootPath, ''), file);
 };
 
-const mockExists = (dir: string, file: string) => fs.existsSync(mockPathFor(dir, file));
+const mockExists = (dir: string, file: string) => {
+  const blackList = [
+    '.DS_Store'
+  ];
+  if (blackList.includes(file)) return false;
+
+  return fs.existsSync(mockPathFor(dir, file));
+};
 
 const mockModule = (dir: string, file: string) => {
   const realModulePath = path.join(dir, file);
