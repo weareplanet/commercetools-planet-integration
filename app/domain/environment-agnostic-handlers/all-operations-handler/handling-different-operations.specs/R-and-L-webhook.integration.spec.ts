@@ -12,6 +12,11 @@ import { CommerceToolsService } from '../../../services/commercetools-service';
 
 import handler from '..';
 
+const disableDatatransSignatureValidation = () => {
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  const noop = () => {};
+  jest.spyOn(DatatransService, 'validateIncomingRequestSignature').mockImplementation(noop);
+};
 
 describe('Main handler', () => {
 
@@ -20,10 +25,11 @@ describe('Main handler', () => {
   // So a simpler, "narrower" test is implemented here - it ends
   // on the checking of what CommerceToolsService.updatePayment was called with (that covers the majority of our logic).
   describe('When a request matches Redirect&Lightbox Webhook operation criteria', () => {
-    beforeEach(() => { // Stub Signature validation
-      /* eslint-disable @typescript-eslint/no-empty-function */
-      const noop = () => {};
-      jest.spyOn(DatatransService, 'validateIncomingRequestSignature').mockImplementation(noop);
+    // TODO: Move this test (as it is implemented now) into app/domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification.
+    // Here, instead, just test that exactly webhook-notification handler is called.
+
+    beforeEach(() => {
+      disableDatatransSignatureValidation();
     });
 
     const paymentFetchedFromCT: Partial<Payment> = {

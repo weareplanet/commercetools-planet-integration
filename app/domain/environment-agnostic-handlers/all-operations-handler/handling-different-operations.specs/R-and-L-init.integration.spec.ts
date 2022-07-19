@@ -26,6 +26,9 @@ describe('All-operations handler', () => {
 
   describe('When a request matches Redirect&Lightbox Init operation criteria', () => {
     it('should go through the R&L Payment Initialization flow', async () => {
+      // TODO: Move this test (as it is implemented now) into app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment.
+      // Here, instead, just test that exactly create-payment handler is called.
+
       dtHttpClientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
 
       const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
