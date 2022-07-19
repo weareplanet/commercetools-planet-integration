@@ -10,9 +10,11 @@ jest.mock('axios', () => ({
   create: () => ({ post: () => Promise.resolve({ data: {}, headers: {} }) })
 }));
 
+const customObjectSpy = jest.fn();
+
 jest.mock('../../../services/commercetools-service/commerce-tools-client', () => {
   return {
-    ctApiRoot: commerceToolsClientFactory()
+    ctApiRoot: commerceToolsClientFactory({ customObject: customObjectSpy })
   };
 });
 
@@ -73,6 +75,19 @@ describe('createPayment handler', () => {
       }
     }) as IAbstractRequestWithTypedBody<IRequestBody>;
   };
+
+  beforeAll(() => {
+    customObjectSpy.mockReturnValue({
+      body: {
+        value: [{
+          paymentMethod: 'VIS',
+          card: {
+            alias: 'savedPaymentMethodAlias value'
+          }
+        }]
+      }
+    });
+  });
 
   describe('when the request body contains only the required part', () => {
     it('responds with 200 and actions with updates', async () => {

@@ -1,9 +1,12 @@
 import { Logger } from 'pino';
 
-import { commerceToolsClientFactory  } from '../../../../test/shared-test-entities/commercetools-client';
+import { commerceToolsClientFactory } from '../../../../test/shared-test-entities/commercetools-client';
+
+const customObjectSpy = jest.fn();
+
 jest.mock('../commercetools-service/commerce-tools-client', () => {
   return {
-    ctApiRoot: commerceToolsClientFactory()
+    ctApiRoot: commerceToolsClientFactory({ customObject: customObjectSpy })
   };
 });
 
@@ -50,7 +53,91 @@ const expectedResult = [
   }
 ];
 
-
+const commerceToolsErrorWhenCustomObjectKeyIsNotExist = {
+  'code': 404,
+  'statusCode': 404,
+  'status': 404,
+  'message': 'URI not found: /planetpayment-discovery/custom-objects/savedPaymentMethods/merchantPaymentMethodKey123',
+  'originalRequest': {
+    'baseUri': 'https://api.europe-west1.gcp.commercetools.com',
+    'method': 'GET',
+    'uriTemplate': '/{projectKey}/custom-objects/{container}/{key}',
+    'pathVariables': {
+      'projectKey': 'planetpayment-discovery',
+      'container': 'savedPaymentMethods',
+      'key': 'merchantPaymentMethodKey123'
+    },
+    'headers': {
+      'Authorization': 'Bearer ********'
+    },
+    'uri': '/planetpayment-discovery/custom-objects/savedPaymentMethods/merchantPaymentMethodKey123'
+  },
+  'retryCount': 0,
+  'headers': {
+    'server': [
+      'istio-envoy'
+    ],
+    'date': [
+      'Tue, 19 Jul 2022 11:50:09 GMT'
+    ],
+    'content-type': [
+      'application/json; charset=utf-8'
+    ],
+    'x-http-status-caused-by-external-upstream': [
+      'false'
+    ],
+    'access-control-allow-origin': [
+      '*'
+    ],
+    'access-control-allow-headers': [
+      'Accept, Authorization, Content-Type, Origin, User-Agent, X-Correlation-ID'
+    ],
+    'access-control-allow-methods': [
+      'GET, POST, DELETE, OPTIONS'
+    ],
+    'access-control-expose-headers': [
+      'X-Correlation-ID'
+    ],
+    'access-control-max-age': [
+      '299'
+    ],
+    'x-correlation-id': [
+      'projects-077f0e5d-8f89-4c77-8f2f-5f3e95e6f054'
+    ],
+    'server-timing': [
+      'projects;dur=3'
+    ],
+    'content-encoding': [
+      'gzip'
+    ],
+    'x-envoy-upstream-service-time': [
+      '4'
+    ],
+    'via': [
+      '1.1 google'
+    ],
+    'alt-svc': [
+      'h3=\':443\'; ma=2592000,h3-29=\':443\'; ma=2592000'
+    ],
+    'connection': [
+      'close'
+    ],
+    'transfer-encoding': [
+      'chunked'
+    ]
+  },
+  'body': {
+    'statusCode': 404,
+    'message': 'The CustomObject with ID \'(savedPaymentMethods,merchantPaymentMethodKey123)\' was not found.',
+    'errors': [
+      {
+        'code': 'InvalidSubject',
+        'message': 'The CustomObject with ID \'(savedPaymentMethods,merchantPaymentMethodKey123)\' was not found.'
+      }
+    ]
+  },
+  'name': 'NotFound'
+};
 
 describe('#initRedirectAndLightbox method', () => {
   let logger: Logger;
@@ -69,6 +156,16 @@ describe('#initRedirectAndLightbox method', () => {
   beforeAll(async () => {
     process.env.LOG_LEVEL = 'debug';
     jest.mock('axios', axiosMockFactory);
+    customObjectSpy.mockReturnValue({
+      body: {
+        value: [{
+          paymentMethod: 'VIS',
+          card: {
+            alias: 'savedPaymentMethodAlias value'
+          }
+        }]
+      }
+    });
   });
 
   beforeEach(async () => {
@@ -103,7 +200,7 @@ describe('#initRedirectAndLightbox method', () => {
         BON: {
           alias: 'BON test card alias'
         },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any; // HACK: yup schema not allowed not declared fields
 
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
@@ -138,7 +235,7 @@ describe('#initRedirectAndLightbox method', () => {
         BON: {
           alias: 'BON test card alias'
         },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any; // HACK: yup schema not allowed not declared fields
 
       await paymentService.initRedirectAndLightbox(mockPayment);
@@ -162,7 +259,7 @@ describe('#initRedirectAndLightbox method', () => {
       expect(result).toBeInstanceOf(Array);
     });
 
-    it('should throw an error because card didn\'t find in CommerceTools', async () => {
+    it('should throw an error because card didn\'t find', async () => {
       expect.assertions(1);
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
@@ -172,6 +269,20 @@ describe('#initRedirectAndLightbox method', () => {
         await paymentService.initRedirectAndLightbox(mockPayment);
       } catch (e) {
         expect(e.message).toEqual('savedPaymentMethodAlias not found');
+      }
+    });
+
+    it('should throw an error because card didn\'t find Commerce Tools with merchant savedPaymentMethodsKey', async () => {
+      expect.assertions(1);
+      customObjectSpy.mockRejectedValue(commerceToolsErrorWhenCustomObjectKeyIsNotExist);
+      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
+      mockPayment.custom.fields.savedPaymentMethodsKey = 'incorrect savedPaymentMethodsKey';
+
+      try {
+        await paymentService.initRedirectAndLightbox(mockPayment);
+      } catch (e) {
+        expect(e).toMatchObject(commerceToolsErrorWhenCustomObjectKeyIsNotExist);
       }
     });
   });
