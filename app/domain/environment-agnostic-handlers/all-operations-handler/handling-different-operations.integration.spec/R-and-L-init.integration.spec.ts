@@ -45,6 +45,12 @@ describe('All-operations handler', () => {
         }
       );
 
+      // TODO: Currently from reading this test it is not clear why the expected result
+      // should match RedirectAndLightboxPaymentInitResponseFactory().
+      // To understand that you must look into RedirectAndLightboxPaymentInitResponseFactory
+      // and realize that the values hardcoded in it
+      // IMPLICITLY correlate with internals of CreateInitializeTransactionResponseFactory and RedirectAndLightboxPaymentInitRequestBodyFactory.
+      // Instead of such indirections - MAKE THE CORRELATION OBVIOUS IN THE CODE OF THIS TEST!
       expect(result).toMatchObject(RedirectAndLightboxPaymentInitResponseFactory());
     });
   });
