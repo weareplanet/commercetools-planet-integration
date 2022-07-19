@@ -141,9 +141,10 @@ describe('#initRedirectAndLightbox method', () => {
   });
 
   describe('payment method validation in Redirect And Lightbox Init operation', () => {
-    it('should pass validation', async () => {
+    it('should pass validation because card exist with same alias in CommerceTools', async () => {
       expect.assertions(1);
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
+      // the same alias we have in mocked implementation of client in test/__mocks__/domain/services/commercetools-service/commerce-tools-client.ts
       mockPayment.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
       mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
 
@@ -152,7 +153,7 @@ describe('#initRedirectAndLightbox method', () => {
       expect(result).toBeInstanceOf(Array);
     });
 
-    it('should throw an error', async () => {
+    it('should throw an error because card didn\'t find in CommerceTools', async () => {
       expect.assertions(1);
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';

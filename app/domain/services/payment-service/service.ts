@@ -92,6 +92,7 @@ export class PaymentService {
     await CommerceToolsService.updatePayment(payment, actionsBuilder.getActions());
   }
 
+  // NOTE: it's validation and getting in one place. If we find better place in future where we can put it, please move it
   private async findPaymentMethod(key: string, alias: string): Promise<CommerceToolsPaymentMethod> {
     const paymentMethods = await CommerceToolsService.getCustomObjects('savedPaymentMethods', key);
     const paymentMethod = paymentMethods?.value?.find((method) => {

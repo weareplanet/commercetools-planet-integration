@@ -34,15 +34,7 @@ export class OperationDetector {
   public static detectOperation = (req: IAbstractRequest) => {
 
     if (this.isCommerceToolsRequest(req)) {
-      const reqBody = req.body;
-      const payment = reqBody.resource.obj;
-      const isRedirectLightboxPaymentFlow =
-        reqBody.action === 'Create'
-        && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
-        && !hasProperties(payment?.custom?.fields, ['transactionId'])
-        && !payment?.paymentStatus?.interfaceCode;
-
-      if (isRedirectLightboxPaymentFlow) {
+      if (this.isRedirectAndLightboxInitOperation(req)) {
         return Operation.RedirectAndLightboxInit;
       }
     } else if (this.isDatatransRequest(req)) {
@@ -51,4 +43,14 @@ export class OperationDetector {
 
     return '';
   };
+
+  private static isRedirectAndLightboxInitOperation(req: ICommerceToolsExtensionRequest): boolean {
+    const reqBody = req.body;
+    const payment = reqBody.resource.obj;
+
+    return reqBody.action === 'Create'
+      && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
+      && !hasProperties(payment?.custom?.fields, ['transactionId'])
+      && !payment?.paymentStatus?.interfaceCode;
+  }
 }
