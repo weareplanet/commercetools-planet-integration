@@ -19,13 +19,13 @@ enum PaymentInterface {
 
 export class OperationDetector {
 
-  // Type quard for ICommerceToolsExtensionRequest
+  // Type guard for ICommerceToolsExtensionRequest
   public static isCommerceToolsRequest(req: IAbstractRequest | ICommerceToolsExtensionRequest): req is ICommerceToolsExtensionRequest {
     const request = req as ICommerceToolsExtensionRequest;
     return !!request.body && (typeof request.body === 'object') && !!request.body.action;
   }
 
-  // Type quard for IDatatransWebhookRequest
+  // Type guard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
     return !!request.headers && !!request.headers[DATATRANS_SIGNATURE_HEADER_NAME];
