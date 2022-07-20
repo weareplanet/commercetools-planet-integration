@@ -43,8 +43,6 @@ export class CommerceToolsService {
       .execute();
 
     logger.debug(res.body, 'Response from CommerceTools after the payment update.');
-
-    return res;
   }
 
   public static async getCustomObjects(containerName: string, key: string): Promise<CommerceToolsPaymentMethodsObject> {

@@ -33,7 +33,7 @@ export class DatatransToCommerceToolsMapper {
   // Despite the visible simplicity of this code it requires a lot of fields of IDatatransWebhookRequestBody -
   // so it was easier to pass the entire request body.
   // Strongly saying, IRequestBody exported from app/domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification/request-schema.ts
-  // should be used, but we try to keep this class anaware of any handlers...
+  // should be used, but we try to keep this class unaware of any handlers...
   public static inferCtPaymentInfo(reqBody: IDatatransWebhookRequestBody): string {
     const infoObj = reqBody.card || reqBody[reqBody.paymentMethod];
     return infoObj ? JSON.stringify(infoObj) : '';

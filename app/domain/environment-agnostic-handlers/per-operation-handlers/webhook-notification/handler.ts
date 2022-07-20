@@ -46,6 +46,6 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
 
   return {
     statusCode: HttpStatusCode.OK,
-    body: { message: 'Hello World from webhook-notification handler!' } // TODO: form a meaningful response
+    body: ''
   };
 };
