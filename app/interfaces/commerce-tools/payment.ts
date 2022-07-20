@@ -1,13 +1,8 @@
 import * as yup from 'yup';
-import {
-  type PaymentDraft,
-  type CustomFieldsDraft,
-  type TypeResourceIdentifier
-} from '@commercetools/platform-sdk';
+// import { type Payment } from '@commercetools/platform-sdk';
 
 import configService from '../../domain/services/config-service';
 import { ErrorMessages } from './error-messages';
-import { ICommerceToolsCustomInterfaceInteraction }  from './interface-interaction';
 
 export const CommerceToolsPaymentSchema = yup.object({
   key: yup.string()
@@ -127,18 +122,11 @@ export const CommerceToolsPaymentSchema = yup.object({
     return true;
   });
 
-export type ICommerceToolsPayment = yup.TypeOf<typeof CommerceToolsPaymentSchema>;
 // Heck! Optional fields become required! https://javascript.plainenglish.io/a-typescript-runtime-data-validators-comparison-15f0ea2e3265#0428
 // If we won't find a good solution and it will hamper -
 // we will have to make a duplicated IPament declaration apart from PaymentSchema ((
-
-export interface ICommerceToolsCustomPaymentFields extends CustomFieldsDraft {
-  type: TypeResourceIdentifier;
-  // Many fields (which are not important in INC-7)...
-  // DO NOT RE_DECLARE THEM - use the type(s) inferred from Yup schema(s) - see a related comment above.
-}
-
-export interface ICommerceToolsPaymentDraft extends PaymentDraft {
-  interfaceInteractions: ICommerceToolsCustomInterfaceInteraction[]
-  custom: ICommerceToolsCustomPaymentFields
-}
+export type ICommerceToolsPayment = yup.TypeOf<typeof CommerceToolsPaymentSchema>;
+// TODO: consider enhancing this type with
+//    & Partial<Payment> (or & RecursivePartial<Payment>)
+// to allow any fields from CommerceTools Payment (not declared in CommerceToolsPaymentSchema) be present in this type
+// (this will allow to avoid doing `as unknown as Payment` - see R-and-L-webhook.integration.spec.ts)

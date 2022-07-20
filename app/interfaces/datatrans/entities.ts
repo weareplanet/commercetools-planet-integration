@@ -1,3 +1,5 @@
+import { IAnyObjectWithStringKeys } from '../extras';
+
 export enum DatatransEnvironment {
   PROD = 'prod',
   TEST = 'test'
@@ -50,6 +52,20 @@ export enum DatatransPaymentMethod {
   VIS = 'VIS',
   WEC = 'WEC'
 }
+
+export type DatatransPaymentMethodDetails = {
+  alias: string; // details which Datatrans provides for "card" and for any other payment method - all contain at least "alias" field
+  expiryMonth?: string;
+  expiryYear?: string;
+} & IAnyObjectWithStringKeys;
+
+// This type represents a part of Datatrans request body
+export type IDatatransPaymentMethodInfo = {
+  paymentMethod: DatatransPaymentMethod;
+  card?: DatatransPaymentMethodDetails;
+} & {
+  [key in keyof typeof DatatransPaymentMethod]?: DatatransPaymentMethodDetails;
+};
 
 export enum DatatransTransactionStatus {
   initialized = 'initialized',

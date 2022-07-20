@@ -4,13 +4,13 @@ import {
   IDatatransInitializeTransaction,
   ICommerceToolsPayment,
   DatatransPaymentMethod,
-  ICommerceToolsPaymentMethod
+  IDatatransPaymentMethodInfo
 } from '../../../interfaces';
 
 interface IInputParametersForMapper {
   payment: ICommerceToolsPayment;
   webhookUrl: string;
-  savedPaymentMethod?: ICommerceToolsPaymentMethod;
+  savedPaymentMethod?: IDatatransPaymentMethodInfo;
 }
 
 export const prepareInitializeTransactionRequestPayload = (parameters: IInputParametersForMapper): IDatatransInitializeTransaction => {
@@ -31,11 +31,13 @@ export const prepareInitializeTransactionRequestPayload = (parameters: IInputPar
     webhook: ({ webhookUrl }) => ({
       url: webhookUrl
     }),
-    card: ({ savedPaymentMethod }) => savedPaymentMethod?.card ? ({
-      alias: savedPaymentMethod.card.alias,
-      expiryMonth: savedPaymentMethod.card.expiryMonth,
-      expiryYear: savedPaymentMethod.card.expiryYear,
-    }) : undefined
+    card: ({ savedPaymentMethod }) => savedPaymentMethod?.card
+      ? ({
+        alias: savedPaymentMethod.card.alias,
+        expiryMonth: savedPaymentMethod.card.expiryMonth,
+        expiryYear: savedPaymentMethod.card.expiryYear,
+      })
+      : undefined
   }, { undefinedValues: { strip: true } }))(parameters);
 
   const option = result.option || parameters.payment?.custom?.fields?.initRequest?.option

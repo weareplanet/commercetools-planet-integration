@@ -1,19 +1,28 @@
+import _merge from 'lodash.merge';
+
+import { RecursivePartial } from './test-utils';
+
 import {
   DatatransTransactionStatus,
   DatatransPaymentMethod,
   DatatransHistoryAction,
-  IDatatransWebhookRequestBody
+  IDatatransWebhookRequestBody,
+  DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../app/interfaces';
 
 import { abstractRequestFactory } from './abstract-request-factories';
 
-export const RedirectAndLightboxWebhookRequestBodyFactory = (): IDatatransWebhookRequestBody =>  {
-  return {
+export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody =>  {
+  const defaultStuff = {
     merchantId: 'Test merchantId',
     refno: 'Test refno',
     transactionId: 'Test transactionId',
     status: DatatransTransactionStatus.authorized,
-    paymentMethod: DatatransPaymentMethod.VIS,
+    paymentMethod: DatatransPaymentMethod.VIS, // ECA, VIS, AMX, CUP, DIN, DIS, JCB, MAU, DNK
+    card: {
+      alias: 'Test card alias',
+      masked: '424242xxxxxx4242'
+    },
     history: [
       {
         action: DatatransHistoryAction.init,
@@ -34,13 +43,18 @@ export const RedirectAndLightboxWebhookRequestBodyFactory = (): IDatatransWebhoo
       }
     ]
   };
+
+  return _merge(
+    defaultStuff,
+    webhookRequestBodyExplicitStuff
+  );
 };
 
-export const RedirectAndLightboxWebhookRequestFactory = () =>  {
+export const RedirectAndLightboxWebhookRequestFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}) =>  {
   return abstractRequestFactory(
-    RedirectAndLightboxWebhookRequestBodyFactory(),
+    RedirectAndLightboxWebhookRequestBodyFactory(webhookRequestBodyExplicitStuff),
     {
-      'datatrans-signature': 't=TS,s0=SIGNATURE'
+      [DATATRANS_SIGNATURE_HEADER_NAME]: 't=TS,s0=SIGNATURE'
     }
   );
 };

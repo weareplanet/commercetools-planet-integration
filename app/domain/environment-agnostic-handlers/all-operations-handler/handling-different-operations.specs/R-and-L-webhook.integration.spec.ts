@@ -1,33 +1,30 @@
-import { IDatatransWebhookRequestBody } from '../../../../interfaces';
-import { DatatransService } from '../../../services/datatrans-service';
 import {
-  type Payment,
-} from '@commercetools/platform-sdk';
+  IDatatransWebhookRequestBody,
+  ICommerceToolsCustomPaymentMethodsObject,
+  DatatransPaymentMethod,
+  DATATRANS_SIGNATURE_HEADER_NAME
+} from '../../../../interfaces';
+import { DatatransService } from '../../../services/datatrans-service';
+import { type Payment } from '@commercetools/platform-sdk';
+import { CommerceToolsService } from '../../../services/commercetools-service';
+import handler from '..';
 
+import {
+  PaymentFactory
+}  from '../../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 import {
   RedirectAndLightboxWebhookRequestFactory
 } from '../../../../../test/shared-test-entities/redirect-and-lightbox-webhook';
 
-import { CommerceToolsService } from '../../../services/commercetools-service';
-
-import handler from '..';
-
-const disableDatatransSignatureValidation = () => {
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  const noop = () => {};
-  jest.spyOn(DatatransService, 'validateIncomingRequestSignature').mockImplementation(noop);
-};
-
-describe('Main handler', () => {
+describe('All-operations handler', () => {
 
   describe('When a request matches Redirect&Lightbox Webhook operation criteria', () => {
-    // TODO: Move this test (as it is implemented now) into app/domain/environment-agnostic-handlers/per-operation-handlers/webhook-notification.
-    // Here, instead, just test that exactly webhook-notification handler is called.
+    describe('and Datatrans Signature validation passes', () => {
 
-    describe('And Datatrans Signature validation passes', () => {
-
-      beforeEach(() => {
-        disableDatatransSignatureValidation();
+      beforeEach(/* Suppose the signature validation passes */ () => {
+        /* eslint-disable @typescript-eslint/no-empty-function */
+        const noop = () => {};
+        jest.spyOn(DatatransService, 'validateIncomingRequestSignature').mockImplementation(noop);
       });
 
       // An attempt to make an END-to-END test (i.e. to mock 'node-fetch' and check its call with the expected actions) appeared TOO MESSY -
@@ -35,7 +32,13 @@ describe('Main handler', () => {
       // So a simpler, "narrower" test is implemented here - it ends
       // on the checking of what CommerceToolsService.updatePayment was called with (that covers the majority of our logic).
 
-      const paymentFetchedFromCT: Partial<Payment> = {
+      const fakeCurrentDate = '2022-07-15T18:10:00Z';
+      beforeEach(() => {
+        jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(fakeCurrentDate);
+      });
+
+      const testSavedPaymentMethodsKey = 'Test payment methods key';
+      const paymentFetchedFromCT = PaymentFactory({
         key: '12345123451234512361',
         version: 2,
         amountPlanned: {
@@ -43,27 +46,55 @@ describe('Main handler', () => {
           centAmount: 12345,
           currencyCode: 'EUR',
           fractionDigits: 2
+        },
+        custom: {
+          fields: {
+            savePaymentMethod: true,
+            savedPaymentMethodsKey: 'Test payment methods key'
+          }
         }
+      } as unknown as Payment);
+      beforeEach(/* Stub CommerceToolsService.getPayment */ () => {
+        jest.spyOn(CommerceToolsService, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
+      });
+
+      beforeEach(/* Mock CommerceToolsService.updatePayment */ () => {
+        jest.spyOn(CommerceToolsService, 'updatePayment').mockResolvedValue(); // does not matter what it returns
+      });
+
+      const paymentMethodCustomObjectFetchedFromCT: Partial<ICommerceToolsCustomPaymentMethodsObject> = {
+        key: 'KEY NOT EQUAL TO testSavedPaymentMethodsKey',
+        version: 1,
+        value: [
+          {
+            paymentMethod: DatatransPaymentMethod.VIS,
+            card: {
+              alias: 'Earlier saved VIS card payment alias'
+            }
+          }
+        ]
       };
-      beforeEach(() => { // Stub CommerceToolsService.getPayment
-        jest.spyOn(CommerceToolsService, 'getPayment').mockResolvedValue(paymentFetchedFromCT as Payment);
+      beforeEach(/* Stub CommerceToolsService.getCustomPaymentMethodsObject */ () => {
+        jest.spyOn(CommerceToolsService, 'getCustomPaymentMethodsObject')
+          .mockResolvedValue(paymentMethodCustomObjectFetchedFromCT as ICommerceToolsCustomPaymentMethodsObject);
       });
 
-      beforeEach(() => { // Mock CommerceToolsService.updatePayment
-        jest.spyOn(CommerceToolsService, 'updatePayment').mockResolvedValue();
+      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomPaymentMethodsObject */ () => {
+        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomPaymentMethodsObject').mockResolvedValue(); // does not matter what it returns
       });
 
-      const fakeCurrentDate = '2022-07-15T18:10:00Z';
-      beforeEach(() => {
-        jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(fakeCurrentDate);
+      const req = RedirectAndLightboxWebhookRequestFactory({
+        paymentMethod: DatatransPaymentMethod.ECA,
+        card: {
+          alias: 'New ECA card payment alias',
+          masked: '520000******0007'
+        }
       });
 
-      it('should go through the Webhook handling flow and respond with 200', async () => {
-        const req = RedirectAndLightboxWebhookRequestFactory();
-        const result = await handler(req);
+      it('should update Payment in CommerceTools', async () => {
+        await handler(req);
 
         const dateFromDtHistoryAuthorizeTransaction = (req.body as IDatatransWebhookRequestBody).history?.[1].date;
-
         const expectedActions = [
           { action: 'setStatusInterfaceCode', interfaceCode: 'authorized' },
           {
@@ -88,8 +119,8 @@ describe('Main handler', () => {
               },
               custom: {
                 fields: {
-                  info: '',
-                  paymentMethod: 'VIS',
+                  paymentMethod: 'ECA',
+                  info: '{"alias":"New ECA card payment alias","masked":"520000******0007"}',
                 },
                 type: {
                   key: 'pp-datatrans-usedmethod-type',
@@ -99,8 +130,51 @@ describe('Main handler', () => {
             }
           }
         ];
-
         expect(CommerceToolsService.updatePayment).toBeCalledWith(paymentFetchedFromCT, expectedActions);
+      });
+
+      it('should save paymentMethod data (alias etc.) to CommerceTools', async () => {
+        await handler(req);
+
+        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).toBeCalledWith(
+          'savedPaymentMethods',
+          testSavedPaymentMethodsKey,
+          [
+            {
+              paymentMethod: DatatransPaymentMethod.VIS,
+              card: {
+                alias: 'Earlier saved VIS card payment alias'
+              }
+            },
+            {
+              paymentMethod: DatatransPaymentMethod.ECA,
+              card: {
+                alias: 'New ECA card payment alias',
+                masked: '520000******0007'
+              }
+            }
+          ]
+        );
+      });
+
+      it('should NOT save paymentMethod data (alias etc.) to CommerceTools, if Payment.savePaymentMethod is false', async () => {
+        const paymentFetchedFromCT = PaymentFactory({
+          custom: {
+            fields: {
+              savePaymentMethod: false,
+              savedPaymentMethodsKey: 'Test payment methods key'
+            }
+          }
+        } as unknown as Payment);
+        jest.spyOn(CommerceToolsService, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
+
+        await handler(req);
+
+        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).not.toBeCalledWith();
+      });
+
+      it('should respond 200', async () => {
+        const result = await handler(req);
 
         expect(result).toEqual(
           {
@@ -111,21 +185,34 @@ describe('Main handler', () => {
       });
     });
 
-    describe('but Datatrans Signature validation fails', () => {
-      beforeEach(() => { // Stub CommerceToolsService.getPayment
+    describe('and Datatrans Signature validation fails', () => {
+      beforeEach(/* Mock CommerceToolsService.getPayment */ () => {
         jest.spyOn(CommerceToolsService, 'getPayment').mockResolvedValue({} as Payment);
       });
 
-      beforeEach(() => { // Mock CommerceToolsService.updatePayment
+      beforeEach(/* Mock CommerceToolsService.updatePayment */ () => {
         jest.spyOn(CommerceToolsService, 'updatePayment').mockResolvedValue();
+      });
+
+      beforeEach(/* Mock CommerceToolsService.getCustomPaymentMethodsObject */ () => {
+        jest.spyOn(CommerceToolsService, 'getCustomPaymentMethodsObject').mockResolvedValue({} as ICommerceToolsCustomPaymentMethodsObject);
+      });
+
+      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomPaymentMethodsObject */ () => {
+        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomPaymentMethodsObject').mockResolvedValue();
       });
 
       it('should go through the Webhook handling flow and respond with 400', async () => {
         const req = RedirectAndLightboxWebhookRequestFactory();
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        (req.headers as any)[DATATRANS_SIGNATURE_HEADER_NAME] = 'wrong-value';
         const result = await handler(req);
 
         expect(CommerceToolsService.getPayment).not.toBeCalled();
         expect(CommerceToolsService.updatePayment).not.toBeCalled();
+
+        expect(CommerceToolsService.getCustomPaymentMethodsObject).not.toBeCalled();
+        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).not.toBeCalled();
 
         expect(result).toEqual(
           {

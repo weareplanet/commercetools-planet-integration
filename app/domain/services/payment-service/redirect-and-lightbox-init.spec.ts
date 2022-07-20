@@ -16,6 +16,8 @@ import {
   CreateInitializeTransactionRequestFactory
 } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
+const aliasExistingInCommerceTools = 'savedPaymentMethodAlias value';
+
 const expectedResultRedirectAndLightboxWithoutPaymentMethod = [
   {
     action: 'setCustomField',
@@ -68,7 +70,7 @@ const expectedResultRedirectAndLightboxWithPaymentMethod = [
     action: 'addInterfaceInteraction',
     fields: {
       interactionType: 'initRequest',
-      message: '{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"savedPaymentMethodAlias value","expiryMonth":"06","expiryYear":"25"}}}',
+      message: `{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"${aliasExistingInCommerceTools}","expiryMonth":"06","expiryYear":"25"}}}`,
     },
     type: {
       key: 'pp-datatrans-interface-interaction-type',
@@ -198,7 +200,7 @@ describe('#initRedirectAndLightbox method', () => {
         value: [{
           paymentMethod: 'VIS',
           card: {
-            alias: 'savedPaymentMethodAlias value',
+            alias: aliasExistingInCommerceTools,
             expiryMonth: '06',
             expiryYear: '25'
           }
@@ -273,12 +275,12 @@ describe('#initRedirectAndLightbox method', () => {
       const initializeTransactionPayload = {
         ...CreateInitializeTransactionRequestFactory(),
         card: {
-          alias: 'savedPaymentMethodAlias value',
+          alias: aliasExistingInCommerceTools,
           expiryMonth: '06',
           expiryYear: '25'
         }
       };
-      mockPayment.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+      mockPayment.custom.fields.savedPaymentMethodAlias = aliasExistingInCommerceTools;
       mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
 
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
@@ -320,10 +322,22 @@ describe('#initRedirectAndLightbox method', () => {
   });
 
   describe('payment method validation in Redirect And Lightbox Init operation', () => {
-    it('should pass validation because card exist with same alias in CommerceTools', async () => {
-      expect.assertions(1);
+    it('should pass validation, if a card with the specified alias exists in CommerceTools', async () => {
+      customObjectSpy.mockReturnValue({
+        body: {
+          value: [{
+            paymentMethod: 'VIS',
+            card: {
+              alias: aliasExistingInCommerceTools,
+              expiryMonth: '06',
+              expiryYear: '25'
+            }
+          }]
+        }
+      });
+
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
-      mockPayment.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+      mockPayment.custom.fields.savedPaymentMethodAlias = aliasExistingInCommerceTools;
       mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
 
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
@@ -331,28 +345,25 @@ describe('#initRedirectAndLightbox method', () => {
       expect(result).toBeInstanceOf(Array);
     });
 
-    it('should throw an error because card didn\'t find', async () => {
+    it('should throw an error, if the card with the specified alias was not found in CommerceTools', async () => {
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
       mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
 
       await expect(paymentService.initRedirectAndLightbox(mockPayment))
         .rejects
-        .toThrow('savedPaymentMethodAlias not found');
+        .toThrow(/^savedPaymentMethodsKey or savedPaymentMethodAlias not found$/);
     });
 
-    it('should throw an error because card didn\'t find Commerce Tools with merchant savedPaymentMethodsKey', async () => {
-      expect.assertions(1);
+    it('should throw an error, if there is no savedPaymentMethodsKey Custom Object with the specified key in CommerceTools', async () => {
       customObjectSpy.mockRejectedValue(commerceToolsErrorWhenCustomObjectKeyIsNotExist);
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
-      mockPayment.custom.fields.savedPaymentMethodsKey = 'incorrect savedPaymentMethodsKey';
+      mockPayment.custom.fields.savedPaymentMethodsKey = 'not-existing-savedPaymentMethodsKey';
 
-      try {
-        await paymentService.initRedirectAndLightbox(mockPayment);
-      } catch (e) {
-        expect(e).toMatchObject(commerceToolsErrorWhenCustomObjectKeyIsNotExist);
-      }
+      await expect(paymentService.initRedirectAndLightbox(mockPayment))
+        .rejects
+        .toThrow(/^savedPaymentMethodsKey or savedPaymentMethodAlias not found$/);
     });
   });
 });
