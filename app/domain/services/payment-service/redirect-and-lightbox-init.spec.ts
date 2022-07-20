@@ -260,16 +260,13 @@ describe('#initRedirectAndLightbox method', () => {
     });
 
     it('should throw an error because card didn\'t find', async () => {
-      expect.assertions(1);
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       mockPayment.custom.fields.savedPaymentMethodAlias = 'alias';
       mockPayment.custom.fields.savedPaymentMethodsKey = 'savedPaymentMethodsKey';
 
-      try {
-        await paymentService.initRedirectAndLightbox(mockPayment);
-      } catch (e) {
-        expect(e.message).toEqual('savedPaymentMethodAlias not found');
-      }
+      await expect(paymentService.initRedirectAndLightbox(mockPayment))
+        .rejects
+        .toThrow('savedPaymentMethodAlias not found');
     });
 
     it('should throw an error because card didn\'t find Commerce Tools with merchant savedPaymentMethodsKey', async () => {
