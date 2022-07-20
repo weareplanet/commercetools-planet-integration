@@ -92,7 +92,10 @@ export class PaymentService {
     await CommerceToolsService.updatePayment(payment, actionsBuilder.getActions());
   }
 
-  // NOTE: it's validation and getting in one place. If we find better place in future where we can put it, please move it
+  // TODO: it's validation and getting in one place,
+  // what at lest does not follow our common design regarding validatiuons:
+  // Consider moving this validation to where all other validations are implemented (in Yup schema):
+  // https://github.com/weareplanet/commercetools-planet-integration/blob/main/app/interfaces/commerce-tools/payment.ts#L66
   private async findPaymentMethod(key: string, alias: string): Promise<CommerceToolsPaymentMethod> {
     const paymentMethods = await CommerceToolsService.getCustomObjects('savedPaymentMethods', key);
     const paymentMethod = paymentMethods?.value?.find((method) => {
