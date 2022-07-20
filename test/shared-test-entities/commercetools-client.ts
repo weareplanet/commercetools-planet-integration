@@ -69,7 +69,6 @@ class ApiRoot {
   }
 
   withProjectKey() {
-    console.info('--- withProjectKey ', this);
     return this;
   }
 
