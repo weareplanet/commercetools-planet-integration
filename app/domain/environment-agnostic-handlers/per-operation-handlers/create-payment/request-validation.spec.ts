@@ -76,13 +76,15 @@ describe('createPayment handler', () => {
     }) as IAbstractRequestWithTypedBody<IRequestBody>;
   };
 
+  const aliasExistingInCommerceTools = 'savedPaymentMethodAlias value';
+
   beforeAll(() => {
     customObjectSpy.mockReturnValue({
       body: {
         value: [{
           paymentMethod: 'VIS',
           card: {
-            alias: 'savedPaymentMethodAlias value'
+            alias: aliasExistingInCommerceTools
           }
         }]
       }
@@ -385,7 +387,7 @@ describe('createPayment handler', () => {
 
     describe('when savedPaymentMethodAlias is NOT empty', () => {
       beforeEach(() => {
-        request.body.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias value';
+        request.body.resource.obj.custom.fields.savedPaymentMethodAlias = aliasExistingInCommerceTools;
       });
 
       describe('and savePaymentMethod is true', () => {
