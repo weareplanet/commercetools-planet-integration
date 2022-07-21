@@ -40,12 +40,12 @@ jobs:
       - name: Preparing package
         id: prepare
         env:
-          PKGVERSIONDATE: "newpackage-v${{ steps.extract_version.outputs.version }}-${{ steps.date.outputs.date }}"
+          PKGVERSIONDATE: "v${{ steps.extract_version.outputs.version }}-${{ steps.date.outputs.date }}"
         run: |
-          mkdir ${{ env.PKGVERSIONDATE }} \
-          && cp -fr ./node_modules ${{ env.PKGVERSIONDATE }}/ \
-          && cp -fr dist/* ${{ env.PKGVERSIONDATE }}/ \
-          && cp -fr package.json ${{ env.PKGVERSIONDATE }}/ \
+          mkdir newpackage-${{ env.PKGVERSIONDATE }} \
+          && cp -fr ./node_modules newpackage-${{ env.PKGVERSIONDATE }}/ \
+          && cp -fr dist/* newpackage-${{ env.PKGVERSIONDATE }}/ \
+          && cp -fr package.json newpackage-${{ env.PKGVERSIONDATE }}/ \
           && echo "PKGVERSIONDATE=${PKGVERSIONDATE}" >> $GITHUB_ENV
 
       - name: Zipping package
