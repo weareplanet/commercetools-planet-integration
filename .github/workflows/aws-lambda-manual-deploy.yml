@@ -33,6 +33,24 @@ jobs:
       - name: Get formatted date
         id: date
         run: echo "::set-output name=date::$(date +%Y%m%d-%H%M%S)"
+      - name: Get current package version
+        id: extract_version
+        uses: Saionaro/extract-package-version@v1.0.6
+
+      - name: Preparing package
+        id: prepare
+        env:
+          pkgversiondate: "v${{ steps.extract_version.outputs.version }}-${{ steps.date.outputs.date }}"
+        run: |
+          mkdir newpackage-${{ steps.prepare.pkgversiondate }} \
+          && cp -fr ./node_modules newpackage-${{ steps.prepare.pkgversiondate }}/ \
+          && cp -fr dist/* newpackage-${{ steps.prepare.pkgversiondate }}/ \
+          && cp -fr package.json newpackage-${{ steps.prepare.pkgversiondate }}/ 
+      - name: Zipping package
+        run: |
+          cd newpackage-${{ steps.prepare.pkgversiondate }} \
+          && zip -r9q paymentconnector-${{ steps.prepare.pkgversiondate }}.zip * \
+          && ls -lha paymentconnector-${{ steps.prepare.pkgversiondate }}.zip
 
       - name: Configure AWS Credentials  
         uses: aws-actions/configure-aws-credentials@v1 
@@ -40,24 +58,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1 
-      - name: Preparing package
-        run: |
-          mkdir newpackage-${{ steps.date.outputs.date }} \
-          && cp -fr ./node_modules newpackage-${{ steps.date.outputs.date }}/ \
-          && cp -fr dist/* newpackage-${{ steps.date.outputs.date }}/ \
-          && cp -fr package.json newpackage-${{ steps.date.outputs.date }}/ 
-      - name: Zipping package
-        run: |
-          cd newpackage-${{ steps.date.outputs.date }} \
-          && zip -r9q paymentconnector-${{ steps.date.outputs.date }}.zip * \
-          && ls -lha paymentconnector-${{ steps.date.outputs.date }}.zip
       - name: Pushing package to S3
         run: |
-          aws s3 cp newpackage-${{ steps.date.outputs.date }}/paymentconnector-${{ steps.date.outputs.date }}.zip  \
-            s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip
+          aws s3 cp newpackage-${{ steps.prepare.pkgversiondate }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip  \
+            s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip
       - name: Updating lambda
         run: |
           aws lambda update-function-code \
             --function-name=paymentconnector-${{ github.actor }} \
             --s3-bucket=commercetools-paymentconnector-lambda-releases \
-            --s3-key=${{ github.actor }}/paymentconnector-${{ steps.date.outputs.date }}.zip 
+            --s3-key=${{ github.actor }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip 
