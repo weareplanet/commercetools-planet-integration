@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Payment Connector - Lambdas
+Description: Payment Connector - Lambdas and extras for STACKNAME-DEVELOPER.
 
 Parameters:
   lambdaFunctionName:
@@ -37,7 +37,7 @@ Resources:
           exports.handler = async function(event, context) {
             return { statusCode: 200, body: 'Hello World, from STACKNAME-DEVELOPER, with API-Gateway integration.' };
           };
-      Description: Lambda function for Payment Connector, without API Gateway.
+      Description: Lambda function of Payment Connector for DEVELOPER, without API Gateway.
       FunctionName: !Ref "lambdaFunctionName"
       Handler: "app/environment-specific-handlers/aws-http/index.allOperationsHandler"
       MemorySize: 128
@@ -144,7 +144,7 @@ Resources:
     Type: AWS::ApiGateway::RestApi
     Properties:
       ApiKeySourceType: HEADER
-      Description: "An API Gateway for a Payment Connector Lambda."
+      Description: "An API Gateway to the Payment Connector Lambda for DEVELOPER."
       EndpointConfiguration:
         Types:
           - REGIONAL
@@ -262,9 +262,9 @@ Resources:
 Outputs:
 
   ApiGatewayStageURL:
-    Description: "URL for the API Gateway stage"
+    Description: "URL for the API Gateway stage for DEVELOPER."
     Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${apiStageName}/"
   
   LambdaFunction:
-    Description: "Developer Lambda function name"
+    Description: "DEVELOPER Lambda function name"
     Value: !Ref "lambdaFunctionName"
