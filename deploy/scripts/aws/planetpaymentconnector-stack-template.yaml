@@ -24,6 +24,14 @@ Parameters:
 #     Type: "String"
 #     Description: API-Gateway REST API Name.
 #     Default: "STACKNAME-STACKID-api"
+<<<<<<< HEAD
+=======
+  apiextensionIAMUser:
+    Type: "String"
+    AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
+    Description: IAM User for CommerceTools API Extension calls on STACKNAME-STACKID.
+    Default: "STACKNAME-STACKID-apiextension-user"
+>>>>>>> ef7f739 (INC-5 - major refactor)
 
 Resources:
 
@@ -46,6 +54,7 @@ Resources:
       Timeout: 150
       Environment:
         Variables:
+<<<<<<< HEAD
           CT_API_URL: "https://api.us-central1.gcp.commercetools.com/" # CommerceTools API URL, double-check this
           CT_AUTH_URL: "https://auth.us-central1.gcp.commercetools.com/" # CommerceTools AUTH URL, double-check this
           CT_CLIENT_ID: "CommerceTools CLIENT ID, as a String" # from the CommerceTools project credentials
@@ -55,6 +64,17 @@ Resources:
           DT_MERCHANTS: "Datatrans MERCHANTS, as a stringified JSON containing id, password, environment and HMAC key"
           DT_PROD_API_URL: "https://api.PROD.datatrans.com/v1" # Datatrans PRODUCTION API URL, double-check this
           DT_TEST_API_URL: "https://api.sandbox.datatrans.com/v1" # Datatrans TEST/SANDBOX API URL, double-check this
+=======
+          CT_API_URL: "CT_API_URL_PLACEHOLDER" # as an URL from the CommerceTools project
+          CT_AUTH_URL: "CT_AUTH_URL_PLACEHOLDER" # as an URL from the CommerceTools project
+          CT_CLIENT_ID: "CT_NEW_CLIENT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_CLIENT_SECRET: "CT_NEW_CLIENT_SECRET_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          DT_CONNECTOR_WEBHOOK_URL: "DT_CONNECTOR_WEBHOOK_URL_PLACEHOLDER" # as an URL from AWS Lambda function itself
+          DT_MERCHANTS: 'DT_MERCHANTS_PLACEHOLDER' # as a stringified JSON containing id, password, environment and HMAC key, using single quotes to avoid issues with double-quotes within the JSON
+          DT_PROD_API_URL: "DT_PROD_API_URL_PLACEHOLDER" # as an URL from Datatrans PRODUCTION API URL
+          DT_TEST_API_URL: "DT_TEST_API_URL_PLACEHOLDER" # as an URL from Datatrans TEST/SANDBOX API URL
+>>>>>>> ef7f739 (INC-5 - major refactor)
           LOG_LEVEL: "debug" # change to INFO after debugging whatever is needed
 
   LambdaFunctionURL:
@@ -94,8 +114,14 @@ Resources:
     Properties:
       FunctionName: !GetAtt LambdaFunction.Arn
       Action: lambda:InvokeFunctionURL
+<<<<<<< HEAD
       Principal: "*"
       FunctionUrlAuthType: "AWS_IAM"
+=======
+      Principal: !GetAtt APIExtensionIAMUser.Arn
+      FunctionUrlAuthType: "AWS_IAM"
+    DependsOn: APIExtensionIAMUserAccessKey
+>>>>>>> ef7f739 (INC-5 - major refactor)
 
 # LambdaPermission:
 #   Type: AWS::Lambda::Permission
@@ -232,6 +258,32 @@ Resources:
 #       Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations'
 #       TimeoutInMillis: 29000
 
+<<<<<<< HEAD
+=======
+  APIExtensionIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref "apiextensionIAMUser"
+      Policies:
+      - PolicyName: !Join ["", [{"Ref": "apiextensionIAMUser"}, "-inline-policy-lambda"]]
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - lambda:InvokeFunctionUrl
+            Resource:
+            #- !Sub "arn:aws:lambda:*:${AWS::AccountId}:function:*"
+            #- !Ref "apiextensionIAMUser"
+            - !GetAtt LambdaFunction.Arn
+
+  APIExtensionIAMUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref "apiextensionIAMUser"
+    DependsOn: APIExtensionIAMUser
+
+>>>>>>> ef7f739 (INC-5 - major refactor)
 Outputs:
 
 #  ApiGatewayStageURL:
@@ -241,7 +293,20 @@ Outputs:
   LambdaFunctionName:
     Description: "STACKID Lambda function name"
     Value: !Ref "lambdaFunctionName"
+<<<<<<< HEAD
 
   LambdaFunctionURL:
     Description: "STACKID Lambda function URL"
     Value: !GetAtt LambdaFunctionURL.FunctionUrl
+=======
+  LambdaFunctionURL:
+    Description: "STACKID Lambda function URL"
+    Value: !GetAtt LambdaFunctionURL.FunctionUrl
+
+  AccessKeyforAPIExtensionIAMUserAccessKey:
+    Value:
+      !Ref APIExtensionIAMUserAccessKey
+  SecretKeyforAPIExtensionIAMUserAccessKey:
+    Value: !GetAtt APIExtensionIAMUserAccessKey.SecretAccessKey
+
+>>>>>>> ef7f739 (INC-5 - major refactor)
