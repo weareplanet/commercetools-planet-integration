@@ -40,17 +40,17 @@ jobs:
       - name: Preparing package
         id: prepare
         env:
-          pkgversiondate: "v${{ steps.extract_version.outputs.version }}-${{ steps.date.outputs.date }}"
+          PKGVERSIONDATE: "v${{ steps.extract_version.outputs.version }}-${{ steps.date.outputs.date }}"
         run: |
-          mkdir newpackage-${{ steps.prepare.pkgversiondate }} \
-          && cp -fr ./node_modules newpackage-${{ steps.prepare.pkgversiondate }}/ \
-          && cp -fr dist/* newpackage-${{ steps.prepare.pkgversiondate }}/ \
-          && cp -fr package.json newpackage-${{ steps.prepare.pkgversiondate }}/ 
+          mkdir newpackage-${{ env.PKGVERSIONDATE }} \
+          && cp -fr ./node_modules newpackage-${{ env.PKGVERSIONDATE }}/ \
+          && cp -fr dist/* newpackage-${{ env.PKGVERSIONDATE }}/ \
+          && cp -fr package.json newpackage-${{ env.PKGVERSIONDATE }}/ 
       - name: Zipping package
         run: |
-          cd newpackage-${{ steps.prepare.pkgversiondate }} \
-          && zip -r9q paymentconnector-${{ steps.prepare.pkgversiondate }}.zip * \
-          && ls -lha paymentconnector-${{ steps.prepare.pkgversiondate }}.zip
+          cd newpackage-${{ env.PKGVERSIONDATE }} \
+          && zip -r9q paymentconnector-${{ env.PKGVERSIONDATE }}.zip * \
+          && ls -lha paymentconnector-${{ env.PKGVERSIONDATE }}.zip
 
       - name: Configure AWS Credentials  
         uses: aws-actions/configure-aws-credentials@v1 
@@ -60,11 +60,11 @@ jobs:
           aws-region: eu-west-1 
       - name: Pushing package to S3
         run: |
-          aws s3 cp newpackage-${{ steps.prepare.pkgversiondate }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip  \
-            s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip
+          aws s3 cp newpackage-${{ env.PKGVERSIONDATE }}/paymentconnector-${{ env.PKGVERSIONDATE }}.zip  \
+            s3://commercetools-paymentconnector-lambda-releases/${{ github.actor }}/paymentconnector-${{ env.PKGVERSIONDATE }}.zip
       - name: Updating lambda
         run: |
           aws lambda update-function-code \
             --function-name=paymentconnector-${{ github.actor }} \
             --s3-bucket=commercetools-paymentconnector-lambda-releases \
-            --s3-key=${{ github.actor }}/paymentconnector-${{ steps.prepare.pkgversiondate }}.zip 
+            --s3-key=${{ github.actor }}/paymentconnector-${{ env.PKGVERSIONDATE }}.zip 
