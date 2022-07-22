@@ -23,8 +23,6 @@ export const prepareInitializeTransactionRequestPayload = (parameters: IInputPar
     option: ({ payment }) => payment?.custom?.fields?.savePaymentMethod !== undefined ? ({
       createAlias: payment?.custom?.fields?.savePaymentMethod
     }) : undefined,
-    customer: ({ payment }) => payment.custom.fields?.savePaymentMethod && payment.custom.fields?.savedPaymentMethodsKey
-      ? ({ id: payment.custom.fields?.savedPaymentMethodsKey }) : undefined,
     redirect: ({ payment }) => ({
       successUrl: payment?.custom?.fields?.successUrl,
       cancelUrl: payment?.custom?.fields?.cancelUrl,
@@ -39,6 +37,7 @@ export const prepareInitializeTransactionRequestPayload = (parameters: IInputPar
       expiryYear: savedPaymentMethod.card.expiryYear,
     }) : undefined
   }, { undefinedValues: { strip: true } }))(parameters);
+
   const option = result.option || parameters.payment?.custom?.fields?.initRequest?.option
     ? {
       option: {
