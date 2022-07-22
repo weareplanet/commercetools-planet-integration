@@ -119,31 +119,31 @@ describe('Redacted fields', () => {
   describe('should redact "alias" on different level of depth', () => {
     it('should redact "body.[card & BON].alias" fields', () => {
       const createInitializeTransactionRequest = CreateInitializeTransactionRequestFactory();
-      createInitializeTransactionRequest.card = { alias: 'card alias' };
+      createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
       logger.info({ body: createInitializeTransactionRequest });
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]"},"BON":{"alias":"[REDACTED]"}}}')
+        expect.stringContaining('"payload":{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"[REDACTED]"}}}')
       );
     });
 
     it('should redact "[card & BON].alias" fields', () => {
       const createInitializeTransactionRequest = CreateInitializeTransactionRequestFactory();
-      createInitializeTransactionRequest.card = { alias: 'card alias' };
+      createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
       logger.info(createInitializeTransactionRequest);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]"},"BON":{"alias":"[REDACTED]"}}')
+        expect.stringContaining('"payload":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"[REDACTED]"}}')
       );
     });
 
     it('should redact "alias" fields', () => {
       const createInitializeTransactionRequest = CreateInitializeTransactionRequestFactory();
-      createInitializeTransactionRequest.card = { alias: 'card alias' };
+      createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
       logger.info(createInitializeTransactionRequest.BON);

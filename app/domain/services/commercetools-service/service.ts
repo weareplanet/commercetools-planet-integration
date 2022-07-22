@@ -6,7 +6,7 @@ import {
 import logger from './../log-service';
 import { ctApiRoot } from './commerce-tools-client';
 import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
-import { CommerceToolsPaymentMethodsObject } from '../../../interfaces';
+import { ICommerceToolsPaymentMethodsObject } from '../../../interfaces';
 import configService from '../config-service';
 
 // Only this service knows how to communicate with CommerceTools.
@@ -45,7 +45,7 @@ export class CommerceToolsService {
     logger.debug(res.body, 'Response from CommerceTools after the payment update.');
   }
 
-  public static async getCustomObjects(containerName: string, key: string): Promise<CommerceToolsPaymentMethodsObject> {
+  public static async getCustomObjects(containerName: string, key: string): Promise<ICommerceToolsPaymentMethodsObject> {
     const res = await ctApiRoot
       .withProjectKey({ projectKey: configService.getConfig().commerceTools.projectId })
       .customObjects()
