@@ -10,10 +10,6 @@ export interface IDatatransInitializeTransaction {
     createAlias?: boolean;
     [key: string]: unknown;
   };
-  customer?: {
-    id: string;
-    [key: string]: unknown;
-  }
   redirect?: {
     successUrl: string;
     cancelUrl: string;
