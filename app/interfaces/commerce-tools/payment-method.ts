@@ -1,13 +1,24 @@
 import { CustomObject } from '@commercetools/platform-sdk';
 import { DatatransPaymentMethod } from '../datatrans';
 
-export type CommerceToolsPaymentMethod = {
-  [key in keyof typeof DatatransPaymentMethod]?: Record<string, unknown>;
-} & {
+// TODO: in future we will support different types of PaymentMethods but for now only PaymentMethod with card
+// export type ICommerceToolsPaymentMethod = {
+//   [key in keyof typeof DatatransPaymentMethod]?: Record<string, unknown>;
+// } & {
+//   paymentMethod: DatatransPaymentMethod;
+//   card?: Record<string, unknown>;
+// };
+
+export type ICommerceToolsPaymentMethod = {
   paymentMethod: DatatransPaymentMethod;
-  card?: Record<string, unknown>;
+  card: {
+    alias: string;
+    expiryMonth: string;
+    expiryYear: string;
+    [key: string]: unknown;
+  };
 };
 
-export interface CommerceToolsPaymentMethodsObject extends CustomObject {
-  value: CommerceToolsPaymentMethod[];
+export interface ICommerceToolsPaymentMethodsObject extends CustomObject {
+  value: ICommerceToolsPaymentMethod[];
 }

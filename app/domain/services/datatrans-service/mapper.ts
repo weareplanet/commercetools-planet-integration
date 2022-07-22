@@ -3,39 +3,53 @@ import { createSchema, morphism } from 'morphism';
 import {
   IDatatransInitializeTransaction,
   ICommerceToolsPayment,
-  DatatransPaymentMethod
+  DatatransPaymentMethod,
+  ICommerceToolsPaymentMethod
 } from '../../../interfaces';
 
-export const prepareInitializeTransactionRequestPayload = (payment: ICommerceToolsPayment, webhookUrl: string): IDatatransInitializeTransaction => {
-  const result = morphism(createSchema<IDatatransInitializeTransaction, ICommerceToolsPayment>({
-    refno: ({ key }) => key,
-    currency: ({ amountPlanned }) => amountPlanned?.currencyCode,
-    amount: ({ amountPlanned }) => amountPlanned?.centAmount,
-    paymentMethods: ({ paymentMethodInfo }) => paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as DatatransPaymentMethod[],
-    language: ({ custom }) => custom?.fields?.language,
-    option: ({ custom }) => custom?.fields?.savePaymentMethod !== undefined ? ({
-      createAlias: custom?.fields?.savePaymentMethod
+interface IInputParametersForMapper {
+  payment: ICommerceToolsPayment;
+  webhookUrl: string;
+  savedPaymentMethod?: ICommerceToolsPaymentMethod;
+}
+
+export const prepareInitializeTransactionRequestPayload = (parameters: IInputParametersForMapper): IDatatransInitializeTransaction => {
+  const result = morphism(createSchema<IDatatransInitializeTransaction, IInputParametersForMapper>({
+    refno: ({ payment }) => payment.key,
+    currency: ({ payment }) => payment?.amountPlanned?.currencyCode,
+    amount: ({ payment }) => payment?.amountPlanned?.centAmount,
+    paymentMethods: ({ payment }) => payment?.paymentMethodInfo?.method?.split(',').map(method => method.trim()) as unknown as DatatransPaymentMethod[],
+    language: ({ payment }) => payment?.custom?.fields?.language,
+    option: ({ payment }) => payment?.custom?.fields?.savePaymentMethod !== undefined ? ({
+      createAlias: payment?.custom?.fields?.savePaymentMethod
     }) : undefined,
-    redirect: ({ custom }) => ({
-      successUrl: custom?.fields?.successUrl,
-      cancelUrl: custom?.fields?.cancelUrl,
-      errorUrl: custom?.fields?.errorUrl,
+    customer: ({ payment }) => payment.custom.fields?.savePaymentMethod && payment.custom.fields?.savedPaymentMethodsKey
+      ? ({ id: payment.custom.fields?.savedPaymentMethodsKey }) : undefined,
+    redirect: ({ payment }) => ({
+      successUrl: payment?.custom?.fields?.successUrl,
+      cancelUrl: payment?.custom?.fields?.cancelUrl,
+      errorUrl: payment?.custom?.fields?.errorUrl,
     }),
-    webhook: () => ({
+    webhook: ({ webhookUrl }) => ({
       url: webhookUrl
     }),
-  }, { undefinedValues: { strip: true } }))(payment);
-  const option = result.option || payment?.custom?.fields?.initRequest?.option
+    card: ({ savedPaymentMethod }) => savedPaymentMethod?.card ? ({
+      alias: savedPaymentMethod.card.alias,
+      expiryMonth: savedPaymentMethod.card.expiryMonth,
+      expiryYear: savedPaymentMethod.card.expiryYear,
+    }) : undefined
+  }, { undefinedValues: { strip: true } }))(parameters);
+  const option = result.option || parameters.payment?.custom?.fields?.initRequest?.option
     ? {
       option: {
-        ...(payment?.custom?.fields?.initRequest?.option as Record<string, unknown>),
+        ...(parameters.payment?.custom?.fields?.initRequest?.option as Record<string, unknown>),
         ...result.option
       }
     }
     : {};
 
   return {
-    ...payment?.custom?.fields?.initRequest,
+    ...parameters.payment?.custom?.fields?.initRequest,
     ...result,
     ...option
   };
