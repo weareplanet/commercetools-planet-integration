@@ -10,6 +10,10 @@ export interface IDatatransInitializeTransaction {
     createAlias?: boolean;
     [key: string]: unknown;
   };
+  customer?: {
+    id: string;
+    [key: string]: unknown;
+  }
   redirect?: {
     successUrl: string;
     cancelUrl: string;
@@ -17,6 +21,11 @@ export interface IDatatransInitializeTransaction {
   };
   webhook: {
     url: string;
-  }
+  };
+  card?: {
+    alias: string;
+    expiryMonth: string; // \d{2}
+    expiryYear: string; // \d{2}
+  };
   [key: string]: unknown;
 }

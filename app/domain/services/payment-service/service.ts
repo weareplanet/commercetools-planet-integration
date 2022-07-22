@@ -8,7 +8,7 @@ import {
   DatatransTransactionStatus,
   DatatransPaymentMethod,
   IDatatransTransactionHistory,
-  CommerceToolsPaymentMethod
+  ICommerceToolsPaymentMethod
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
@@ -33,15 +33,17 @@ export class PaymentService {
   async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
     const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
     const withSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
+    let savedPaymentMethod: ICommerceToolsPaymentMethod;
 
     if (withSavedPaymentMethod) {
-      await this.findPaymentMethod(savedPaymentMethodsKey, savedPaymentMethodAlias);
+      savedPaymentMethod = await this.findPaymentMethod(savedPaymentMethodsKey, savedPaymentMethodAlias);
     }
 
-    const initializeTransactionPayload = prepareInitializeTransactionRequestPayload(
+    const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
       payment,
-      configService.getConfig().datatrans.webhookUrl
-    );
+      webhookUrl: configService.getConfig().datatrans.webhookUrl,
+      savedPaymentMethod
+    });
 
     const datatransService = new DatatransService();
     const { transaction, location } = await datatransService
@@ -93,10 +95,10 @@ export class PaymentService {
   }
 
   // TODO: it's validation and getting in one place,
-  // what at lest does not follow our common design regarding validatiuons:
+  // what at lest does not follow our common design regarding validations:
   // Consider moving this validation to where all other validations are implemented (in Yup schema):
   // https://github.com/weareplanet/commercetools-planet-integration/blob/main/app/interfaces/commerce-tools/payment.ts#L66
-  private async findPaymentMethod(key: string, alias: string): Promise<CommerceToolsPaymentMethod> {
+  private async findPaymentMethod(key: string, alias: string): Promise<ICommerceToolsPaymentMethod> {
     const paymentMethods = await CommerceToolsService.getCustomObjects('savedPaymentMethods', key);
     const paymentMethod = paymentMethods?.value?.find((method) => {
       const paymentDetails = method.card;
