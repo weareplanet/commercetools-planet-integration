@@ -4,7 +4,6 @@ import {
   IAbstractResponse
 } from '../../../../interfaces';
 import { PaymentService } from '../../../services/payment-service';
-import { ErrorForCommerceTools } from '../../../services/errors-service';
 import logger from '../../../services/log-service';
 import { IRequestBody } from './request-schema';
 
@@ -22,7 +21,8 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       }
     };
   } catch (err) {
+    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
     logger.error(err);
-    throw new ErrorForCommerceTools(err.message, err);
+    throw err;
   }
 };

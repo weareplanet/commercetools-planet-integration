@@ -129,7 +129,7 @@ describe('Main handler', () => {
 
         expect(result).toEqual(
           {
-            statusCode: 400,
+            statusCode: 500,
             body: {
               message: 'Datatrans Signature validation failed'
             }
