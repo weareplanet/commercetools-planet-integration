@@ -5,21 +5,21 @@ const ValidError = { message: 'Error message' };
 
 describe('ErrorsService', () => {
 
-  describe('CommerceTools errors', () => {
-    it('returns commercetools error with valid parameters', () => {
+  describe('When a request was from CommerceTools', () => {
+    it('should return commercetools error with valid parameters', () => {
       const commerceToolsRequest = {
         headers: {},
         rawBody: '{}',
         body: { action: 'Create' }
       };
-      const commerceToolsError = ErrorsService.getCommerceToolsError(ValidError);
+      const commerceToolsError = ErrorsService.makeCommerceToolsErrorResponse(ValidError);
 
       expect(ErrorsService.handleError(commerceToolsRequest, ValidError)).toMatchObject(commerceToolsError);
     });
   });
 
-  describe('Datatrans errors', () => {
-    it('returns datatrans error with valid parameters', () => {
+  describe('When a request was from Datatrans', () => {
+    it('should return datatrans error with valid parameters', () => {
       const datatransRequest = {
         headers: {
           [DATATRANS_SIGNATURE_HEADER_NAME]: 'SIGN_HEADER_NAME'
@@ -27,21 +27,21 @@ describe('ErrorsService', () => {
         rawBody: '{}',
         body: {}
       };
-      const datatransError = ErrorsService.getDatatransError(ValidError);
+      const datatransError = ErrorsService.makeDatatransErrorResponse(ValidError);
 
       expect(ErrorsService.handleError(datatransRequest, ValidError)).toMatchObject(datatransError);
     });
   });
 
-  describe('Internal errors', () => {
-    const internalError = ErrorsService.getInternalError(ValidError);
+  describe('When a request was neither from CommerceTools nor from Datatrans', () => {
+    const internalError = ErrorsService.makeGeneralErrorResponse(ValidError);
     const request = {
       headers: {},
       rawBody: '{}',
       body: {}
     };
 
-    it('returns internal error with unknown request', () => {
+    it('should return internal error with unknown request', () => {
       expect(ErrorsService.handleError(request, ValidError)).toMatchObject(internalError);
     });
   });

@@ -15,15 +15,13 @@ export class ErrorsService {
    * @returns Formatted error
    */
   public static handleError(req: IAbstractRequest, err: Record<string, unknown>): IAbstractResponse {
-    if (req && err) {
-      if (OperationDetector.isCommerceToolsRequest(req)) {
-        return this.getCommerceToolsError(err);
-      }
-      else if (OperationDetector.isDatatransRequest(req)) {
-        return this.getDatatransError(err);
-      }
+    if (OperationDetector.isCommerceToolsRequest(req)) {
+      return this.makeCommerceToolsErrorResponse(err);
     }
-    return this.getInternalError(err);
+    else if (OperationDetector.isDatatransRequest(req)) {
+      return this.makeDatatransErrorResponse(err);
+    }
+    return this.makeGeneralErrorResponse(err);
   }
 
   /**
@@ -31,7 +29,7 @@ export class ErrorsService {
    * @param err error
    * @returns Error in CommerceTools format
    */
-  public static getCommerceToolsError(err: Record<string, unknown>) {
+  public static makeCommerceToolsErrorResponse(err: Record<string, unknown>) {
     delete err?.config;
     delete err?.stack;
 
@@ -55,16 +53,11 @@ export class ErrorsService {
    * @param err error
    * @returns Error in Datatrans format
    */
-  public static getDatatransError(err: Record<string, unknown>) {
-    const datatransError = {
-      code: HttpStatusCode.INTERNAL_SERVER_ERROR,
-      message: err?.message
-    };
-
+  public static makeDatatransErrorResponse(err: Record<string, unknown>) {
     return {
-      statusCode: HttpStatusCode.BAD_REQUEST,
+      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
       body: {
-        error: datatransError
+        message: err?.message
       }
     };
   }
@@ -74,7 +67,7 @@ export class ErrorsService {
    * @param err error
    * @returns Internal error
    */
-  public static getInternalError(err: Record<string, unknown>) {
+  public static makeGeneralErrorResponse(err: Record<string, unknown>) {
     return {
       statusCode: HttpStatusCode.BAD_REQUEST,
       body: ''

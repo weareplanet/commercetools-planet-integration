@@ -1,6 +1,9 @@
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
-import handler from '../../../domain/environment-agnostic-handlers/all-operations-handler';
-import { ErrorsService } from '.';
+import handler from '.';
+import * as handlerMock from '.';
+import * as createPaymentHandler from '../per-operation-handlers/create-payment';
+import * as createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
+import { ErrorsService } from '../../services/errors-service';
 
 const dtHttpClientMock = {
   post: jest.fn()
@@ -10,6 +13,7 @@ jest.mock('axios', () => {
     create: () => dtHttpClientMock
   };
 });
+
 
 describe('Errors Service Integration', () => {
 
@@ -34,10 +38,13 @@ describe('Errors Service Integration', () => {
         }
       });
 
-      const result = await handler(req);
-      const error = ErrorsService.getCommerceToolsError({});
+      jest.spyOn(createPaymentHandler, 'default').mockResolvedValue(
+        ErrorsService.makeCommerceToolsErrorResponse({})
+      );
 
-      expect(result.statusCode).toEqual(error.statusCode);
+      const result = await handler(req);
+
+      expect(result.statusCode).toEqual(400);
       expect(dtHttpClientMock.post).not.toBeCalled();
     });
   });
@@ -49,25 +56,29 @@ describe('Errors Service Integration', () => {
         'datatrans-signature': 't=TS,s0=SIGNATURE'
       });
 
-      const result = await handler(req);
-      const error = ErrorsService.getDatatransError({});
+      jest.spyOn(createPaymentWebhookHandler, 'default').mockResolvedValue(
+        ErrorsService.makeDatatransErrorResponse({})
+      );
 
-      expect(result.statusCode).toEqual(error.statusCode);
+      const result = await handler(req);
+
+      expect(result.statusCode).toEqual(500);
       expect(dtHttpClientMock.post).not.toBeCalled();
     });
   });
 
   describe('When a request not matches any format', () => {
-    it('should return 200 and empty body', async () => {
+    it('should return general error with 400', async () => {
 
       const req = abstractRequestFactory({}, {});
-      const result = await handler(req);
-      const error = {
-        statusCode: 200,
-        body: ''
-      };
 
-      expect(result).toEqual(error);
+      jest.spyOn(handlerMock, 'default').mockResolvedValue(
+        ErrorsService.makeGeneralErrorResponse({})
+      );
+
+      const result = await handler(req);
+
+      expect(result.statusCode).toEqual(400);
       expect(dtHttpClientMock.post).not.toBeCalled();
     });
   });

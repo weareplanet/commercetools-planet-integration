@@ -21,6 +21,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       }
     };
   } catch (err) {
+    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
     logger.error(err);
     throw err;
   }

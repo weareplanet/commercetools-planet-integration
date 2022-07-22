@@ -11,7 +11,6 @@ import {
 import { CommerceToolsService } from '../../../services/commercetools-service';
 
 import handler from '..';
-import { HttpStatusCode } from 'http-status-code-const-enum';
 
 const disableDatatransSignatureValidation = () => {
   /* eslint-disable @typescript-eslint/no-empty-function */
@@ -130,12 +129,9 @@ describe('Main handler', () => {
 
         expect(result).toEqual(
           {
-            statusCode: 400,
+            statusCode: 500,
             body: {
-              error: {
-                code: HttpStatusCode.INTERNAL_SERVER_ERROR,
-                message: 'Datatrans Signature validation failed'
-              }
+              message: 'Datatrans Signature validation failed'
             }
           }
         );

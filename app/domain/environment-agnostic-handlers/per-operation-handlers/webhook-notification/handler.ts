@@ -30,6 +30,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       rawRequestBody: req.rawBody
     });
   } catch (err) {
+    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
     logger.debug(err, 'Error of updating the Payment in CommerceTools');
     throw err;
   }
