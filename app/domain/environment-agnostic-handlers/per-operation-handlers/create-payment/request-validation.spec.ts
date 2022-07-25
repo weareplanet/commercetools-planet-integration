@@ -291,7 +291,7 @@ describe('createPayment handler', () => {
         const response = await handler(request);
 
         expect(response.body).toMatchObject({
-          message: 'Attribute key is longer than expected in Payment'
+          message: 'Attribute payment key cannot exceed 20 characters in the payload'
         });
 
         expect(response.statusCode).toEqual(400);
