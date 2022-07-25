@@ -1,9 +1,9 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import logger from '../../../services/log-service';
 import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
-  IAbstractResponse
+  IAbstractResponse,
+  StructuredError
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import { PaymentService, DatatransToCommerceToolsMapper } from '../../../services/payment-service';
@@ -30,9 +30,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       rawRequestBody: req.rawBody
     });
   } catch (err) {
-    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
-    logger.debug(err, 'Error of updating the Payment in CommerceTools');
-    throw err;
+    throw new StructuredError(err, 'Error of updating the Payment in CommerceTools');
   }
 
   return {

@@ -5,6 +5,7 @@ import {
   IAbstractRequestHandler,
   IAbstractRequestWithTypedBody,
   IAbstractRequestHandlerWithTypedInput,
+  StructuredError
 } from '../../../interfaces';
 import logger from '../../services/log-service';
 import { InputValidationService } from '../../services/input-validation-service';
@@ -24,8 +25,7 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
           const validationService = new InputValidationService();
           req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
         } catch (err) {
-          logger.error({ err }, 'Input validation error');
-          throw err;
+          throw new StructuredError(err, 'Input validation error');
         }
       }
     };
@@ -35,6 +35,12 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
       validateInput();
       return await lowLevelHandler(req as IAbstractRequestWithTypedBody<TRequestBody>); // TODO: think how to improve this brutal type cast;
     } catch (err) {
+      if (err instanceof StructuredError) {
+        const structuredError = err as StructuredError;
+        logger.error(structuredError.message);
+        return ErrorsService.handleError(req, structuredError.error);
+      }
+      logger.error(err.message);
       return ErrorsService.handleError(req, err);
     }
   };
