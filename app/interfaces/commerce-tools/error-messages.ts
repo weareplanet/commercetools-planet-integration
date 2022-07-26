@@ -15,7 +15,7 @@ export const ErrorMessages = {
     return (params: MessageParams) => `Custom field ${takeFieldNameFromPath(params.path)} is missing in Payment`;
   },
   longKey: () => {
-    return 'Attribute key is longer than expected in Payment';
+    return 'Attribute payment key cannot exceed 20 characters in the payload';
   },
   merchantCredentialsMissing: () => {
     return 'Merchant credentials are missing';
