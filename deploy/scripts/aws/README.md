@@ -80,7 +80,7 @@ _**Second**_, with all the information above, you should modify and run the `dep
 ### _**Some preparations for all the following:**_
 - Get the git repository cloned.
 - Get into the cloned repository with a shell (bash, zsh).
-- Make sure that your AWS credentials are OK (get them fresh from your AWS SSO page, or run `aws configure` for the awscli profiles. The scripts here assume usage of the _default_ awscli profile.)
+- Make sure that your AWS credentials are OK (get them fresh from your AWS SSO page, or run `aws configure` for the awscli profiles. The scripts and commands used here assume usage of the _default_ awscli profile.)
 
 ### STEP 3 - **Create AWS infrastructure**
 
@@ -95,6 +95,7 @@ A few details about the supporting files
 1. After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging or versioning, for example.
 2. Inside `cf-deploy.sh` there are a few pre-filled ENV vars for the Lambda function. **These ENV vars values can be modified in the script prior to running it, using the information from steps 1 and 2. This can save time on the step 6 ahead.**
 
+Then:
 - Again, make sure that your AWS credenntials are OK (valid, refreshed, etc)
 - Define an ID for the new stack, with no special characters or spaces in it, like "prod01" or "Develop02" - this will be **STACKID**
 - Define on which region it will be deployed, like "eu-west-1" or "us-east-2" - this will be **AWSREGION**
@@ -102,7 +103,7 @@ A few details about the supporting files
    > `bash cf-deploy.sh STACKID AWSREGION`
 
    (_an example: `bash cf-deploy.sh prod01 eu-west-1`_)
-- Take a look at the CloudFormation dashboard and wait for the stack creation completion
+- Take a look at the CloudFormation dashboard and wait for the stack creation completion, it should take a few minutes
 - The Lambda function name will be `planetpaymentcommtool-STACKID`, where STACKID is your provided value (this name can be customized within the script, read its comments).
 
 ### STEP 4 - **Package Build**
@@ -163,5 +164,4 @@ Then proceed with any additional parameter, header, etc required for your needs.
 # TO DO's
 
 - Verify if API-Gateway is really needed for the lambdas.
-- evaluate integration of the script and JSON files for creation of payment types within CommerceTools, as created by Oleksandr
 - include routine in cf-deploy.sh to get FunctionURL and insert it on Lambda's ENV var, reducing one operation at step 6.
