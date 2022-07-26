@@ -35,21 +35,21 @@ This procedure was developed and tested on Ubuntu Linux 20.04 and _should_ run o
 - Lambda will use Node.JS v16 runtime (function uses TypeScript)
 
 ## How-to's section
----
+
 ### STEP 1 - **Setup Datatrans**
 
-You can skip this step if you already have the Datatrans information below.
+You can skip this step if you already have the Datatrans setup done and all information below.
 
 Details on the needed information regarding the needed ENV vars can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration) altogether with links for how to get them. This procedure doesn't cover in details how to setup Datatrans (account, credentials). 
 A mild suggestion is to look [here](https://docs.datatrans.ch/docs/home).
 
 From the setup, you must get the following pieces of information:
 
-| Item | Type | At Lambda |
+| Item | Type | Usage at Lambda ENV Var |
 |---|---|---|
-|`id, password, environment and HMAC key`| a stringfied JSON | **DT_MERCHANTS** ENV var |
-|`Datatrans PRODUCTION API URL`| URL | **DT_PROD_API_URL** ENV var |
-|`Datatrans TEST API URL` | URL | **DT_TEST_API_URL** ENV var |
+|`id, password, environment and HMAC key`| a stringfied JSON | **DT_MERCHANTS** |
+|`Datatrans PRODUCTION API URL`| URL | **DT_PROD_API_URL** |
+|`Datatrans TEST API URL` | URL | **DT_TEST_API_URL** |
 
 - _DT_MERCHANTS will look like this:_
 
@@ -57,7 +57,9 @@ From the setup, you must get the following pieces of information:
 
 ### STEP 2 - **Setup CommerceTools**
 
-Again, details on the needed information regarding the needed ENV vars can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration) altogether with links for how to get them. This procedure covers _**PARTIALLY**_ how to setup CommerceTools. A suggestion is to look [here](https://docs.commercetools.com/getting-started/#create-an-api-client).
+You can skip this step if you already have the CommerceTools setup done and all information below.
+
+Again, details on the needed information regarding the needed ENV vars can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration) altogether with links for how to get them. This procedure covers _PARTIALLY_ how to setup CommerceTools. A suggestion is to look [here](https://docs.commercetools.com/getting-started/#create-an-api-client).
 
 _**First**_, you must setup your access in CommerceTools (account, credentials, projects).
 
@@ -72,23 +74,26 @@ From this setup, when creating the API client, you must get the following pieces
 |`CommerceTools CLIENT SECRET`| string | **CT_CLIENT_SECRET** | **CT_CLIENT_SECRET** |
 |`CommerceTools SCOPES`| string | _not used_ | **CT_SCOPES** |
 
-_**Second**_, with all the information above, you should run the `deploy/commercetools/ct-setup.sh` script (from inside the `deploy/commercetools folder`)to create all the custom fields regading payment, interaction, methods, etc types within the chosen CommerceTools project.
-> This script has a few variables like the ones above that must be filled before running it. Edit the file to do that.
+_**Second**_, with all the information above, you should modify and run the `deploy/commercetools/ct-setup.sh` script (from inside the `deploy/commercetools folder`) to create all the custom field types regading payment, interaction, methods, etc within the chosen CommerceTools project.
+> This script has a few variables like the ones above that must be filled _**before**_ running it. Edit the file to do that.
 
 ### _**Some preparations for all the following:**_
 - Get the git repository cloned.
 - Get into the cloned repository with a shell (bash, zsh).
-- Make sure that your AWS credentials are OK (get them fresh from your AWS SSO page, or run `aws configure` for the awscli profiles.)
+- Make sure that your AWS credentials are OK (get them fresh from your AWS SSO page, or run `aws configure` for the awscli profiles. The scripts here assume usage of the _default_ awscli profile.)
 
 ### STEP 3 - **Create AWS infrastructure**
-#### A few details about the supporting files
+
+A few details about the supporting files
 
 | File | Purpose and Details |
 | ---- | ------- |
 | **planetpaymentconnector-stack-template.yaml** | A CloudFormation (CF) template that creates all infrastructure resources within an user-specified AWS account and region. It is copied then customized by cf-deploy.sh to create CF stacks. Do not use as-is. Avoid changing it if not sure on how CloudFormation works. |
 | **cf-deploy.sh** | Shell script to create a CF stack, using the planetpaymentconnector-stack-template.yaml. Each run with different input parameters will render a different stack (with its own Lambda function and permissions) allowing multiple functions to work.|
-| Notes about _cf-deploy.sh_ | 1. After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging or versioning, for example. |
-| | 2. Inside cf-deploy.sh there are a few pre-filled ENV vars for the Lambda function, but you should verify if they're correct to your project, location etc. **These ENV vars can be inserted in the script prior to running it, using the information from steps 1 and 2. This can save time on the step 6 ahead.**|
+
+**Notes about _cf-deploy.sh** 
+1. After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging or versioning, for example.
+2. Inside `cf-deploy.sh` there are a few pre-filled ENV vars for the Lambda function. **These ENV vars values can be modified in the script prior to running it, using the information from steps 1 and 2. This can save time on the step 6 ahead.**
 
 - Again, make sure that your AWS credenntials are OK (valid, refreshed, etc)
 - Define an ID for the new stack, with no special characters or spaces in it, like "prod01" or "Develop02" - this will be **STACKID**
@@ -96,8 +101,8 @@ _**Second**_, with all the information above, you should run the `deploy/commerc
 - At the shell run this script providing the two parameters defined above:
    > `bash cf-deploy.sh STACKID AWSREGION`
 
-   (_an example: `bash cf-deploy.sh paymentconnector fabiocarvalho-planet`_)
-- Take a look at the CloudFormation dashboard and wait for stack creation completion
+   (_an example: `bash cf-deploy.sh prod01 eu-west-1`_)
+- Take a look at the CloudFormation dashboard and wait for the stack creation completion
 - The Lambda function name will be `planetpaymentcommtool-STACKID`, where STACKID is your provided value (this name can be customized within the script, read its comments).
 
 ### STEP 4 - **Package Build**
@@ -123,20 +128,22 @@ There are several methods to build a Node JS package. We're providing one method
 
 ### STEP 5 - **Package Deploy**
 
-It will deploy the package above into the Lambda function created at the step 3. At the shell, run this command, changing `AWSREGION` for the region where you had deployed the function, `STACKID` for the name you provided before and `yourpackagename.zip` to the name fo the package build in step 4:
+It will deploy the .zip package above into the Lambda function created at the step 3.
+
+Run this command at the shell, changing `AWSREGION` for the region where you had deployed the function, `STACKID` for the name you provided before and `yourpackagename.zip` to the name fo the package build in step 4:
 
 > `aws lambda update-function-code --region=AWSREGION --function-name=planetpaymentcommtool-STACKID --zip-file=yourpackagename.zip`
 
-Eventually you may need to refresh your credentials and try again.
+_Eventually you may need to refresh your AWS credentials and try again._
 
 ### STEP 6 - **Lambda ENV vars adjustments**
 
 In the deployed Lambda function configurations, you need to fill the ENV vars values using data from steps 1 and 2. (As mentioned before, you can do it on step 3 modifying the ct-deploy.sh script prior to run it).
 
-Pay attention to the DT_CONNECTOR_WEBHOOK_URL variable: it must contain the FunctionURL from the Lambda function itself. 
+Pay attention to the `DT_CONNECTOR_WEBHOOK_URL` variable: it must contain the FunctionURL from the Lambda function itself.
 
 ### **Extras**
-### _Calling your Lambda function with FunctionURL_
+#### _Calling your Lambda function with FunctionURL_
 
 After your individual stack is deployed you can get its FunctionURL directly from the Lambda function dashboard. This allows you to call the Lambda function without the need of an API-Gateway.
 
@@ -156,5 +163,5 @@ Then proceed with any additional parameter, header, etc required for your needs.
 # TO DO's
 
 - Verify if API-Gateway is really needed for the lambdas.
-- Integrate the script and JSON files for creation of payment types within CommerceTools, as created by Oleksandr
-- include links to Datatrans and CommerceTools help pages regarding signing up and project setup.
+- evaluate integration of the script and JSON files for creation of payment types within CommerceTools, as created by Oleksandr
+- include routine in cf-deploy.sh to get FunctionURL and insert it on Lambda's ENV var, reducing one operation at step 6.
