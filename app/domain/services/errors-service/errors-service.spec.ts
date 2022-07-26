@@ -2,7 +2,8 @@ import { ErrorsService } from '.';
 import { OperationDetector } from '../../../domain/environment-agnostic-handlers/all-operations-handler/operation-detector';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 
-const ValidError = { message: 'Error message' };
+const ErrorMessage = 'Error message';
+const ValidError = { message: ErrorMessage };
 
 describe('ErrorsService', () => {
 
@@ -16,7 +17,7 @@ describe('ErrorsService', () => {
 
     it('should return commercetools error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeCommerceToolsErrorResponse(ValidError);
+      const error = ErrorsService.makeCommerceToolsErrorResponse(ErrorMessage, ValidError);
 
       expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
     });
@@ -30,7 +31,7 @@ describe('ErrorsService', () => {
 
     it('should return datatrans error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeDatatransErrorResponse(ValidError);
+      const error = ErrorsService.makeDatatransErrorResponse(ErrorMessage);
 
       expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
     });
@@ -38,7 +39,7 @@ describe('ErrorsService', () => {
 
   describe('When a request was neither from CommerceTools nor from Datatrans', () => {
     const request = abstractRequestFactory({});
-    const error = ErrorsService.makeGeneralErrorResponse(ValidError);
+    const error = ErrorsService.makeGeneralErrorResponse();
 
     it('should return internal error with unknown request', () => {
       expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);

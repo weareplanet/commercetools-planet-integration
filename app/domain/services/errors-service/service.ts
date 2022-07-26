@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import { IAbstractRequest, IAbstractResponse, ICommerceToolsErrorCode } from '../../../interfaces';
+import { IAbstractRequest, IAbstractResponse, ICommerceToolsErrorCode, NestedError } from '../../../interfaces';
 import { OperationDetector } from '../../environment-agnostic-handlers/all-operations-handler/operation-detector';
-
+import logger from '../../services/log-service';
 
 /**
  * This service handles and formats all connector errors
@@ -15,13 +15,22 @@ export class ErrorsService {
    * @returns Formatted error
    */
   public static handleError(req: IAbstractRequest, err: Record<string, unknown>): IAbstractResponse {
+    const message = err.message.toString();
+    let error = err;
+
+    if (err instanceof NestedError) {
+      error = (err as NestedError).innerError;
+    }
+
+    logger.error({ error }, message);
+
     if (OperationDetector.isCommerceToolsRequest(req)) {
-      return this.makeCommerceToolsErrorResponse(err);
+      return this.makeCommerceToolsErrorResponse(message, error);
     }
     if (OperationDetector.isDatatransRequest(req)) {
-      return this.makeDatatransErrorResponse(err);
+      return this.makeDatatransErrorResponse(message);
     }
-    return this.makeGeneralErrorResponse(err);
+    return this.makeGeneralErrorResponse();
   }
 
   /**
@@ -29,7 +38,7 @@ export class ErrorsService {
    * @param err error
    * @returns Error in CommerceTools format
    */
-  public static makeCommerceToolsErrorResponse(err: Record<string, unknown>) {
+  public static makeCommerceToolsErrorResponse(message: string, err: Record<string, unknown>) {
     delete err?.config;
     delete err?.stack;
 
@@ -42,7 +51,7 @@ export class ErrorsService {
     return {
       statusCode: HttpStatusCode.BAD_REQUEST,
       body: {
-        message: err?.message,
+        message,
         errors: [commerceToolsError]
       }
     };
@@ -53,11 +62,11 @@ export class ErrorsService {
    * @param err error
    * @returns Error in Datatrans format
    */
-  public static makeDatatransErrorResponse(err: Record<string, unknown>) {
+  public static makeDatatransErrorResponse(message: string) {
     return {
       statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
       body: {
-        message: err?.message
+        message
       }
     };
   }
@@ -67,7 +76,7 @@ export class ErrorsService {
    * @param err error
    * @returns Internal error
    */
-  public static makeGeneralErrorResponse(err: Record<string, unknown>) {
+  public static makeGeneralErrorResponse() {
     return {
       statusCode: HttpStatusCode.BAD_REQUEST,
       body: ''
