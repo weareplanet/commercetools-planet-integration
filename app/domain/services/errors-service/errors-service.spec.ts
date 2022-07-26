@@ -1,6 +1,7 @@
 import { ErrorsService } from '.';
 import { OperationDetector } from '../../../domain/environment-agnostic-handlers/all-operations-handler/operation-detector';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+import { NestedError } from '../../../interfaces';
 
 const ErrorMessage = 'Error message';
 const ValidError = { message: ErrorMessage };
@@ -43,6 +44,23 @@ describe('ErrorsService', () => {
 
     it('should return internal error with unknown request', () => {
       expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
+    });
+  });
+
+  describe('When ErrorsService excepts a NestedError', () => {
+
+    beforeEach(() => {
+      jest.spyOn(OperationDetector, 'isDatatransRequest').mockReturnValue(true);
+    });
+
+    it('should return custom error message', () => {
+
+      const request = abstractRequestFactory({});
+      const nestedMessage = 'Error message from nested error';
+      const nestedError = new NestedError(ValidError, nestedMessage);
+      const response = ErrorsService.handleError(request, nestedError as unknown as Record<string, unknown>);
+
+      expect(response.body).toMatchObject({ message: nestedMessage });
     });
   });
 });
