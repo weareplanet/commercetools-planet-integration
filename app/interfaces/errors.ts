@@ -2,9 +2,9 @@
 /**
  Represents an error decorator with log message
  */
-export class StructuredError {
+export class NestedError {
   /**
-   * Initializes an StructuredError
+   * Initializes an NestedError
    * @param error  - error body
    * @param message - message that need to be logged
    */

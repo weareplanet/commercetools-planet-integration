@@ -23,14 +23,14 @@ export class DatatransService {
     const headerValue = reqHeaders[DATATRANS_SIGNATURE_HEADER_NAME] || '';
     const matchResult = headerValue.match(/t=(?<timestamp>\d+),s0=(?<actualSignature>.+)$/);
     if (!matchResult) {
-      logger.debug({ headerValue }, `Missed expected ${DATATRANS_SIGNATURE_HEADER_NAME} header`);
+      logger.error({ headerValue }, `Missed expected ${DATATRANS_SIGNATURE_HEADER_NAME} header`);
       throw new Error('Datatrans Signature validation failed');
     }
 
     const { groups: { timestamp, actualSignature } } = matchResult;
     const expectedSignature = CryptoService.createSha256Hmac(this.getMerchantHmacKey(merchantId), timestamp + requestBody);
     if (expectedSignature != actualSignature) {
-      logger.debug({ actualSignature, timestamp, requestBody, expectedSignature }, 'Error of Datatrans signature validation');
+      logger.error({ actualSignature, timestamp, requestBody, expectedSignature }, 'Error of Datatrans signature validation');
       throw new Error('Datatrans Signature validation failed');
     }
   }

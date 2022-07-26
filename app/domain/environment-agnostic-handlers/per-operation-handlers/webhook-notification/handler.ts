@@ -3,7 +3,7 @@ import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse,
-  StructuredError
+  NestedError
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import { PaymentService, DatatransToCommerceToolsMapper } from '../../../services/payment-service';
@@ -30,7 +30,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
       rawRequestBody: req.rawBody
     });
   } catch (err) {
-    throw new StructuredError(err, 'Error of updating the Payment in CommerceTools');
+    throw new NestedError(err, 'Error of updating the Payment in CommerceTools');
   }
 
   return {
