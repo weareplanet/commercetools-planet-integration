@@ -6,7 +6,6 @@ import {
 } from '../../../interfaces';
 import { logConnectorVersion } from '../../services/connector-version-service';
 import { OperationDetector, Operation } from './operation-detector';
-import '../../services/config-service';
 
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';

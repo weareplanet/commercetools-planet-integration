@@ -2,8 +2,7 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
-  IAbstractResponse,
-  NestedError
+  IAbstractResponse
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import { PaymentService, DatatransToCommerceToolsMapper } from '../../../services/payment-service';
@@ -17,21 +16,17 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, req.rawBody);
 
   // Process the request body
-  try {
-    const paymentService = new PaymentService();
-    await paymentService.saveAuthorizationTransactionInCommerceTools({
-      paymentKey: req.body.refno,
-      paymentStatus: req.body.status,
-      transactionId: req.body.transactionId,
-      transactionHistory: req.body.history,
-      paymentMethod: req.body.paymentMethod,
-      // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
-      paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
-      rawRequestBody: req.rawBody
-    });
-  } catch (err) {
-    throw new NestedError(err, 'Error of updating the Payment in CommerceTools');
-  }
+  const paymentService = new PaymentService();
+  await paymentService.saveAuthorizationTransactionInCommerceTools({
+    paymentKey: req.body.refno,
+    paymentStatus: req.body.status,
+    transactionId: req.body.transactionId,
+    transactionHistory: req.body.history,
+    paymentMethod: req.body.paymentMethod,
+    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
+    paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
+    rawRequestBody: req.rawBody
+  });
 
   return {
     statusCode: HttpStatusCode.OK,

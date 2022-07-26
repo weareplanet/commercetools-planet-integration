@@ -47,7 +47,26 @@ describe('ErrorsService', () => {
     });
   });
 
-  describe('When ErrorsService excepts a NestedError', () => {
+  describe('When a request was from CommerceTools and ErrorsService recieved a NestedError', () => {
+
+    beforeEach(() => {
+      jest.spyOn(OperationDetector, 'isCommerceToolsRequest').mockReturnValue(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn((OperationDetector as any), 'isRedirectAndLightboxInitOperation').mockReturnValue(true);
+    });
+
+    it('should return custom error message', () => {
+
+      const request = abstractRequestFactory({});
+      const nestedMessage = 'Error message from nested error';
+      const nestedError = new NestedError(ValidError, nestedMessage);
+      const response = ErrorsService.handleError(request, nestedError as unknown as Record<string, unknown>);
+
+      expect((response.body as Record<string, unknown>).message).toEqual(nestedMessage);
+    });
+  });
+
+  describe('When a request was from Datatrans and ErrorsService recieved a NestedError', () => {
 
     beforeEach(() => {
       jest.spyOn(OperationDetector, 'isDatatransRequest').mockReturnValue(true);
