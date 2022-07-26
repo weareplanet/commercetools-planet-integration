@@ -1,5 +1,4 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import logger from '../../../services/log-service';
 import configService from '../../../services/config-service';
 import {
   IAbstractRequestWithTypedBody,
@@ -17,23 +16,17 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, req.rawBody);
 
   // Process the request body
-  try {
-    const paymentService = new PaymentService();
-    await paymentService.saveAuthorizationTransactionInCommerceTools({
-      paymentKey: req.body.refno,
-      paymentStatus: req.body.status,
-      transactionId: req.body.transactionId,
-      transactionHistory: req.body.history,
-      paymentMethod: req.body.paymentMethod,
-      // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
-      paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
-      rawRequestBody: req.rawBody
-    });
-  } catch (err) {
-    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
-    logger.debug(err, 'Error of updating the Payment in CommerceTools');
-    throw err;
-  }
+  const paymentService = new PaymentService();
+  await paymentService.saveAuthorizationTransactionInCommerceTools({
+    paymentKey: req.body.refno,
+    paymentStatus: req.body.status,
+    transactionId: req.body.transactionId,
+    transactionHistory: req.body.history,
+    paymentMethod: req.body.paymentMethod,
+    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
+    paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
+    rawRequestBody: req.rawBody
+  });
 
   return {
     statusCode: HttpStatusCode.OK,

@@ -47,7 +47,7 @@ describe('Errors Service Integration', () => {
 
     beforeEach(() => {
       jest.spyOn(handlerMock, 'default').mockResolvedValue(
-        ErrorsService.makeGeneralErrorResponse({})
+        ErrorsService.makeGeneralErrorResponse()
       );
     });
 

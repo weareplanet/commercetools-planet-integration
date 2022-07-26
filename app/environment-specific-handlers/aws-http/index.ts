@@ -1,3 +1,4 @@
+// TODO: If an error happens somewhere before handler body the error format will not conform INC-57.
 import { AwsApiGatewayAdapter } from './api-gateway-adapter';
 import { allOperationHandler as envAgnosticAllOpsHandler }  from '../../domain/environment-agnostic-handlers';
 

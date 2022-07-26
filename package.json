@@ -4,7 +4,7 @@
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint 'app/**/*.ts' 'test/**/*.ts'",
+    "lint": "eslint app/**/*.ts test/**/*.ts",
     "transpile": "tsc",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",

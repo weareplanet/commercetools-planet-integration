@@ -4,25 +4,18 @@ import {
   IAbstractResponse
 } from '../../../../interfaces';
 import { PaymentService } from '../../../services/payment-service';
-import logger from '../../../services/log-service';
 import { IRequestBody } from './request-schema';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-  try {
-    const paymentService = new PaymentService();
-    const payment = req.body.resource?.obj;
+  const paymentService = new PaymentService();
+  const payment = req.body.resource?.obj;
 
-    const actions = await paymentService.initRedirectAndLightbox(payment);
+  const actions = await paymentService.initRedirectAndLightbox(payment);
 
-    return {
-      statusCode: HttpStatusCode.OK,
-      body: {
-        actions,
-      }
-    };
-  } catch (err) {
-    // TODO: Consider move this logging to a single centralized place - into `any-handler-wrapper`.
-    logger.error(err);
-    throw err;
-  }
+  return {
+    statusCode: HttpStatusCode.OK,
+    body: {
+      actions,
+    }
+  };
 };

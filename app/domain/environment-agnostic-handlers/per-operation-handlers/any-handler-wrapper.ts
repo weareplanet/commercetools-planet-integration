@@ -6,7 +6,6 @@ import {
   IAbstractRequestWithTypedBody,
   IAbstractRequestHandlerWithTypedInput,
 } from '../../../interfaces';
-import logger from '../../services/log-service';
 import { InputValidationService } from '../../services/input-validation-service';
 import { ErrorsService } from '../../services/errors-service';
 
@@ -20,13 +19,8 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
   return async (req: IAbstractRequest): Promise<IAbstractResponse> => {
     const validateInput = () => {
       if (inputSchema) {
-        try {
-          const validationService = new InputValidationService();
-          req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
-        } catch (err) {
-          logger.error({ err }, 'Input validation error');
-          throw err;
-        }
+        const validationService = new InputValidationService();
+        req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
       }
     };
 
