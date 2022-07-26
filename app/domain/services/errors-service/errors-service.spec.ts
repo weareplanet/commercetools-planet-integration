@@ -3,8 +3,8 @@ import { OperationDetector } from '../../../domain/environment-agnostic-handlers
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 import { NestedError } from '../../../interfaces';
 
-const ErrorMessage = 'Error message';
-const ValidError = { message: ErrorMessage };
+const errorMessage = 'Error message';
+const validError = new Error(errorMessage);
 
 describe('ErrorsService', () => {
 
@@ -18,9 +18,9 @@ describe('ErrorsService', () => {
 
     it('should return commercetools error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeCommerceToolsErrorResponse(ErrorMessage, ValidError);
+      const error = ErrorsService.makeCommerceToolsErrorResponse(errorMessage, validError);
 
-      expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
+      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
@@ -32,9 +32,9 @@ describe('ErrorsService', () => {
 
     it('should return datatrans error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeDatatransErrorResponse(ErrorMessage);
+      const error = ErrorsService.makeDatatransErrorResponse(errorMessage);
 
-      expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
+      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
@@ -43,7 +43,7 @@ describe('ErrorsService', () => {
     const error = ErrorsService.makeGeneralErrorResponse();
 
     it('should return internal error with unknown request', () => {
-      expect(ErrorsService.handleError(request, ValidError)).toMatchObject(error);
+      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
@@ -59,8 +59,8 @@ describe('ErrorsService', () => {
 
       const request = abstractRequestFactory({});
       const nestedMessage = 'Error message from nested error';
-      const nestedError = new NestedError(ValidError, nestedMessage);
-      const response = ErrorsService.handleError(request, nestedError as unknown as Record<string, unknown>);
+      const nestedError = new NestedError(validError, nestedMessage);
+      const response = ErrorsService.handleError(request, nestedError);
 
       expect((response.body as Record<string, unknown>).message).toEqual(nestedMessage);
     });
@@ -76,8 +76,8 @@ describe('ErrorsService', () => {
 
       const request = abstractRequestFactory({});
       const nestedMessage = 'Error message from nested error';
-      const nestedError = new NestedError(ValidError, nestedMessage);
-      const response = ErrorsService.handleError(request, nestedError as unknown as Record<string, unknown>);
+      const nestedError = new NestedError(validError, nestedMessage);
+      const response = ErrorsService.handleError(request, nestedError);
 
       expect(response.body).toMatchObject({ message: nestedMessage });
     });

@@ -9,7 +9,7 @@ export class NestedError {
    * @param message - message that need to be logged
    */
   constructor(
-    public readonly innerError: Record<string, unknown>,
+    public readonly innerError: Error,
     public readonly message: string
   ) { }
 }

@@ -6,6 +6,7 @@ import {
   IAbstractResponse,
   IAbstractRequestHandler,
 } from '../../interfaces';
+import { ErrorsService } from '../../domain/services/errors-service';
 
 function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
@@ -14,12 +15,13 @@ function bodyParsingError(e: Error): boolean {
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
   createEnvSpecificHandler(handler: IAbstractRequestHandler) {
     return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+      let agnosticRequest;
       try {
-        const agnosticRequest: IAbstractRequest = this.cloudRequestToAbstract(event);
+        agnosticRequest = this.cloudRequestToAbstract(event);
         const agnosticResponse = await handler(agnosticRequest);
         return this.abstractResponseToCloud(agnosticResponse);
       } catch (err) {
-        return this.handleError(err);
+        return this.handleError(agnosticRequest, err);
       }
     };
   }
@@ -40,7 +42,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
 
   private createApiGatewayResponse(
     statusCode: number,
-    payload: string|Record<string, unknown>
+    payload: string | Record<string, unknown>
   ): APIGatewayProxyResult {
     let body = '';
     if (payload) {
@@ -62,7 +64,7 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     return response;
   }
 
-  private handleError(err: Error) {
+  private handleError(request: IAbstractRequest, err: Error) {
     if (bodyParsingError(err)) {
       return this.abstractResponseToCloud({
         statusCode: HttpStatusCode.BAD_REQUEST,
@@ -74,9 +76,15 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
       });
     }
 
-    return this.abstractResponseToCloud({
-      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
-      body: ''
-    });
+    if (request) {
+      return this.abstractResponseToCloud(
+        ErrorsService.handleError(request, err)
+      );
+    }
+
+    // For some reason (not processed above) we have no request
+    return this.abstractResponseToCloud(
+      ErrorsService.makeGeneralErrorResponse()
+    );
   }
 }

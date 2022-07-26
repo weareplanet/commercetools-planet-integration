@@ -14,13 +14,10 @@ export class ErrorsService {
    * @param err error
    * @returns Formatted error
    */
-  public static handleError(req: IAbstractRequest, err: Record<string, unknown>): IAbstractResponse {
+  public static handleError(req: IAbstractRequest, err: Error | NestedError): IAbstractResponse {
     const message = err.message.toString();
-    let error = err;
 
-    if (err instanceof NestedError) {
-      error = (err as NestedError).innerError;
-    }
+    const error: Error = (err instanceof NestedError) ? err.innerError : err;
 
     logger.error({ error }, message);
 
@@ -38,8 +35,8 @@ export class ErrorsService {
    * @param err error
    * @returns Error in CommerceTools format
    */
-  public static makeCommerceToolsErrorResponse(message: string, err: Record<string, unknown>) {
-    delete err?.config;
+  public static makeCommerceToolsErrorResponse(message: string, err: Error) {
+    delete (err as unknown as Record<string, unknown>)?.config;
     delete err?.stack;
 
     const commerceToolsError = {
