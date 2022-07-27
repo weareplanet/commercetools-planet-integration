@@ -41,7 +41,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"body":{"action":"Create","resource":{"id":"123","typeId":"typeId","obj":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}}}}')
+        expect.stringMatching(/"payload":{"body":{.*,"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -55,7 +55,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"action":"Create","resource":{"id":"123","typeId":"typeId","obj":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}}}')
+        expect.stringMatching(/"payload":.*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -69,7 +69,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"id":"123","typeId":"typeId","obj":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}}')
+        expect.stringMatching(/"payload":{"id":"123".*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -83,7 +83,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"key":"12345318909876543216","amountPlanned":{"type":"centPrecision","currencyCode":"EUR","centAmount":1555,"fractionDigits":2},"paymentMethodInfo":{"paymentInterface":"pp-datatrans-redirect-integration","method":"VIS, PAP"},"custom":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}},"paymentStatus":{},"transactions":[],"interfaceInteractions":[]}')
+        expect.stringMatching(/"payload":{"key":"12345318909876543216".*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -97,7 +97,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj.custom);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"type":{"typeId":"type","id":"89637766-02f9-4391-9c7a-9077d9662daf"},"fields":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}}')
+        expect.stringMatching(/"payload":{"type":.*"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -111,7 +111,7 @@ describe('Redacted fields', () => {
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj.custom.fields);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"key":"refno","cancelUrl":"https://google.com","merchantId":"Test_merchant_id","successUrl":"https://google.com","errorUrl":"https://google.com","savedPaymentMethodAlias":"[REDACTED]"}')
+        expect.stringMatching(/"payload":{"key":"refno".*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
   });
@@ -125,7 +125,7 @@ describe('Redacted fields', () => {
       logger.info({ body: createInitializeTransactionRequest });
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"body":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"[REDACTED]"}}}')
+        expect.stringMatching(/"payload":{"body":.*"card":{"alias":"\[REDACTED\]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"\[REDACTED\]".*/)
       );
     });
 
@@ -137,7 +137,7 @@ describe('Redacted fields', () => {
       logger.info(createInitializeTransactionRequest);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"},"card":{"alias":"[REDACTED]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"[REDACTED]"}}')
+        expect.stringMatching(/"payload":{"refno":.*"card":{"alias":"\[REDACTED\]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"\[REDACTED\]".*/)
       );
     });
 
@@ -149,7 +149,7 @@ describe('Redacted fields', () => {
       logger.info(createInitializeTransactionRequest.BON);
 
       expect(loggingStream.write).toBeCalledWith(
-        expect.stringContaining('"payload":{"alias":"[REDACTED]"}')
+        expect.stringMatching(/"payload":{"alias":"\[REDACTED\]"}/)
       );
     });
   });

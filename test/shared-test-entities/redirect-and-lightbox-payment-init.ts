@@ -1,10 +1,50 @@
+import _merge from 'lodash.merge';
+
+import { RecursivePartial } from './test-utils';
 
 import {
+  ICommerceToolsPayment,
   DatatransPaymentMethod,
   IDatatransInitializeTransaction,
   ICommerceToolsExtensionRequestBody
 } from '../../app/interfaces';
 
+export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceToolsPayment> = {}): ICommerceToolsPayment =>  {
+  const defaultStuff = {
+    key: '12345318909876543216',
+    amountPlanned: {
+      type: 'centPrecision',
+      currencyCode: 'EUR',
+      centAmount: 1555,
+      fractionDigits: 2
+    },
+    paymentMethodInfo: {
+      paymentInterface: 'pp-datatrans-redirect-integration',
+      method: 'VIS, PAP'
+    },
+    custom: {
+      type: {
+        typeId: 'type',
+        id: '89637766-02f9-4391-9c7a-9077d9662daf'
+      },
+      fields: {
+        key: 'refno',
+        cancelUrl: 'https://google.com',
+        merchantId: 'Test_merchant_id',
+        successUrl: 'https://google.com',
+        errorUrl: 'https://google.com'
+      }
+    },
+    paymentStatus: {},
+    transactions: [],
+    interfaceInteractions: []
+  }  as unknown as ICommerceToolsPayment; // TODO: provide all required fields
+
+  return _merge(
+    defaultStuff,
+    paymentExplicitStuff
+  );
+};
 
 export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  {
   return {
@@ -12,37 +52,9 @@ export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  {
     resource: {
       id: '123',
       typeId: 'typeId',
-      obj: {
-        key: '12345318909876543216',
-        amountPlanned: {
-          type: 'centPrecision',
-          currencyCode: 'EUR',
-          centAmount: 1555,
-          fractionDigits: 2
-        },
-        paymentMethodInfo: {
-          paymentInterface: 'pp-datatrans-redirect-integration',
-          method: 'VIS, PAP'
-        },
-        custom: {
-          type: {
-            typeId: 'type',
-            id: '89637766-02f9-4391-9c7a-9077d9662daf'
-          },
-          fields: {
-            key: 'refno',
-            cancelUrl: 'https://google.com',
-            merchantId: 'Test_merchant_id',
-            successUrl: 'https://google.com',
-            errorUrl: 'https://google.com'
-          }
-        },
-        paymentStatus: {},
-        transactions: [],
-        interfaceInteractions: []
-      }
+      obj: PaymentFactory()
     }
-  } as unknown as ICommerceToolsExtensionRequestBody;
+  } as unknown as ICommerceToolsExtensionRequestBody; // TODO: provide all required fields
 };
 
 export const RedirectAndLightboxPaymentInitResponseFactory = () => ({

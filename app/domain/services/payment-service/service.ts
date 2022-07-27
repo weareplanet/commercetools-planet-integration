@@ -1,28 +1,29 @@
-import { type PaymentUpdateAction } from '@commercetools/platform-sdk';
+import { Payment, type PaymentUpdateAction } from '@commercetools/platform-sdk';
 
 import configService from '../config-service';
 import {
   CommerceToolsCustomTypeKey,
   CommerceToolsCustomInteractionType,
   ICommerceToolsPayment,
+  ICommerceToolsCustomPaymentMethodsObject,
   DatatransTransactionStatus,
-  DatatransPaymentMethod,
   IDatatransTransactionHistory,
-  ICommerceToolsPaymentMethod
+  IDatatransPaymentMethodInfo,
+  ErrorMessages
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
-import { DatatransToCommerceToolsMapper } from './dt-to-ct-mapper';
+import { DatatransToCommerceToolsMapper, PaymentMethodInfoForCommerceTools } from './dt-to-ct-mapper';
 
-interface CreateAuthorizationTransactionOptions {
+type SaveAuthorizationOptions = {
+  rawRequestBody: string;
   paymentKey: string;
   paymentStatus: DatatransTransactionStatus;
   transactionId: string;
   transactionHistory: IDatatransTransactionHistory;
-  paymentMethod: DatatransPaymentMethod;
-  paymentMethodInfo: string;
-  rawRequestBody: string;
-}
+} & PaymentMethodInfoForCommerceTools;
+
+const PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME = 'savedPaymentMethods';
 
 // This service implements DOMAIN LOGIC FLOWS.
 // It is abstracted from HTTP communications and 3-parties:
@@ -32,11 +33,11 @@ interface CreateAuthorizationTransactionOptions {
 export class PaymentService {
   async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
     const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
-    const withSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
-    let savedPaymentMethod: ICommerceToolsPaymentMethod;
 
-    if (withSavedPaymentMethod) {
-      savedPaymentMethod = await this.findPaymentMethod(savedPaymentMethodsKey, savedPaymentMethodAlias);
+    let savedPaymentMethod;
+    const needToUseSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
+    if (needToUseSavedPaymentMethod) {
+      savedPaymentMethod = await this.validateSavedPaymentMethodExistense(savedPaymentMethodsKey, savedPaymentMethodAlias);
     }
 
     const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
@@ -64,9 +65,15 @@ export class PaymentService {
       .getActions();
   }
 
-  async saveAuthorizationTransactionInCommerceTools(opts: CreateAuthorizationTransactionOptions) {
+  async saveAuthorizationInCommerceTools(opts: SaveAuthorizationOptions) {
     const payment = await CommerceToolsService.getPayment(opts.paymentKey);
 
+    await this.saveAuthorizationToPayment(payment, opts);
+
+    await this.savePaymentMethodToCustomObject(payment, opts.ctCustomPaymentMethod);
+  }
+
+  private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {
     const actionsBuilder = CommerceToolsService.getActionsBuilder();
 
     actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
@@ -85,8 +92,8 @@ export class PaymentService {
       custom: {
         type: actionsBuilder.makeCustomTypeReference(CommerceToolsCustomTypeKey.PlanetPaymentUsedMethodType),
         fields: {
-          paymentMethod: opts.paymentMethod,
-          info: opts.paymentMethodInfo
+          paymentMethod: opts.ctCustomPaymentMethod.paymentMethod,
+          info: opts.paymentDetailsSerialized
         }
       }
     });
@@ -95,22 +102,57 @@ export class PaymentService {
   }
 
   // TODO: it's validation and getting in one place,
-  // what at lest does not follow our common design regarding validations:
-  // Consider moving this validation to where all other validations are implemented (in Yup schema):
+  // what at lest does not follow our common design regarding validatiuons -
+  // so consider moving the validation to where all other validations are implemented (in Yup schema):
   // https://github.com/weareplanet/commercetools-planet-integration/blob/main/app/interfaces/commerce-tools/payment.ts#L66
-  private async findPaymentMethod(key: string, alias: string): Promise<ICommerceToolsPaymentMethod> {
-    const paymentMethods = await CommerceToolsService.getCustomObjects('savedPaymentMethods', key);
-    const paymentMethod = paymentMethods?.value?.find((method) => {
-      const paymentDetails = method.card;
-
-      return paymentDetails?.alias === alias;
-    });
+  private async validateSavedPaymentMethodExistense(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
+    const paymentMethod = await this.findPaymentMethod(methodKey, alias);
 
     if (!paymentMethod) {
-      // TODO: think about making specific errors. It will allow use different code in commerce tools error
-      throw new Error('savedPaymentMethodAlias not found');
+      throw new Error(ErrorMessages.savedPaymentMethodsKeyOrAliasNotFound());
+    }
+    return paymentMethod;
+  }
+
+  private async findPaymentMethod(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
+    const paymentMethodsObject = await CommerceToolsService.getCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
+    return this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, alias);
+  }
+
+  private findPaymentMethodAmongAlreadySaved(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, alias: string): IDatatransPaymentMethodInfo {
+    return paymentMethodsObject?.value?.find((method) => {
+      const currentMethodAlias = DatatransToCommerceToolsMapper.getPaymentMethodDetails(method).details.alias;
+      return currentMethodAlias === alias;
+    });
+  }
+
+  private async savePaymentMethodToCustomObject(payment: Payment, paymentMethodInfo: IDatatransPaymentMethodInfo) {
+    if (!(payment as unknown as ICommerceToolsPayment).custom.fields.savePaymentMethod) {
+      return; // No necessity to save
+    }
+    const { savedPaymentMethodsKey } = payment.custom.fields;
+
+    const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);
+
+    const  paymentMethodsObject = await CommerceToolsService.getCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+    if (paymentMethodsObject) {
+      const paymentMethod = this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
+      if (paymentMethod) { // This payment method is already saved
+        return;
+      }
     }
 
-    return paymentMethod;
+    let valueToBeSaved = [
+      {
+        paymentMethod: paymentMethodInfo.paymentMethod,
+        [paymentMethodDetailsToBeSaved.name]: paymentMethodDetailsToBeSaved.details
+      }
+    ];
+
+    if (paymentMethodsObject) { // Need to amend already existing Custom Object
+      valueToBeSaved = paymentMethodsObject.value.concat(valueToBeSaved);
+    }
+
+    await CommerceToolsService.createOrUpdateCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
   }
 }

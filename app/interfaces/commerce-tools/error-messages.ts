@@ -23,6 +23,9 @@ export const ErrorMessages = {
   rejectedSavePaymentMethod: () => {
     return 'Custom field savePaymentMethod cannot be true when savedPaymentMethodAlias is not empty';
   },
+  savedPaymentMethodsKeyOrAliasNotFound: () => {
+    return 'savedPaymentMethodsKey or savedPaymentMethodAlias not found';
+  },
   rejectedWebhook: () => {
     return 'Webhook is a connector wide setting; setting it individually per request is not supported';
   },

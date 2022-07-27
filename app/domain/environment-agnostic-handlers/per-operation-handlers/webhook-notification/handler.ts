@@ -17,15 +17,14 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
 
   // Process the request body
   const paymentService = new PaymentService();
-  await paymentService.saveAuthorizationTransactionInCommerceTools({
+  await paymentService.saveAuthorizationInCommerceTools({
+    rawRequestBody: req.rawBody,
     paymentKey: req.body.refno,
     paymentStatus: req.body.status,
     transactionId: req.body.transactionId,
     transactionHistory: req.body.history,
-    paymentMethod: req.body.paymentMethod,
-    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to abstract PaymentService from dealing with req.body
-    paymentMethodInfo: DatatransToCommerceToolsMapper.inferCtPaymentInfo(req.body),
-    rawRequestBody: req.rawBody
+    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to kepp PaymentService abstracted from dealing with any "Request"
+    ...DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(req.body) // req.body matches to the required argument type
   });
 
   return {

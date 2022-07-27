@@ -18,13 +18,13 @@ const DatatransTransactionHistoryItemSchema = yup
     date: yup.string()
   }).required();
 
-export type IDatatransTransactionHistoryItem = yup.TypeOf<typeof DatatransTransactionHistoryItemSchema> & IAnyObjectWithStringKeys;
+export type IDatatransTransactionHistoryItem = yup.TypeOf<typeof DatatransTransactionHistoryItemSchema>
+  & IAnyObjectWithStringKeys; // Any fields not declared in DatatransTransactionHistoryItemSchema can be present in this type
 
 const DatatransTransactionHistorySchema = yup
   .array()
   .of(DatatransTransactionHistoryItemSchema);
 
-// export type IDatatransTransactionHistory = yup.TypeOf<typeof DatatransTransactionHistorySchema>;
 export type IDatatransTransactionHistory = IDatatransTransactionHistoryItem[];
 
 export const DatatransWebhookRequestBodySchema = yup.object({
