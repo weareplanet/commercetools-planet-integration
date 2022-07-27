@@ -36,4 +36,22 @@ const pinoOptions: pino.LoggerOptions = {
   }
 };
 
+// TODO: to implement INC-59 requirements:
+//
+// Create RequestContextService:
+// 1. Implement the instantiable RequestContextService class which has at least getContext() method.
+// 2. On every entry point ASAP (at least in app/domain/environment-agnostic-handlers/per-operation-handlers/any-handler-wrapper.ts) -
+//    create an instance pasing request to it -
+//    the constructor should extract paymentKey from the request,
+//    extract correlationId from the request or create it otherwise
+//    and keep that context data in the instance.
+// 3. Create an instance of LogService passing requestContextService into it.
+// 4. Pass this logService instance to all used services (everywhere below this logService instance should be used).
+//    To achieve this - make ALL service instantiable to inject a logService instance to each of them.
+//
+// Make LogService context-aware:
+// 1. Make this module exporting the instantiable LogService class.
+// 2. Pass requestContextService instance as an argument into LogService constructor.
+// 3. Make LogService passing { requestContext: requestContextService.getContext() } for every log message.
+
 export default pino(pinoOptions);
