@@ -1,4 +1,4 @@
-import { CustomObject } from '@commercetools/platform-sdk';
+import { type CustomObject } from '@commercetools/platform-sdk';
 import { IDatatransPaymentMethodInfo } from '../datatrans';
 
 export interface ICommerceToolsCustomPaymentMethodsObject extends CustomObject {

@@ -1,15 +1,12 @@
 import {
   type Payment,
-  type PaymentUpdateAction
+  type PaymentUpdateAction,
+  type CustomObject
 } from '@commercetools/platform-sdk';
 
 import logger from './../log-service';
 import { ctApiRoot } from './commerce-tools-client';
 import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
-import {
-  IDatatransPaymentMethodInfo,
-  ICommerceToolsCustomPaymentMethodsObject
-} from '../../../interfaces';
 import configService from '../config-service';
 
 // Only this service knows how to communicate with CommerceTools.
@@ -51,7 +48,7 @@ export class CommerceToolsService {
     logger.debug(res.body, 'Response from CommerceTools after the Payment update.');
   }
 
-  public static async getCustomPaymentMethodsObject(containerName: string, key: string): Promise<ICommerceToolsCustomPaymentMethodsObject> {
+  public static async getCustomObject<TCustomObject extends CustomObject>(containerName: string, key: string): Promise<TCustomObject> {
     logger.debug({ containerName, key }, 'Requesting CustomObject from CommerceTools...');
     let res;
     try {
@@ -69,10 +66,10 @@ export class CommerceToolsService {
     }
 
     logger.debug(res.body, 'Response from CommerceTools to the CustomObject request.');
-    return res.body;
+    return res.body as TCustomObject; // TODO: this cast is not safe
   }
 
-  public static async createOrUpdateCustomPaymentMethodsObject(containerName: string, key: string, value: IDatatransPaymentMethodInfo[]) {
+  public static async createOrUpdateCustomObject<TValue>(containerName: string, key: string, value: TValue) {
     logger.debug({ containerName, key }, 'Creating CustomObject in CommerceTools...');
 
     const customObjectDraft = {

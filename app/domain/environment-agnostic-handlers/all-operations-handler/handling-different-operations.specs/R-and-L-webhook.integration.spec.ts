@@ -74,13 +74,13 @@ describe('All-operations handler', () => {
           }
         ]
       };
-      beforeEach(/* Stub CommerceToolsService.getCustomPaymentMethodsObject */ () => {
-        jest.spyOn(CommerceToolsService, 'getCustomPaymentMethodsObject')
+      beforeEach(/* Stub CommerceToolsService.getCustomObject */ () => {
+        jest.spyOn(CommerceToolsService, 'getCustomObject')
           .mockResolvedValue(paymentMethodCustomObjectFetchedFromCT as ICommerceToolsCustomPaymentMethodsObject);
       });
 
-      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomPaymentMethodsObject */ () => {
-        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomPaymentMethodsObject').mockResolvedValue(); // does not matter what it returns
+      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomObject */ () => {
+        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomObject').mockResolvedValue(); // does not matter what it returns
       });
 
       const req = RedirectAndLightboxWebhookRequestFactory({
@@ -136,7 +136,7 @@ describe('All-operations handler', () => {
       it('should save paymentMethod data (alias etc.) to CommerceTools', async () => {
         await handler(req);
 
-        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).toBeCalledWith(
+        expect(CommerceToolsService.createOrUpdateCustomObject).toBeCalledWith(
           'savedPaymentMethods',
           testSavedPaymentMethodsKey,
           [
@@ -170,7 +170,7 @@ describe('All-operations handler', () => {
 
         await handler(req);
 
-        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).not.toBeCalledWith();
+        expect(CommerceToolsService.createOrUpdateCustomObject).not.toBeCalledWith();
       });
 
       it('should respond 200', async () => {
@@ -194,12 +194,12 @@ describe('All-operations handler', () => {
         jest.spyOn(CommerceToolsService, 'updatePayment').mockResolvedValue();
       });
 
-      beforeEach(/* Mock CommerceToolsService.getCustomPaymentMethodsObject */ () => {
-        jest.spyOn(CommerceToolsService, 'getCustomPaymentMethodsObject').mockResolvedValue({} as ICommerceToolsCustomPaymentMethodsObject);
+      beforeEach(/* Mock CommerceToolsService.getCustomObject */ () => {
+        jest.spyOn(CommerceToolsService, 'getCustomObject').mockResolvedValue({} as ICommerceToolsCustomPaymentMethodsObject);
       });
 
-      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomPaymentMethodsObject */ () => {
-        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomPaymentMethodsObject').mockResolvedValue();
+      beforeEach(/* Mock CommerceToolsService.createOrUpdateCustomObject */ () => {
+        jest.spyOn(CommerceToolsService, 'createOrUpdateCustomObject').mockResolvedValue();
       });
 
       it('should go through the Webhook handling flow and respond with 400', async () => {
@@ -211,8 +211,8 @@ describe('All-operations handler', () => {
         expect(CommerceToolsService.getPayment).not.toBeCalled();
         expect(CommerceToolsService.updatePayment).not.toBeCalled();
 
-        expect(CommerceToolsService.getCustomPaymentMethodsObject).not.toBeCalled();
-        expect(CommerceToolsService.createOrUpdateCustomPaymentMethodsObject).not.toBeCalled();
+        expect(CommerceToolsService.getCustomObject).not.toBeCalled();
+        expect(CommerceToolsService.createOrUpdateCustomObject).not.toBeCalled();
 
         expect(result).toEqual(
           {

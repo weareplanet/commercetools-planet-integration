@@ -115,7 +115,7 @@ export class PaymentService {
   }
 
   private async findPaymentMethod(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
-    const paymentMethodsObject = await CommerceToolsService.getCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
+    const paymentMethodsObject = await CommerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
     return this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, alias);
   }
 
@@ -134,7 +134,7 @@ export class PaymentService {
 
     const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);
 
-    const  paymentMethodsObject = await CommerceToolsService.getCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+    const  paymentMethodsObject = await CommerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
     if (paymentMethodsObject) {
       const paymentMethod = this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
       if (paymentMethod) { // This payment method is already saved
@@ -153,6 +153,6 @@ export class PaymentService {
       valueToBeSaved = paymentMethodsObject.value.concat(valueToBeSaved);
     }
 
-    await CommerceToolsService.createOrUpdateCustomPaymentMethodsObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
+    await CommerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
   }
 }
