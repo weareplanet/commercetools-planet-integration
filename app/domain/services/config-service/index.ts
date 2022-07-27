@@ -7,11 +7,10 @@ import configFromEnv from './env-loader';
 class ConfigService {
   private config: IAppConfig;
 
-  constructor() {
-    this.init();
-  }
-
   getConfig() {
+    if (!this.config) {
+      this.init();
+    }
     return this.config;
   }
 

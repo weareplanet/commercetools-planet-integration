@@ -24,6 +24,11 @@ describe('Connector config validations', () => {
     DT_CONNECTOR_WEBHOOK_URL
   } = process.env;
 
+  const loadConfig = async () => {
+    const configService = (await import('.')).default;
+    configService.getConfig();
+  };
+
   const originalEnvVarsValues = {
     commerceTools: {
       clientId: CT_CLIENT_ID,
@@ -149,7 +154,7 @@ describe('Connector config validations', () => {
         }
       });
 
-      await expect(import('.'))
+      await expect(loadConfig())
         .rejects
         .toThrowError('CT_CLIENT_ID is required');
 
@@ -167,7 +172,7 @@ describe('Connector config validations', () => {
         }
       });
 
-      await expect(import('.'))
+      await expect(loadConfig())
         .rejects
         .toThrowError('CT_CLIENT_SECRET is required');
 
@@ -185,7 +190,7 @@ describe('Connector config validations', () => {
         }
       });
 
-      await expect(import('.'))
+      await expect(loadConfig())
         .rejects
         .toThrowError('CT_PROJECT_ID is required');
 
@@ -203,7 +208,7 @@ describe('Connector config validations', () => {
         }
       });
 
-      await expect(import('.'))
+      await expect(loadConfig())
         .rejects
         .toThrowError('CT_AUTH_URL is required');
 
@@ -221,7 +226,7 @@ describe('Connector config validations', () => {
         }
       });
 
-      await expect(import('.'))
+      await expect(loadConfig())
         .rejects
         .toThrowError('CT_API_URL is required');
 
@@ -246,7 +251,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_PROD_API_URL is required');
 
@@ -267,7 +272,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_PROD_API_URL must be a valid URL');
 
@@ -290,7 +295,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_TEST_API_URL is required');
 
@@ -311,7 +316,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_TEST_API_URL must be a valid URL');
 
@@ -332,7 +337,7 @@ describe('Connector config validations', () => {
           }
         });
 
-        await expect(import('.'))
+        await expect(loadConfig())
           .rejects
           .toThrowError('DT_CONNECTOR_WEBHOOK_URL is required');
 
@@ -350,7 +355,7 @@ describe('Connector config validations', () => {
           }
         });
 
-        await expect(import('.'))
+        await expect(loadConfig())
           .rejects
           .toThrowError('DT_CONNECTOR_WEBHOOK_URL must be a valid URL');
 
@@ -372,7 +377,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
 
@@ -390,7 +395,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
 
@@ -410,7 +415,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
 
@@ -428,7 +433,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
 
@@ -448,7 +453,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
 
@@ -466,7 +471,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('merchant\'s enviroment must be one of the following values: prod, test');
 
@@ -486,7 +491,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
 
@@ -504,7 +509,7 @@ describe('Connector config validations', () => {
             }
           });
 
-          await expect(import('.'))
+          await expect(loadConfig())
             .rejects
             .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
 
