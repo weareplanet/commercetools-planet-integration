@@ -4,6 +4,8 @@
 // Well, for testing it's not a big deal to not use DatatransEnvironment, but to hardcode the environment value(s) -
 // maybe it's even more "honest" testing.
 
+import pino from 'pino';
+
 import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
@@ -106,14 +108,19 @@ describe('Connector config validations', () => {
     }
   };
 
-  // TODO: get rid of this weird async load in every test
-  const loadLogger = async () => {
-    const logger = (await import('../log-service')).default;
-    jest.spyOn(logger, 'info');
-    jest.spyOn(logger, 'debug');
+  beforeEach(async () => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    setProcessEnvVars(originalEnvVarsValues); // reset to defaults
+    jest.resetModules();
+  });
 
-    return logger;
-  };
+  // TODO: get rid of this weird async load in every test
+  let logger: pino.Logger;
+  beforeEach(/* load logger */async () => {
+    logger = (await import('../log-service')).default;
+    jest.spyOn(logger, 'debug');
+  });
 
   afterAll(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -123,28 +130,15 @@ describe('Connector config validations', () => {
   });
 
   describe('commerTools config validations', () => {
-    beforeEach(async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setProcessEnvVars(originalEnvVarsValues); // reset to defaults
-      jest.resetModules();
-    });
-
     it('should pass when all neccessary values are provided and correct', async () => {
-      expect.assertions(3);
-      const logger = await loadLogger();
-
       setProcessEnvVars(testEnvVarsValues);
       const configService = (await import('.')).default;
 
       expect(configService.getConfig()).toEqual(testEnvVarsValues);
-      expect(logger.info).toHaveBeenCalled();
       expect(logger.debug).toHaveBeenCalled();
     });
 
     it('should throw validation error about clientId', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
@@ -155,20 +149,14 @@ describe('Connector config validations', () => {
         }
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_CLIENT_ID is required');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      await expect(import('.'))
+        .rejects
+        .toThrowError('CT_CLIENT_ID is required');
+
+      expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
     });
 
     it('should throw validation error about clientSecret', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
@@ -179,20 +167,14 @@ describe('Connector config validations', () => {
         }
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_CLIENT_SECRET is required');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      await expect(import('.'))
+        .rejects
+        .toThrowError('CT_CLIENT_SECRET is required');
+
+      expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
     });
 
     it('should throw validation error about projectId', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
@@ -203,20 +185,14 @@ describe('Connector config validations', () => {
         }
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_PROJECT_ID is required');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      await expect(import('.'))
+        .rejects
+        .toThrowError('CT_PROJECT_ID is required');
+
+      expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
     });
 
     it('should throw validation error about authUrl', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
@@ -227,20 +203,14 @@ describe('Connector config validations', () => {
         }
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_AUTH_URL is required');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      await expect(import('.'))
+        .rejects
+        .toThrowError('CT_AUTH_URL is required');
+
+      expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
     });
 
     it('should throw validation error about apiUrl', async () => {
-      expect.assertions(4);
-      const logger = await loadLogger();
       setProcessEnvVars({
         ...testEnvVarsValues,
         commerceTools: {
@@ -251,31 +221,18 @@ describe('Connector config validations', () => {
         }
       });
 
-      try {
-        await import('.');
-        expect.assertions(1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toEqual('CT_API_URL is required');
-      }
-      expect(logger.info).not.toHaveBeenCalled();
-      expect(logger.debug).not.toHaveBeenCalled();
+      await expect(import('.'))
+        .rejects
+        .toThrowError('CT_API_URL is required');
+
+      expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
     });
   });
 
   describe('Datatrans config validations', () => {
-    beforeEach(async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setProcessEnvVars(originalEnvVarsValues);
-      jest.resetModules();
-    });
-
     describe('apiUrls validations', () => {
       describe('apiUrls.prod', () => {
         it('when prod URL is absent - should throw an error', async () => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -289,20 +246,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_PROD_API_URL is required');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_PROD_API_URL is required');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when prod URL is malformed - should throw an error', async () => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -316,22 +267,16 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_PROD_API_URL must be a valid URL');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_PROD_API_URL must be a valid URL');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
 
       describe('apiUrls.test', () => {
         it('when test URL is absent - should throw an error', async () => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -345,20 +290,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_TEST_API_URL is required');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_TEST_API_URL is required');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when test URL is malformed - should throw an error', async () => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -372,23 +311,17 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_TEST_API_URL must be a valid URL');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_TEST_API_URL must be a valid URL');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
     });
 
     describe('webhookUrl validations', () => {
       it('when absent - should throw an error', async () => {
-        expect.assertions(4);
-        const logger = await loadLogger();
         setProcessEnvVars({
           ...testEnvVarsValues,
           datatrans: {
@@ -399,20 +332,14 @@ describe('Connector config validations', () => {
           }
         });
 
-        try {
-          await import('.');
-          expect.assertions(1);
-        } catch (err) {
-          expect(err).toBeInstanceOf(Error);
-          expect(err.message).toEqual('DT_CONNECTOR_WEBHOOK_URL is required');
-        }
-        expect(logger.info).not.toHaveBeenCalled();
-        expect(logger.debug).not.toHaveBeenCalled();
+        await expect(import('.'))
+          .rejects
+          .toThrowError('DT_CONNECTOR_WEBHOOK_URL is required');
+
+        expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
       });
 
       it('when is malformed - should throw an error', async () => {
-        expect.assertions(4);
-        const logger = await loadLogger();
         setProcessEnvVars({
           ...testEnvVarsValues,
           datatrans: {
@@ -423,15 +350,11 @@ describe('Connector config validations', () => {
           }
         });
 
-        try {
-          await import('.');
-          expect.assertions(1);
-        } catch (err) {
-          expect(err).toBeInstanceOf(Error);
-          expect(err.message).toEqual('DT_CONNECTOR_WEBHOOK_URL must be a valid URL');
-        }
-        expect(logger.info).not.toHaveBeenCalled();
-        expect(logger.debug).not.toHaveBeenCalled();
+        await expect(import('.'))
+          .rejects
+          .toThrowError('DT_CONNECTOR_WEBHOOK_URL must be a valid URL');
+
+        expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
       });
     });
 
@@ -439,8 +362,6 @@ describe('Connector config validations', () => {
 
       describe('should throw validation error about merchants\' id', () => {
         it('when it is absent', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -451,20 +372,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id specified');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when it is malformed', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -475,22 +390,16 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-            expect.assertions(1);
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' id as string');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
 
       describe('should throw validation error about merchants\' password', () => {
         it('when it is absent', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -501,19 +410,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password specified');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when it is malformed', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -524,21 +428,16 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' password as a string');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
 
       describe('should throw validation error about merchants\' enviroment', () => {
         it('when it is absent', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -549,19 +448,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' enviroment specified');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when it is malformed', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -572,21 +466,16 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('merchant\'s enviroment must be one of the following values: prod, test');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('merchant\'s enviroment must be one of the following values: prod, test');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
 
       describe('should throw validation error about merchants\' dtHmacKey', () => {
         it('when it is absent', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -597,19 +486,14 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey specified');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
 
         it('when it is malformed', async() => {
-          expect.assertions(4);
-          const logger = await loadLogger();
           setProcessEnvVars({
             ...testEnvVarsValues,
             datatrans: {
@@ -620,14 +504,11 @@ describe('Connector config validations', () => {
             }
           });
 
-          try {
-            await import('.');
-          } catch (err) {
-            expect(err).toBeInstanceOf(Error);
-            expect(err.message).toEqual('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
-          }
-          expect(logger.info).not.toHaveBeenCalled();
-          expect(logger.debug).not.toHaveBeenCalled();
+          await expect(import('.'))
+            .rejects
+            .toThrowError('DT_MERCHANTS must be stringified JSON array of objects with merchants\' dtHmacKey as string');
+
+          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
         });
       });
     });

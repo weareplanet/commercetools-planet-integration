@@ -23,9 +23,7 @@ class ConfigService {
       { strict: true }
     );
 
-    logger.debug(this.config.commerceTools, 'CommerceTools config');
-    logger.debug(this.config.datatrans, 'Datatrans config');
-    logger.info('All configs are valid');
+    logger.debug(this.config, 'Loaded configuration');
   }
 }
 
