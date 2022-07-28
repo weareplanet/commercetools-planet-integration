@@ -7,11 +7,10 @@ import configFromEnv from './env-loader';
 class ConfigService {
   private config: IAppConfig;
 
-  constructor() {
-    this.init();
-  }
-
   getConfig() {
+    if (!this.config) {
+      this.init();
+    }
     return this.config;
   }
 
@@ -23,9 +22,7 @@ class ConfigService {
       { strict: true }
     );
 
-    logger.debug(this.config.commerceTools, 'CommerceTools config');
-    logger.debug(this.config.datatrans, 'Datatrans config');
-    logger.info('All configs are valid');
+    logger.debug(this.config, 'Loaded configuration');
   }
 }
 
