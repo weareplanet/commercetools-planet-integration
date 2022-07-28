@@ -8,7 +8,7 @@ on:
   #    - master
   #    - "feat/INC-61"
   push:
-    types: [ labeled ]
+    #types: [ labeled ]
     branches:
     - "feat/INC-61"
 
