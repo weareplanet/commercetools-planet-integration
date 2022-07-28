@@ -1,0 +1,72 @@
+name: Bump and Release
+
+on:
+  #pull_request:
+  #  types: [ labeled ]
+  #  branches:
+  #    - main
+  #    - master
+  #    - "feat/INC-61"
+  push:
+    types: [ labeled ]
+    branches:
+    - "feat/INC-61"
+
+jobs:
+  bump-and-release:
+    name: Bumps version and Release tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set 'patch' release by default
+        run: echo "BUMP=patch" >> $GITHUB_ENV
+      - name: Check and set 'minor' release
+        if: ${{ github.event.label.name == 'bump:minor' }}
+        run: echo "BUMP=minor" >> $GITHUB_ENV
+      - name: Check and set 'major' release
+        if: ${{ github.event.label.name == 'bump:major' }}
+        run: echo "BUMP=major" >> $GITHUB_ENV
+      - name: Install semver-tool
+        run: |
+          export DIR=$(mktemp -d)
+          cd $DIR
+          curl https://github.com/fsaintjacques/semver-tool/archive/3.2.0.tar.gz -L -o semver.tar.gz
+          tar -xvf semver.tar.gz
+          sudo cp semver-tool-3.2.0/src/semver /usr/local/bin
+      - name: Get the codebase from the git repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Bump version
+        run: |
+          TAG=$(git tag --sort=-creatordate | head -n 1) && \
+          if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
+          export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      - name: Setup git
+        run: |
+          git config user.email "githubactions@planetpayment.com"
+          git config user.name "GitHub Actions"
+      - name: Prepare CHANGELOG
+        run: |
+          echo "${{ github.event.pull_request.body }}" | csplit -s - "/##/"
+          echo "# Changelog
+          
+          ## ${{ env.VERSION }}
+          " >> CHANGELOG.tmp
+          grep "^*" xx01 >> CHANGELOG.tmp
+          grep -v "^# " CHANGELOG.md >> CHANGELOG.tmp
+          cp CHANGELOG.tmp CHANGELOG.md
+      - name: Prepare README
+        run: |
+          export MAJOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f1)
+          export MINOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f2)
+      - name: Prepare update
+        run: |
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
+      - name: Commit changes
+        run: |
+          git add CHANGELOG.md README.md package.json
+          git commit -m "GHA - Bump to version ${{ env.VERSION }}"
+      - name: Push
+        run: git push
