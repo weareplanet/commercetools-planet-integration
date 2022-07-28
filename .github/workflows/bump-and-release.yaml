@@ -52,13 +52,14 @@ jobs:
       - name: Prepare CHANGELOG
         # add VERSION in the first line of CHANGELOG.md
         run: |
-          sed -i -e "1 i \#\#\ ${{ env.VERSION }}" CHANGELOG.md
+          if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Prepare update
         run: |
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
       - name: Commit changes
         run: |
-          git add CHANGELOG.md README.md package.json
+          if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
+          git add package.json
           git commit -m "Bump to version ${{ env.VERSION }}"
       - name: Push
         run: git push
