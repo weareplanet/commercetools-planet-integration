@@ -50,25 +50,15 @@ jobs:
           git config user.email "githubactions@planetpayment.com"
           git config user.name "GitHub Actions"
       - name: Prepare CHANGELOG
+        # add VERSION in the first line of CHANGELOG.md
         run: |
-          echo "${{ github.event.pull_request.body }}" | csplit -s - "/##/"
-          echo "# Changelog
-          
-          ## ${{ env.VERSION }}
-          " >> CHANGELOG.tmp
-          grep "^*" xx01 >> CHANGELOG.tmp
-          grep -v "^# " CHANGELOG.md >> CHANGELOG.tmp
-          cp CHANGELOG.tmp CHANGELOG.md
-      - name: Prepare README
-        run: |
-          export MAJOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f1)
-          export MINOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f2)
+          sed -i -e "1 i \#\#\ ${{ env.VERSION }}" CHANGELOG.md
       - name: Prepare update
         run: |
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
       - name: Commit changes
         run: |
           git add CHANGELOG.md README.md package.json
-          git commit -m "GHA - Bump to version ${{ env.VERSION }}"
+          git commit -m "Bump to version ${{ env.VERSION }}"
       - name: Push
         run: git push
