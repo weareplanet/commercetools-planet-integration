@@ -2,14 +2,19 @@ import pino from 'pino';
 
 import { RedirectAndLightboxPaymentInitRequestBodyFactory, CreateInitializeTransactionRequestFactory } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
+let logger: pino.Logger;
+const loadLogger = async () => {
+  logger = (await import('.')).LogService.getLogger();
+};
+
 describe('Redacted fields', () => {
-  let logger: pino.Logger;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let loggingStream: any;
   let originalLogLevel: string;
 
   beforeEach(async () => {
-    logger = (await import('.')).default;
+    await loadLogger();
     /* eslint-disable @typescript-eslint/no-var-requires */
     const { streamSym } = require('pino/lib/symbols');
     /* eslint-disable @typescript-eslint/ban-ts-comment */

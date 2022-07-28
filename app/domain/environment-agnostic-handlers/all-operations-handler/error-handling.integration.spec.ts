@@ -1,3 +1,4 @@
+import { LogService }  from '../../services/log-service';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 import handler from '.';
 import * as handlerMock from '.';
@@ -5,6 +6,7 @@ import { ErrorsService } from '../../services/errors-service';
 import { OperationDetector } from './operation-detector';
 
 describe('Errors Service Integration', () => {
+  const logger = LogService.getLogger();
 
   describe('When the request is recognized as a request from CommerceTools', () => {
 
@@ -47,7 +49,7 @@ describe('Errors Service Integration', () => {
 
     beforeEach(() => {
       jest.spyOn(handlerMock, 'default').mockResolvedValue(
-        ErrorsService.makeGeneralErrorResponse()
+        new ErrorsService({ logger }).makeGeneralErrorResponse()
       );
     });
 

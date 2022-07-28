@@ -4,8 +4,8 @@
 // Well, for testing it's not a big deal to not use DatatransEnvironment, but to hardcode the environment value(s) -
 // maybe it's even more "honest" testing.
 
+import { LogService }  from '../log-service';
 import pino from 'pino';
-
 import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
@@ -24,9 +24,17 @@ describe('Connector config validations', () => {
     DT_CONNECTOR_WEBHOOK_URL
   } = process.env;
 
+  let logger: pino.Logger;
+  const createLogger = () => {
+    logger =  LogService.getLogger();
+    jest.spyOn(logger, 'debug');
+    return logger;
+  };
+
   const loadConfig = async () => {
-    const configService = (await import('.')).default;
-    configService.getConfig();
+    const ConfigService = (await import('.')).ConfigService;
+    const config = new ConfigService({ logger: createLogger() }).getConfig();
+    return config;
   };
 
   const originalEnvVarsValues = {
@@ -120,13 +128,6 @@ describe('Connector config validations', () => {
     jest.resetModules();
   });
 
-  // TODO: get rid of this weird async load in every test
-  let logger: pino.Logger;
-  beforeEach(/* load logger */async () => {
-    logger = (await import('../log-service')).default;
-    jest.spyOn(logger, 'debug');
-  });
-
   afterAll(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -137,9 +138,8 @@ describe('Connector config validations', () => {
   describe('commerTools config validations', () => {
     it('should pass when all neccessary values are provided and correct', async () => {
       setProcessEnvVars(testEnvVarsValues);
-      const configService = (await import('.')).default;
-
-      expect(configService.getConfig()).toEqual(testEnvVarsValues);
+      const config = await loadConfig();
+      expect(config).toEqual(testEnvVarsValues);
       expect(logger.debug).toHaveBeenCalled();
     });
 

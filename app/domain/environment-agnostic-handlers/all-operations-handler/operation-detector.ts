@@ -2,6 +2,7 @@ import {
   IAbstractRequest,
   ICommerceToolsExtensionRequest,
   IDatatransWebhookRequest,
+  getHttpHeaderValue,
   DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../interfaces';
 
@@ -28,7 +29,7 @@ export class OperationDetector {
   // Type guard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
-    return !!request.headers && !!request.headers[DATATRANS_SIGNATURE_HEADER_NAME];
+    return !!getHttpHeaderValue(request.headers, DATATRANS_SIGNATURE_HEADER_NAME);
   }
 
   public static detectOperation = (req: IAbstractRequest) => {

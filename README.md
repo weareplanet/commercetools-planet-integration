@@ -74,6 +74,50 @@ Pay attention - if you need a separate scaling for different use cases - you can
 > If the "single all-operation function" approach described above is not acceptable for you, any operation-specific handler (from `app/domain/environment-agnostic-handlers/per-operation-handlers`) can be deployed individually.
 In order to keep this ability every such handler, by its design, must be self-sufficient (able to completely process an `IAbstractRequest` obtained from an anvironment-specific adapter). It means that, particularly, all necessary input validation and error handling must be implemented within a function exported from any subfolder of `app/domain/environment-agnostic-handlers/per-operation-handlers` rather than in `app/domain/environment-agnostic-handlers/all-operations-handler` (the latter must be just an orchestrator).
 
+## Logging and Tracing request context
+
+To make a log message in any place in the application you can do the following:
+```
+const logger = LogService.getLogger();
+
+logger.info('Processing event X');
+...
+logger.debug(someObject, "Some meaningful message");
+```
+
+However it's recommended to make a logger aware of the request context - that gives an ability **to trace all log messages related to the same event processing (one call of the Connector)**.
+
+The approach is following:
+
+  1. At the higher possible level during a request processing (most probably - in the environment adapter) - amend `IAbstractRequest` with the "tracing context":
+  ```
+  const abstractRequestDraft: IAbstractRequest = { body: ..., headers: ...  } // all fields (taken from the original HTTP request), without `tracingContext` yet
+  const abstractRequest: IAbstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
+  // now abstractRequest.tracingContext has a value
+  ```
+
+  2. In any place where you need to log something and a request object (of either `IAbstractRequest` or `IAbstractRequestWithTypedBody` type) is accessible (i.e. in a request handlers) - do the following:
+  ```
+  const logger = LogService.getLogger(req.tracingContext); // this logger will include the "tracing context" data into every log message.
+
+  logger.info('Processing event X');
+  ...
+  logger.debug(someObject, "Some meaningful message");
+  ```
+
+  3. To have such a context-aware logging in places where a request object is not accessible (in services etc.) - pass the context-aware logger object to that place.
+  For example (from `app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/handler.ts`):
+
+  ```
+  export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
+    const logger = LogService.getLogger(req.tracingContext);
+    const paymentService = new PaymentService({ logger });     // context-aware logger is passed into the PaymentService instance
+    // ...
+  };
+  ```
+
+  In order to facilitate this all service classes (exported from `services/*`) subclasses of `ServiceWithLogger` class having `{ logger }` as a constructor argument.
+
 
 ## Programming language
 

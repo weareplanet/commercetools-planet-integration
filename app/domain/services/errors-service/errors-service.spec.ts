@@ -1,12 +1,15 @@
-import { ErrorsService } from '.';
+import { LogService }  from '../log-service';
 import { OperationDetector } from '../../../domain/environment-agnostic-handlers/all-operations-handler/operation-detector';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 import { NestedError } from '../../../interfaces';
+import { ErrorsService } from '.';
 
 const errorMessage = 'Error message';
 const validError = new Error(errorMessage);
 
 describe('ErrorsService', () => {
+  const logger =  LogService.getLogger();
+  const errorsService = new ErrorsService({ logger });
 
   describe('When a request was from CommerceTools', () => {
 
@@ -18,9 +21,9 @@ describe('ErrorsService', () => {
 
     it('should return commercetools error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeCommerceToolsErrorResponse(errorMessage, validError);
+      const error = errorsService.makeCommerceToolsErrorResponse(errorMessage, validError);
 
-      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
+      expect(errorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
@@ -32,18 +35,18 @@ describe('ErrorsService', () => {
 
     it('should return datatrans error with valid parameters', () => {
       const request = abstractRequestFactory({});
-      const error = ErrorsService.makeDatatransErrorResponse(errorMessage);
+      const error = errorsService.makeDatatransErrorResponse(errorMessage);
 
-      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
+      expect(errorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
   describe('When a request was neither from CommerceTools nor from Datatrans', () => {
     const request = abstractRequestFactory({});
-    const error = ErrorsService.makeGeneralErrorResponse();
+    const error = errorsService.makeGeneralErrorResponse();
 
     it('should return internal error with unknown request', () => {
-      expect(ErrorsService.handleError(request, validError)).toMatchObject(error);
+      expect(errorsService.handleError(request, validError)).toMatchObject(error);
     });
   });
 
@@ -56,11 +59,10 @@ describe('ErrorsService', () => {
     });
 
     it('should return custom error message', () => {
-
       const request = abstractRequestFactory({});
       const nestedMessage = 'Error message from nested error';
       const nestedError = new NestedError(validError, nestedMessage);
-      const response = ErrorsService.handleError(request, nestedError);
+      const response = errorsService.handleError(request, nestedError);
 
       expect((response.body as Record<string, unknown>).message).toEqual(nestedMessage);
     });
@@ -73,11 +75,10 @@ describe('ErrorsService', () => {
     });
 
     it('should return custom error message', () => {
-
       const request = abstractRequestFactory({});
       const nestedMessage = 'Error message from nested error';
       const nestedError = new NestedError(validError, nestedMessage);
-      const response = ErrorsService.handleError(request, nestedError);
+      const response = errorsService.handleError(request, nestedError);
 
       expect(response.body).toMatchObject({ message: nestedMessage });
     });

@@ -1,3 +1,4 @@
+import pino from 'pino';
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import {
@@ -5,39 +6,60 @@ import {
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
+  ITracingRequestContext,
 } from '../../interfaces';
+import { RequestContextService } from '../../domain/services/request-context-service';
 import { ErrorsService } from '../../domain/services/errors-service';
+import { LogService } from '../../domain/services/log-service';
 
 function bodyParsingError(e: Error): boolean {
   return e.message.includes('Unexpected token');
 }
 
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
+  private logger: pino.Logger;
+
+  constructor() {
+    this.setupLogger(); // So far setup a context-unaware logger
+  }
+
   createEnvSpecificHandler(handler: IAbstractRequestHandler) {
     return async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-      let agnosticRequest;
+      let abstractRequest;
       try {
-        agnosticRequest = this.cloudRequestToAbstract(event);
-        const agnosticResponse = await handler(agnosticRequest);
-        return this.abstractResponseToCloud(agnosticResponse);
+        abstractRequest = this.cloudRequestToAbstract(event);
+        const abstractResponse = await handler(abstractRequest);
+        return this.abstractResponseToCloud(abstractResponse);
       } catch (err) {
-        return this.handleError(agnosticRequest, err);
+        return this.handleError(abstractRequest, err);
       }
     };
   }
 
-  private cloudRequestToAbstract(event: APIGatewayEvent) {
-    return {
+  private cloudRequestToAbstract(event: APIGatewayEvent): IAbstractRequest {
+    const abstractRequestDraft = {
       headers: event.headers,
       rawBody: event.body,
       // TODO: move the JSON parsing (and the corresponding error handling)
-      // into app/domain/environment-agnostic-handlers
+      // into app/domain/environment-abstract-handlers
       body: JSON.parse(event.body)
     };
+
+    // Amend the request with the tracing context ASAP
+    const abstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
+
+    // Now the request context is known - make this.logger aware of it
+    this.setupLogger(abstractRequest.tracingContext);
+
+    return abstractRequest;
   }
 
-  private abstractResponseToCloud(agnosticResponse: IAbstractResponse) {
-    return this.createApiGatewayResponse(agnosticResponse.statusCode, agnosticResponse.body);
+  private abstractResponseToCloud(abstractResponse: IAbstractResponse) {
+    return this.createApiGatewayResponse(abstractResponse.statusCode, abstractResponse.body);
+  }
+
+  private setupLogger(requestContext?: ITracingRequestContext) {
+    this.logger = LogService.getLogger(requestContext);
   }
 
   private createApiGatewayResponse(
@@ -76,15 +98,17 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
       });
     }
 
+    const errorsService = new ErrorsService({ logger: this.logger });
+
     if (request) {
       return this.abstractResponseToCloud(
-        ErrorsService.handleError(request, err)
+        errorsService.handleError(request, err)
       );
     }
 
     // For some reason (not processed above) we have no request
     return this.abstractResponseToCloud(
-      ErrorsService.makeGeneralErrorResponse()
+      errorsService.makeGeneralErrorResponse()
     );
   }
 }

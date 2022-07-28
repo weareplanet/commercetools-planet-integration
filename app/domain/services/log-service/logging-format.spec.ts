@@ -1,14 +1,18 @@
 import pino from 'pino';
-let logger: pino.Logger; // just for TS compiler
+
+let logger: pino.Logger;
+const loadLogger = async () => {
+  logger = (await import('.')).LogService.getLogger();
+};
 
 describe('Log line', () => {
-  let logLevelValue: string;
+  let logLevelValue: string|undefined;
   beforeEach(async () => { // Ignore the LOG_LEVEL defined in the environment, reload the logger with enabled logging
     logLevelValue = process.env.LOG_LEVEL;
     process.env.LOG_LEVEL = 'trace'; // the lowest defined level
 
     jest.resetModules();
-    logger = (await import('.')).default;
+    await loadLogger();
   });
 
   afterEach(() => { // Repair the LOG_LEVEL defined in the environment

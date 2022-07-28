@@ -2,7 +2,7 @@ import {
   IAbstractRequestWithTypedBody
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
-import configService from '../../../services/config-service';
+import { ConfigService } from '../../../services/config-service';
 import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
 import { commerceToolsClientFactory  } from '../../../../../test/shared-test-entities/commercetools-client';
 
@@ -23,7 +23,7 @@ import handler from '.';
 describe('createPayment handler', () => {
 
   const requiredCustomFields = () => {
-    const merchantIdPresentInConfig = configService.getConfig().datatrans?.merchants[0].id;
+    const merchantIdPresentInConfig = new ConfigService().getConfig().datatrans?.merchants[0].id;
     return {
       merchantId: merchantIdPresentInConfig,
       successUrl: 'successUrl string value',
@@ -236,7 +236,7 @@ describe('createPayment handler', () => {
 
     describe('when the credentials for merchantId are PRESENT in config', () => {
       beforeEach(() => {
-        const merchantIdPresentInConfig = configService.getConfig().datatrans?.merchants[0].id;
+        const merchantIdPresentInConfig = new ConfigService().getConfig().datatrans?.merchants[0].id;
         request.body.resource.obj.custom.fields.merchantId = merchantIdPresentInConfig;
       });
 

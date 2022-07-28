@@ -1,4 +1,5 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
+import { LogService } from '../../../services/log-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
@@ -7,9 +8,9 @@ import { PaymentService } from '../../../services/payment-service';
 import { IRequestBody } from './request-schema';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-  const paymentService = new PaymentService();
+  const logger = LogService.getLogger(req.tracingContext);
+  const paymentService = new PaymentService({ logger });
   const payment = req.body.resource?.obj;
-
   const actions = await paymentService.initRedirectAndLightbox(payment);
 
   return {

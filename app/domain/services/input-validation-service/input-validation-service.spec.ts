@@ -1,11 +1,13 @@
 import * as yup from 'yup';
 
 import { InputValidationService } from '.';
+import { LogService }  from '../log-service';
 
 describe('InputValidationService', () => {
   let service: InputValidationService;
+  const logger =  LogService.getLogger();
   beforeEach(() => {
-    service = new InputValidationService();
+    service = new InputValidationService({ logger });
   });
 
   describe('#transformAndValidate', () => {

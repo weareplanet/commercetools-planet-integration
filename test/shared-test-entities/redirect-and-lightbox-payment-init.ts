@@ -46,13 +46,13 @@ export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceT
   );
 };
 
-export const RedirectAndLightboxPaymentInitRequestBodyFactory = () =>  {
+export const RedirectAndLightboxPaymentInitRequestBodyFactory = (payment?: RecursivePartial<ICommerceToolsPayment>) =>  {
   return {
     action: 'Create',
     resource: {
       id: '123',
       typeId: 'typeId',
-      obj: PaymentFactory()
+      obj: payment || PaymentFactory()
     }
   } as unknown as ICommerceToolsExtensionRequestBody; // TODO: provide all required fields
 };

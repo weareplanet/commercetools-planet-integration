@@ -1,17 +1,12 @@
 import pino from 'pino';
-let logger: pino.Logger;
 
-function callAllLevelsOfLogs () {
-  logger.trace('trace');
-  logger.debug('debug');
-  logger.info('info');
-  logger.warn('warn');
-  logger.error('error');
-  logger.fatal('fatal');
+let logger: pino.Logger;
+async function loadLogger() {
+  logger = (await import('.')).LogService.getLogger();
 }
 
 async function prepeareLoggerForTesting() {
-  logger = (await import('.')).default;
+  await loadLogger();
   /* eslint-disable @typescript-eslint/no-var-requires */
   const { streamSym } = require('pino/lib/symbols');
   /* eslint-disable @typescript-eslint/ban-ts-comment */
@@ -22,8 +17,17 @@ async function prepeareLoggerForTesting() {
   return loggingStream;
 }
 
+function callAllLevelsOfLogs () {
+  logger.trace('trace');
+  logger.debug('debug');
+  logger.info('info');
+  logger.warn('warn');
+  logger.error('error');
+  logger.fatal('fatal');
+}
+
 describe('Log levels', () => {
-  let logLevel: string;
+  let logLevel: string|undefined;
 
   beforeAll(() => {
     logLevel = process.env.LOG_LEVEL;
