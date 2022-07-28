@@ -19,7 +19,9 @@ jobs:
 
     steps:
       - name: Set 'patch' release by default
-        run: echo "BUMP=patch" >> $GITHUB_ENV
+        run: |
+          echo "debug : github.event.label.name = ${{ github.event.label.name }}" \
+          && echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
         if: ${{ github.event.label.name == 'bump:minor' }}
         run: echo "BUMP=minor" >> $GITHUB_ENV
