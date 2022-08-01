@@ -8,6 +8,7 @@ import { ServiceWithLogger } from '../log-service/service-with-logger';
 import { ctApiRoot } from './commerce-tools-client';
 import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
 import { ConfigService } from '../config-service';
+import { COMMERCETOOLS_CORRELATION_ID_HEADER_NAME } from '../../../interfaces';
 
 // Only this service knows how to communicate with CommerceTools.
 // It is unaware of business flows.
@@ -20,10 +21,12 @@ export class CommerceToolsService extends ServiceWithLogger {
     this.logger.debug({ paymentKey }, 'Requesting Payment from CommerceTools...');
 
     const res = await ctApiRoot
-      .withProjectKey({ projectKey: new ConfigService().getConfig().commerceTools.projectId })
+      .withProjectKey(this.makeWithProjectKeyOption())
       .payments()
       .withKey({ key: paymentKey })
-      .get()
+      .get({
+        headers: this.makeXCorrelationIdHeader()
+      })
       .execute();
 
     this.logger.debug(res.body, 'Response from CommerceTools to the Payment request.');
@@ -34,10 +37,11 @@ export class CommerceToolsService extends ServiceWithLogger {
     this.logger.debug(actions, `Updating Payment ${payment.key} in CommerceTools...`);
 
     const res = await ctApiRoot
-      .withProjectKey({ projectKey: new ConfigService().getConfig().commerceTools.projectId })
+      .withProjectKey(this.makeWithProjectKeyOption())
       .payments()
       .withKey({ key: payment.key })
       .post({
+        headers: this.makeXCorrelationIdHeader(),
         body: {
           version: payment.version,
           actions
@@ -53,10 +57,12 @@ export class CommerceToolsService extends ServiceWithLogger {
     let res;
     try {
       res = await ctApiRoot
-        .withProjectKey({ projectKey: new ConfigService().getConfig().commerceTools.projectId })
+        .withProjectKey(this.makeWithProjectKeyOption())
         .customObjects()
         .withContainerAndKey({ container: containerName, key })
-        .get()
+        .get({
+          headers: this.makeXCorrelationIdHeader()
+        })
         .execute();
     } catch (err) {
       if (err.code == 404) {
@@ -79,11 +85,25 @@ export class CommerceToolsService extends ServiceWithLogger {
     };
 
     const res = await ctApiRoot
-      .withProjectKey({ projectKey: new ConfigService().getConfig().commerceTools.projectId })
+      .withProjectKey(this.makeWithProjectKeyOption())
       .customObjects()
-      .post({ body: customObjectDraft })
+      .post({
+        headers: this.makeXCorrelationIdHeader(),
+        body: customObjectDraft
+      })
       .execute();
 
     this.logger.debug(res.body, 'Response from CommerceTools after the CustomObject creation.');
+  }
+
+  private makeWithProjectKeyOption(): { projectKey: string } {
+    return { projectKey: new ConfigService().getConfig().commerceTools.projectId };
+  }
+
+  private makeXCorrelationIdHeader(): { [COMMERCETOOLS_CORRELATION_ID_HEADER_NAME]: string } | Record<string, never> {
+    if (!this.logger.requestContext) {
+      return {};
+    }
+    return { [COMMERCETOOLS_CORRELATION_ID_HEADER_NAME]: this.logger.requestContext.correlationId };
   }
 }

@@ -116,7 +116,9 @@ The approach is following:
   };
   ```
 
-  In order to facilitate this all service classes (exported from `services/*`) subclasses of `ServiceWithLogger` class having `{ logger }` as a constructor argument.
+  Extra notes:
+  - In order to facilitate presense of the context-aware logger in all services all their classes (exported from `services/*`) are derived from `ServiceWithLogger` class having `{ logger }` as a constructor argument.
+  - When you need, you can get the "trace context" from `logger.requestContext` to use it in your purposes (for example, to include it into a request to a 3rd party).
 
 
 ## Programming language
