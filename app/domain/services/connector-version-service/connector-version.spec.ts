@@ -3,7 +3,7 @@ import { LogService }  from '../log-service';
 import { ConnectorVersionService } from '.';
 
 describe('Connector version', () => {
-  const logger =  LogService.getLogger();
+  const logger =  new LogService();
 
   it('shows with which version Connector is running', () => {
     jest.spyOn(logger, 'info');

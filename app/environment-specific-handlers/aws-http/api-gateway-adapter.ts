@@ -1,4 +1,3 @@
-import pino from 'pino';
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import {
@@ -6,7 +5,7 @@ import {
   IAbstractRequest,
   IAbstractResponse,
   IAbstractRequestHandler,
-  ITracingRequestContext,
+  ITraceContext,
 } from '../../interfaces';
 import { RequestContextService } from '../../domain/services/request-context-service';
 import { ErrorsService } from '../../domain/services/errors-service';
@@ -17,7 +16,7 @@ function bodyParsingError(e: Error): boolean {
 }
 
 export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGatewayEvent, APIGatewayProxyResult> {
-  private logger: pino.Logger;
+  private logger: LogService;
 
   constructor() {
     this.setupLogger(); // So far setup a context-unaware logger
@@ -46,11 +45,11 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
       body: JSON.parse(event.body)
     };
 
-    // Amend the request with the tracing context ASAP
+    // Amend the request with the trace context ASAP
     const abstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
 
     // Now the request context is known - make this.logger aware of it
-    this.setupLogger(abstractRequest.tracingContext);
+    this.setupLogger(abstractRequest.traceContext);
 
     return abstractRequest;
   }
@@ -59,8 +58,8 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     return this.createApiGatewayResponse(abstractResponse.statusCode, abstractResponse.body);
   }
 
-  private setupLogger(requestContext?: ITracingRequestContext) {
-    this.logger = LogService.getLogger(requestContext);
+  private setupLogger(requestContext?: ITraceContext) {
+    this.logger = new LogService(requestContext);
   }
 
   private createApiGatewayResponse(

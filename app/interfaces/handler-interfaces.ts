@@ -5,15 +5,15 @@ interface IRawRequest {
   rawBody: string; // sometimes the string which was originally in the HTTP request body is needed for some lower-level modules
 }
 
-///////////////// Tracing context
+///////////////// trace context
 
-export interface ITracingRequestContext {
+export type ITraceContext = {
   correlationId: string;
-  paymentKey?: number; // optional - just because it's not convenient to extract the value at the top level (in a business-logic unaware adapter)
+  paymentKey?: string; // optional, because in a common case it's impossible to extract the value
 }
 
-export interface IRequestWithTracingContext {
-  tracingContext?: ITracingRequestContext // TODO: make it not optional when all the functionality is working (this requires many corrections in tests)
+type IRequestWithTraceContext = {
+  traceContext?: ITraceContext // TODO: make it not optional when all the functionality is working (this requires many corrections in tests)
 }
 
 ///////////////// Abstract Request/Response
@@ -23,7 +23,7 @@ export type IAbstractHeaders = Record<string, string>;
 export type IAbstractBody = string | Record<string, unknown>;
 
 export type IAbstractRequest = IRawRequest
-  & IRequestWithTracingContext
+  & IRequestWithTraceContext
   & {
     headers?: IAbstractHeaders;
     body: IAbstractBody;
@@ -46,7 +46,7 @@ export interface IAbstractToEnvHandlerAdapter<IEnvironmentReq, IEnvironmentRes> 
 // (with PARSED headers and body (of type TRequestBody)
 
 export type IAbstractRequestWithTypedBody<TRequestBody> = IRawRequest
-  & IRequestWithTracingContext
+  & IRequestWithTraceContext
   & {
     headers?: IAbstractHeaders;
     body: TRequestBody;

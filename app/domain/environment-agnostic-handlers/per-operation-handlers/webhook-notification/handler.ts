@@ -10,7 +10,7 @@ import { PaymentService, DatatransToCommerceToolsMapper } from '../../../service
 import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-  const logger = LogService.getLogger(req.tracingContext);
+  const logger = new LogService(req.traceContext);
 
   // Validate the signature of the received notification
   // TODO: when Datatrans starts to pass merchantId into the Webhook request -

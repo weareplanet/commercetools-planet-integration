@@ -1,31 +1,39 @@
 import { v4 as uuidV4 } from 'uuid';
 
+import { OperationDetector } from './operation-detector';
+
 import {
   IAbstractRequest,
-  ITracingRequestContext,
+  ITraceContext,
   getHttpHeaderValue,
   COMMERCETOOLS_CORRELATION_ID_HEADER_NAME,
 } from '../../../interfaces';
 import { LogService, ServiceWithLogger } from '../log-service';
 
 export class RequestContextService extends ServiceWithLogger {
-
   constructor() {
     // This service does not expect a context-aware logger from outside,
     // because this service is the source of the context (chicken and egg).
-    const contextUnawareLogger = LogService.getLogger();
+    const contextUnawareLogger = new LogService();
     super({ logger: contextUnawareLogger });
   }
 
   amendRequestWithTracingContext(req: IAbstractRequest): IAbstractRequest {
-    const tracingContext = this.getRequestContext(req);
+    const traceContext = this.getRequestContext(req);
     return {
       ...req,
-      tracingContext
+      traceContext: traceContext
     };
   }
 
-  private getRequestContext(req: IAbstractRequest): ITracingRequestContext {
+  private getRequestContext(req: IAbstractRequest): ITraceContext {
+    return {
+      correlationId: this.calculateCorrelationId(req),
+      paymentKey: this.getPaymentKey(req),
+    };
+  }
+
+  private calculateCorrelationId(req: IAbstractRequest): string {
     let correlationId = getHttpHeaderValue(req.headers, COMMERCETOOLS_CORRELATION_ID_HEADER_NAME);
     if (!correlationId) {
       // https://docs.commercetools.com/api/general-concepts#correlation-id
@@ -34,9 +42,18 @@ export class RequestContextService extends ServiceWithLogger {
       correlationId = uuidV4();
     }
 
-    return {
-      correlationId
-      // TODO: paymentKey ?
-    };
+    return correlationId;
+  }
+
+  private getPaymentKey(req: IAbstractRequest): string {
+    if (OperationDetector.isCommerceToolsRequest(req)) {
+      return req.body.resource.obj.key;
+    }
+
+    if (OperationDetector.isDatatransRequest(req)) {
+      return req.body.refno;
+    }
+
+    return null;
   }
 }

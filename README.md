@@ -78,7 +78,7 @@ In order to keep this ability every such handler, by its design, must be self-su
 
 To make a log message in any place in the application you can do the following:
 ```
-const logger = LogService.getLogger();
+const logger = new LogService();
 
 logger.info('Processing event X');
 ...
@@ -89,16 +89,16 @@ However it's recommended to make a logger aware of the request context - that gi
 
 The approach is following:
 
-  1. At the higher possible level during a request processing (most probably - in the environment adapter) - amend `IAbstractRequest` with the "tracing context":
+  1. At the higher possible level during a request processing (most probably - in the environment adapter) - amend `IAbstractRequest` with the "trace context":
   ```
-  const abstractRequestDraft: IAbstractRequest = { body: ..., headers: ...  } // all fields (taken from the original HTTP request), without `tracingContext` yet
+  const abstractRequestDraft: IAbstractRequest = { body: ..., headers: ...  } // all fields (taken from the original HTTP request), without `traceContext` yet
   const abstractRequest: IAbstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
-  // now abstractRequest.tracingContext has a value
+  // now abstractRequest.traceContext has a value
   ```
 
   2. In any place where you need to log something and a request object (of either `IAbstractRequest` or `IAbstractRequestWithTypedBody` type) is accessible (i.e. in a request handlers) - do the following:
   ```
-  const logger = LogService.getLogger(req.tracingContext); // this logger will include the "tracing context" data into every log message.
+  const logger = new LogService(req.traceContext); // this logger will include the "trace context" data into every log message.
 
   logger.info('Processing event X');
   ...
@@ -110,7 +110,7 @@ The approach is following:
 
   ```
   export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-    const logger = LogService.getLogger(req.tracingContext);
+    const logger = new LogService(req.traceContext);
     const paymentService = new PaymentService({ logger });     // context-aware logger is passed into the PaymentService instance
     // ...
   };

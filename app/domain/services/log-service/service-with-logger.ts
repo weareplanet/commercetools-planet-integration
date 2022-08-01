@@ -1,11 +1,11 @@
-import pino from 'pino';
+import { LogService } from './service';
 
 export type ServiceWithLoggerOptions = {
-  logger: pino.Logger
+  logger: LogService
 }
 
 export class ServiceWithLogger {
-  protected logger: pino.Logger;
+  protected logger: LogService;
 
   constructor({ logger }: ServiceWithLoggerOptions) {
     this.logger = logger;

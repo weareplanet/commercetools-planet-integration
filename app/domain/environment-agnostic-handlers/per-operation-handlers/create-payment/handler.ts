@@ -8,7 +8,7 @@ import { PaymentService } from '../../../services/payment-service';
 import { IRequestBody } from './request-schema';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
-  const logger = LogService.getLogger(req.tracingContext);
+  const logger = new LogService(req.traceContext);
   const paymentService = new PaymentService({ logger });
   const payment = req.body.resource?.obj;
   const actions = await paymentService.initRedirectAndLightbox(payment);

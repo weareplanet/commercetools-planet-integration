@@ -1,40 +1,29 @@
-import pino from 'pino';
-
-import { RedirectAndLightboxPaymentInitRequestBodyFactory, CreateInitializeTransactionRequestFactory } from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
-
-let logger: pino.Logger;
-const loadLogger = async () => {
-  logger = (await import('.')).LogService.getLogger();
-};
+import {
+  loadLogServiceForTesting,
+  RedirectAndLightboxPaymentInitRequestBodyFactory,
+  CreateInitializeTransactionRequestFactory
+} from '../../../../test/test-utils';
 
 describe('Redacted fields', () => {
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let loggingStream: any;
   let originalLogLevel: string;
 
-  beforeEach(async () => {
-    await loadLogger();
-    /* eslint-disable @typescript-eslint/no-var-requires */
-    const { streamSym } = require('pino/lib/symbols');
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    /* @ts-ignore */
-    loggingStream = logger[streamSym];
-    jest.spyOn(loggingStream, 'write');
-  });
-
-  beforeAll(() => {
+  beforeAll(/* remember the original LOG_LEVEL */ () => {
     originalLogLevel = process.env.LOG_LEVEL as string;
     process.env.LOG_LEVEL = 'info';
   });
 
-  afterAll(() => {
+  afterAll(/* repair the original LOG_LEVEL */() => {
     if (originalLogLevel) {
       process.env.LOG_LEVEL = originalLogLevel;
     } else {
       delete process.env.LOG_LEVEL;
     }
   });
+
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   describe('should redact "savedPaymentMethodAlias" on different level of depth', () => {
     it('should redact "body.resource.obj.custom.fields.savedPaymentMethodAlias" filed', () => {
       const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
@@ -43,9 +32,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"body":{.*,"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -57,9 +48,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":.*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -71,9 +64,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"id":"123".*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -85,9 +80,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"key":"12345318909876543216".*"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -99,9 +96,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj.custom);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"type":.*"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -113,9 +112,11 @@ describe('Redacted fields', () => {
         body: redirectAndLightboxPaymentInitRequestBody,
       };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(commerceToolsExtensionRequestWithBodyOnly.body.resource.obj.custom.fields);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"key":"refno".*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
@@ -127,9 +128,11 @@ describe('Redacted fields', () => {
       createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info({ body: createInitializeTransactionRequest });
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"body":.*"card":{"alias":"\[REDACTED\]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"\[REDACTED\]".*/)
       );
     });
@@ -139,9 +142,11 @@ describe('Redacted fields', () => {
       createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(createInitializeTransactionRequest);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"refno":.*"card":{"alias":"\[REDACTED\]","expiryMonth":"06","expiryYear":"25"},"BON":{"alias":"\[REDACTED\]".*/)
       );
     });
@@ -151,9 +156,11 @@ describe('Redacted fields', () => {
       createInitializeTransactionRequest.card = { alias: 'card alias', expiryMonth: '06', expiryYear: '25' };
       createInitializeTransactionRequest.BON = { alias: 'BON alias' };
 
+      const { logger, logStream } = loadLogServiceForTesting();
+
       logger.info(createInitializeTransactionRequest.BON);
 
-      expect(loggingStream.write).toBeCalledWith(
+      expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"alias":"\[REDACTED\]"}/)
       );
     });

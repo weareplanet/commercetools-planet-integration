@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-import { ITracingRequestContext } from '../../../interfaces';
+import { ITraceContext } from '../../../interfaces';
 
 const { LOG_LEVEL = 'debug' } = process.env;
 
@@ -31,12 +31,10 @@ const pinoOptions: pino.LoggerOptions = {
   nestedKey: 'payload',  // Log the object passed to a log method under this key
   formatters: {
     level(label: unknown /* , number: unknown */) {
-      // default is { level: number }
-      return { level: label };
+      return { level: label }; // default is { level: number }
     },
     // bindings(/* bindings: Record<string, unknown> */) {
-    //   // default is { pid, hostname }
-    //   return {};
+    //   return {}; // default is { pid, hostname }
     // },
   },
   base: {}, // the same effect as of (now commented out) bindings above
@@ -46,38 +44,49 @@ const pinoOptions: pino.LoggerOptions = {
   }
 };
 
-export class LogService {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
+const pinoSingleton = pino(pinoOptions);
 
-  // Use this factory method instead of the service constructor (this is why constructor is private).
-  // Why - see a long comment below.
-  public static getLogger(requestContext?: ITracingRequestContext) {
-    if (requestContext) {
-      // Amend pinoOptions so that requestContext is used for every log message
+const wrapLogMethod = function(methodName: string) {
+  return function(...args: unknown[]) {
+    const argsWithRequestContext: unknown[] = Array.from(args);
+    if (this.requestContext) {
+      if (typeof argsWithRequestContext[0] === 'object') {
+        argsWithRequestContext[0] = {
+          ...argsWithRequestContext[0],
+          ...this.requestContext
+        };
+      } else {
+        argsWithRequestContext.unshift(this.requestContext);
+      }
     }
 
-    return pino(pinoOptions);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (LogService.pinoLogger as unknown as any)[methodName](...argsWithRequestContext);
+  };
+};
+
+export class LogService implements pino.BaseLogger {
+  // pino.LoggerOptions allows to provide `formatters.log` to customize what to write into the underlying stream.
+  // To use this option we would have to create a new pino object at least once for every request.
+  // But its creation takes 300-700 ms - so we'd' like to avoid that).
+  // So our approach is to use the singleton pino instance.
+  private static readonly pinoLogger: pino.Logger = pinoSingleton;
+
+  readonly requestContext?: ITraceContext;
+
+  constructor(requestContext?: ITraceContext) {
+    this.requestContext = requestContext;
   }
+
+  level: string; // we do not do anything with this, just had to declare this due to `implements pino.BaseLogger`
+
+  fatal = wrapLogMethod('fatal');
+  error = wrapLogMethod('error');
+  warn = wrapLogMethod('warn');
+  info = wrapLogMethod('info');
+  debug = wrapLogMethod('debug');
+  trace = wrapLogMethod('trace');
+  silent = wrapLogMethod('silent');
 }
-
-/* TODO: (maybe)
-pino library exports a factory function and we cannot do `class LogService extends pino.Logger`.
-If we want LogService to provide an instance of LogService which has log methods -
-we should make LogService a decorator for the output of pino() factory -
-something like this:
-
-export class LogService {
-  private logger: pino.Logger;
-
-  constructor() {
-    this.logger = pino(pinoOptions);
-
-    Object.keys(pino.levels.values).forEach(function (methodName) {
-      this[methodName] = function(...args) {
-        this.logger[methodName](...args);
-      }
-    })
-  }
-}
-*/

@@ -10,11 +10,9 @@ import { CommerceToolsService } from '../../../services/commercetools-service';
 import handler from '..';
 
 import {
-  PaymentFactory
-}  from '../../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
-import {
+  PaymentFactory,
   RedirectAndLightboxWebhookRequestFactory
-} from '../../../../../test/shared-test-entities/redirect-and-lightbox-webhook';
+} from '../../../../../test/test-utils';
 
 describe('All-operations handler', () => {
 

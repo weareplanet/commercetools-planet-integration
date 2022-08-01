@@ -5,7 +5,6 @@
 // maybe it's even more "honest" testing.
 
 import { LogService }  from '../log-service';
-import pino from 'pino';
 import { IAppConfig } from './schema';
 
 // 'env-loader' module is globally mocked in the test environment - so to test its internals we need to unmock it
@@ -24,9 +23,9 @@ describe('Connector config validations', () => {
     DT_CONNECTOR_WEBHOOK_URL
   } = process.env;
 
-  let logger: pino.Logger;
+  let logger: LogService;
   const createLogger = () => {
-    logger =  LogService.getLogger();
+    logger =  new LogService();
     jest.spyOn(logger, 'debug');
     return logger;
   };

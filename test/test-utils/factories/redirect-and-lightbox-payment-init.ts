@@ -1,13 +1,13 @@
 import _merge from 'lodash.merge';
 
-import { RecursivePartial } from './test-utils';
+import { RecursivePartial } from '..';
 
 import {
   ICommerceToolsPayment,
   DatatransPaymentMethod,
   IDatatransInitializeTransaction,
   ICommerceToolsExtensionRequestBody
-} from '../../app/interfaces';
+} from '../../../app/interfaces';
 
 export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceToolsPayment> = {}): ICommerceToolsPayment =>  {
   const defaultStuff = {

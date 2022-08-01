@@ -1,6 +1,6 @@
 import { LogService }  from '../log-service';
 import { OperationDetector } from '../request-context-service/operation-detector';
-import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+import { abstractRequestFactory } from '../../../../test/test-utils';
 import { NestedError } from '../../../interfaces';
 import { ErrorsService } from '.';
 
@@ -8,7 +8,7 @@ const errorMessage = 'Error message';
 const validError = new Error(errorMessage);
 
 describe('ErrorsService', () => {
-  const logger =  LogService.getLogger();
+  const logger =  new LogService();
   const errorsService = new ErrorsService({ logger });
 
   describe('When a request was from CommerceTools', () => {

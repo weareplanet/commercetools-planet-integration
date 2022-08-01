@@ -18,7 +18,7 @@ import { ErrorsService } from '../../services/errors-service';
 // This wrpper also performs some logic (input validation, errror handling etc.) common for any low-level business handler.
 export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): IAbstractRequestHandler => {
   return async (req: IAbstractRequest): Promise<IAbstractResponse> => {
-    const logger = LogService.getLogger(req.tracingContext);
+    const logger = new LogService(req.traceContext);
     const validateInput = () => {
       if (inputSchema) {
         const validationService = new InputValidationService({ logger });

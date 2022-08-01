@@ -1,6 +1,6 @@
 import _merge from 'lodash.merge';
 
-import { RecursivePartial } from './test-utils';
+import { RecursivePartial } from '../types';
 
 import {
   DatatransTransactionStatus,
@@ -8,7 +8,7 @@ import {
   DatatransHistoryAction,
   IDatatransWebhookRequestBody,
   DATATRANS_SIGNATURE_HEADER_NAME
-} from '../../app/interfaces';
+} from '../../../app/interfaces';
 
 import { abstractRequestFactory } from './abstract-request-factories';
 

@@ -1,44 +1,31 @@
-import pino from 'pino';
-
-let logger: pino.Logger;
-const loadLogger = async () => {
-  logger = (await import('.')).LogService.getLogger();
-};
+import { loadLogServiceForTesting } from '../../../../test/test-utils';
 
 describe('Log line', () => {
-  let logLevelValue: string|undefined;
-  beforeEach(async () => { // Ignore the LOG_LEVEL defined in the environment, reload the logger with enabled logging
-    logLevelValue = process.env.LOG_LEVEL;
-    process.env.LOG_LEVEL = 'trace'; // the lowest defined level
+  let originalLogLevel: string;
 
-    jest.resetModules();
-    await loadLogger();
+  beforeAll(/* remember the original LOG_LEVEL */ () => {
+    originalLogLevel = process.env.LOG_LEVEL as string;
+    process.env.LOG_LEVEL = 'info';
   });
 
-  afterEach(() => { // Repair the LOG_LEVEL defined in the environment
-    if (logLevelValue) {
-      process.env.LOG_LEVEL = logLevelValue;
+  afterAll(/* repair the original LOG_LEVEL */() => {
+    if (originalLogLevel) {
+      process.env.LOG_LEVEL = originalLogLevel;
     } else {
       delete process.env.LOG_LEVEL;
     }
   });
 
-  // Suppressing of eslint and ts errors appear below is due to a tricky spying on the underlying pino stream
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  let loggingStream: any;
-  beforeEach(() => { // Spy on logger's underlying stream
-    /* eslint-disable @typescript-eslint/no-var-requires */
-    const { streamSym } = require('pino/lib/symbols');
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    /* @ts-ignore */
-    loggingStream = logger[streamSym];
-    jest.spyOn(loggingStream, 'write');
+  beforeEach(() => {
+    jest.resetModules();
   });
 
   it('contains `level` as a symbolic label (not a number as by default)', () => {
+    const { logger, logStream } = loadLogServiceForTesting();
+
     logger.info('Test Log Line');
 
-    expect(loggingStream.write).toHaveBeenCalledWith(
+    expect(logStream.write).toHaveBeenCalledWith(
       expect.stringMatching(/{.*"level":"info".*}/)
     );
   });
@@ -46,13 +33,15 @@ describe('Log line', () => {
   describe('contains `message` and (optionally) `payload`', () => {
     describe('When only the message is passed to the log method', () => {
       it('contains the log message under `message` key (not under the default `msg`)', () => {
+        const { logger, logStream } = loadLogServiceForTesting();
+
         logger.info('Test Log Line');
 
-        expect(loggingStream.write).toHaveBeenCalledWith(
+        expect(logStream.write).toHaveBeenCalledWith(
           expect.stringMatching(/{.*"message":"Test Log Line".*}/)
         );
 
-        expect(loggingStream.write).toHaveBeenCalledWith(
+        expect(logStream.write).toHaveBeenCalledWith(
           expect.not.stringMatching(/"payload":/)
         );
       });
@@ -60,9 +49,11 @@ describe('Log line', () => {
 
     describe('When a log object and the message are passed to the log method', () => {
       it('contains the passed log object under `payload` key (not at the root level as by default)', () => {
+        const { logger, logStream } = loadLogServiceForTesting();
+
         logger.info({ testKey: 'testValue' }, 'Test Log Line');
 
-        expect(loggingStream.write).toHaveBeenCalledWith(
+        expect(logStream.write).toHaveBeenCalledWith(
           expect.stringMatching(/{.*"payload":{"testKey":"testValue"}.*"message":"Test Log Line".*}/)
         );
       });
@@ -70,9 +61,11 @@ describe('Log line', () => {
   });
 
   it('contains `time`', () => {
+    const { logger, logStream } = loadLogServiceForTesting();
+
     logger.info('Test Log Line');
 
-    expect(loggingStream.write).toHaveBeenCalledWith(
+    expect(logStream.write).toHaveBeenCalledWith(
       expect.stringMatching(/{.*"time":\d+.*}/)
     );
   });

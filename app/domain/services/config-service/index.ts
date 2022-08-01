@@ -11,13 +11,14 @@ export class ConfigService extends ServiceWithLogger {
 
   constructor(opts?: ServiceWithLoggerOptions) {
     super({
-      // It is not a big problem, if this service will use a (request) context-unaware logger.
+      // It is not a big problem, if this service will use a context-unaware logger.
       // Why such a design:
       // that's an overhead to provide a context-aware logger into `new ConfigService()` every time you need just to get the config.
       // Providing a context-aware logger makes sense only
       // when the config is requested for the first time (and going to be (lazily) loaded).
       // And even in this case if it is not provided - that's OK (just a log message about the config load will be without the request context information).
-      logger: opts?.logger || LogService.getLogger()
+      // Also it basically makes sense to load the config on the cold start phase (before any request).
+      logger: opts?.logger || new LogService()
     });
   }
 

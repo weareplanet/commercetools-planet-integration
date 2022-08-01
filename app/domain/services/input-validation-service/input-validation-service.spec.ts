@@ -5,7 +5,7 @@ import { LogService }  from '../log-service';
 
 describe('InputValidationService', () => {
   let service: InputValidationService;
-  const logger =  LogService.getLogger();
+  const logger =  new LogService();
   beforeEach(() => {
     service = new InputValidationService({ logger });
   });

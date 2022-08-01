@@ -12,7 +12,7 @@ describe('DatatransService', () => {
     const merchantId = 'merchId';
     const fakeMerchantHmacKey = 'secret1234';
 
-    const logger =  LogService.getLogger();
+    const logger =  new LogService();
     const datatransService = new DatatransService({ logger });
 
     const expectedSignature = new CryptoService({ logger }).createSha256Hmac(fakeMerchantHmacKey, timestamp + reqBody);

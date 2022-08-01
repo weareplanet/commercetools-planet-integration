@@ -12,18 +12,20 @@ import {
 import createPaymentHandler from '../per-operation-handlers/create-payment';
 import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
 
-///// PREPARE A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
+// Load the app configuration in COLD START phase
+new ConfigService().getConfig();
 
+///// A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
-  const logger = LogService.getLogger(req.tracingContext);
+  const logger = new LogService(req.traceContext);
 
   new ConnectorVersionService({ logger }).logVersion();
 
-  // Load the app configuration.
-  new ConfigService({ logger }).getConfig();
-
   // Delegate the request to a proper handler depending on the req content
   const operation = OperationDetector.detectOperation(req);
+  if (operation) {
+    logger.debug(`Operation to be performed: ${operation}.`);
+  }
 
   switch (operation) {
     case Operation.RedirectAndLightboxInit: {

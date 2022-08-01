@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 
-import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
+import { abstractRequestFactory } from '../../../../../test/test-utils';
 
 import handler from '..';
 

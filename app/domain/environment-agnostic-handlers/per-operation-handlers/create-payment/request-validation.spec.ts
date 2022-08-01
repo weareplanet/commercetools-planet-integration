@@ -3,8 +3,10 @@ import {
 } from '../../../../interfaces';
 import { IRequestBody } from './request-schema';
 import { ConfigService } from '../../../services/config-service';
-import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
-import { commerceToolsClientFactory  } from '../../../../../test/shared-test-entities/commercetools-client';
+import {
+  abstractRequestFactory,
+  commerceToolsClientFactory
+} from '../../../../../test/test-utils';
 
 jest.mock('axios', () => ({
   create: () => ({ post: () => Promise.resolve({ data: {}, headers: {} }) })

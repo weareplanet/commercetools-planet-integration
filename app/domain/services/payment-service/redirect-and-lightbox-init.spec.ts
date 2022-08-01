@@ -1,5 +1,14 @@
 import { type Payment } from '@commercetools/platform-sdk';
 
+import {
+  loadLogServiceForTesting,
+  commerceToolsClientFactory,
+  RedirectAndLightboxPaymentInitRequestBodyFactory,
+  CreateInitializeTransactionResponseFactory,
+  CreateInitializeTransactionRequestFactory,
+  PaymentFactory
+} from '../../../../test/test-utils';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let dtClientMock: any;
 jest.mock('axios', () => {
@@ -11,7 +20,6 @@ jest.mock('axios', () => {
   };
 });
 
-import { commerceToolsClientFactory } from '../../../../test/shared-test-entities/commercetools-client';
 const customObjectSpy = jest.fn();
 jest.mock('../commercetools-service/commerce-tools-client', () => {
   return {
@@ -19,15 +27,7 @@ jest.mock('../commercetools-service/commerce-tools-client', () => {
   };
 });
 
-import { LogService }  from '../log-service';
 import { PaymentService } from '.';
-
-import {
-  RedirectAndLightboxPaymentInitRequestBodyFactory,
-  CreateInitializeTransactionResponseFactory,
-  CreateInitializeTransactionRequestFactory,
-  PaymentFactory
-} from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
 
 const aliasExistingInCommerceTools = 'savedPaymentMethodAlias value';
 
@@ -212,11 +212,16 @@ describe('#initRedirectAndLightbox method', () => {
     });
   });
 
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let loggingStream: any;
+  let logStream: any;
   beforeEach(async () => {
-    const logger = LogService.getLogger();
-    paymentService = new PaymentService({ logger });
+    const loggerAndStream = loadLogServiceForTesting();
+    paymentService = new PaymentService({ logger: loggerAndStream.logger });
+    logStream = loggerAndStream.logStream;
   });
 
   afterAll(() => {
@@ -301,10 +306,7 @@ describe('#initRedirectAndLightbox method', () => {
   });
 
   describe('the redaction of logs for Redirect And Lightbox Init operation', () => {
-    // TODO: for some reason this test passes on the individual run of this suite (npm run test:local-dev:file -- app/domain/services/payment-service/redirect-and-lightbox-init.spec.ts)
-    // but fails when all tests are running (npm run test)
-    // Investigate this!
-    it.skip('should redact logs', async () => {
+    it('should redact logs', async () => {
       dtClientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
       const mockPayment = PaymentFactory({
         custom: {
@@ -318,16 +320,9 @@ describe('#initRedirectAndLightbox method', () => {
         }
       } as unknown as Payment);
 
-      /* eslint-disable @typescript-eslint/no-var-requires */
-      const { streamSym } = require('pino/lib/symbols');
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
-      /* @ts-ignore */
-      loggingStream = paymentService.logger[streamSym];
-      jest.spyOn(loggingStream, 'write');
-
       await paymentService.initRedirectAndLightbox(mockPayment);
 
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringContaining('"payload":{"body":{"BON":{"alias":"[REDACTED]"},"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"}}},"message":"DataTrans initRequest"}')
       );
     });

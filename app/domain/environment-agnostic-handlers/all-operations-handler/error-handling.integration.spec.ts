@@ -1,12 +1,12 @@
 import { LogService }  from '../../services/log-service';
-import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+import { abstractRequestFactory } from '../../../../test/test-utils';
 import handler from '.';
 import * as handlerMock from '.';
 import { ErrorsService } from '../../services/errors-service';
 import { OperationDetector } from '../../services/request-context-service/operation-detector';
 
 describe('Errors Service Integration', () => {
-  const logger = LogService.getLogger();
+  const logger = new LogService();
 
   describe('When the request is recognized as a request from CommerceTools', () => {
 
