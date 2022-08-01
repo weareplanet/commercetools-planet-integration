@@ -18,8 +18,9 @@ enum PaymentInterface {
   DataTransRedirectIntegration = 'pp-datatrans-redirect-integration'
 }
 
+// TODO: Turn this class into a "standard" service.
+// Or maybe merge it with RequestContextService into RequestTreatmentService?
 export class OperationDetector {
-
   // Type guard for ICommerceToolsExtensionRequest
   public static isCommerceToolsRequest(req: IAbstractRequest | ICommerceToolsExtensionRequest): req is ICommerceToolsExtensionRequest {
     const request = req as ICommerceToolsExtensionRequest;

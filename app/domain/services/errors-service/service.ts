@@ -1,10 +1,10 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
 import { IAbstractRequest, IAbstractResponse, ICommerceToolsErrorCode, NestedError } from '../../../interfaces';
-import { OperationDetector } from '../../environment-agnostic-handlers/all-operations-handler/operation-detector';
+import { OperationDetector } from '../request-context-service/operation-detector';
 import { ServiceWithLogger } from '../log-service';
 
 /**
- * This service handles and formats all connector errors
+ * This service ensures the error format in the HTTP response
  */
 export class ErrorsService extends ServiceWithLogger {
 

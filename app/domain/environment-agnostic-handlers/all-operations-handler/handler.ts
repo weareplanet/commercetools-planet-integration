@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'http-status-code-const-enum';
 import { LogService } from '../../services/log-service';
 import { ConfigService } from '../../services/config-service';
 import { ConnectorVersionService } from '../../services/connector-version-service';
-import { OperationDetector, Operation } from './operation-detector';
+import { OperationDetector, Operation } from '../../services/request-context-service/operation-detector';
 import {
   IAbstractRequest,
   IAbstractResponse

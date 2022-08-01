@@ -1,5 +1,5 @@
 import { LogService }  from '../log-service';
-import { OperationDetector } from '../../../domain/environment-agnostic-handlers/all-operations-handler/operation-detector';
+import { OperationDetector } from '../request-context-service/operation-detector';
 import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
 import { NestedError } from '../../../interfaces';
 import { ErrorsService } from '.';

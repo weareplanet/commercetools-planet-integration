@@ -27,7 +27,6 @@ export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstr
     };
 
     try {
-      // place for parsing request body
       validateInput();
       return await lowLevelHandler(req as IAbstractRequestWithTypedBody<TRequestBody>); // TODO: think how to improve this brutal type cast;
     } catch (err) {

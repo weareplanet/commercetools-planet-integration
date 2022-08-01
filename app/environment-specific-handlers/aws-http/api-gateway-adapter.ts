@@ -40,8 +40,9 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     const abstractRequestDraft = {
       headers: event.headers,
       rawBody: event.body,
-      // TODO: move the JSON parsing (and the corresponding error handling)
-      // into app/domain/environment-abstract-handlers
+      // Maybe a better place for body parsing is app/domain/environment-agnostic-handlers/per-operation-handlers/any-handler-wrapper.ts
+      // (because it is not something cloud-specific),
+      // but we need to deal with body parts earlier (see RequestContextService, OperationDetector).
       body: JSON.parse(event.body)
     };
 
