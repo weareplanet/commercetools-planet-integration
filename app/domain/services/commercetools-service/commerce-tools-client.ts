@@ -14,9 +14,9 @@ import {
   createApiBuilderFromCtpClient,
 } from '@commercetools/platform-sdk';
 
-import configService from '../config-service';
+import { ConfigService } from '../config-service';
 
-const appConfig = configService.getConfig();
+const appConfig = new ConfigService().getConfig();
 const projectKey = appConfig.commerceTools.projectId;
 
 // TODO: in production version must be used only: manage_payments, manage_key_value_documents

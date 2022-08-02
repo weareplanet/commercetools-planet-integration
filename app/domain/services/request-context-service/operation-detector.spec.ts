@@ -1,5 +1,5 @@
 import { OperationDetector } from './operation-detector';
-import { abstractRequestFactory } from '../../../../test/shared-test-entities/abstract-request-factories';
+import { abstractRequestFactory } from '../../../../test/test-utils';
 
 describe('OperationDetector', () => {
 

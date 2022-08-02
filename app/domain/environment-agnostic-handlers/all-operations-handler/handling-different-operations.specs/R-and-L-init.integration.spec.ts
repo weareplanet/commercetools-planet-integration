@@ -1,11 +1,10 @@
 import {
+  abstractRequestFactory,
   RedirectAndLightboxPaymentInitRequestBodyFactory,
   RedirectAndLightboxPaymentInitResponseFactory,
   CreateInitializeTransactionRequestFactory,
   CreateInitializeTransactionResponseFactory
-} from '../../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
-
-import { abstractRequestFactory } from '../../../../../test/shared-test-entities/abstract-request-factories';
+} from '../../../../../test/test-utils';
 
 const dtHttpClientMock = {
   post: jest.fn()

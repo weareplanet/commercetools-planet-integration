@@ -1,20 +1,33 @@
-import { Logger } from 'pino';
+import { type Payment } from '@commercetools/platform-sdk';
 
-import { commerceToolsClientFactory } from '../../../../test/shared-test-entities/commercetools-client';
+import {
+  loadLogServiceForTesting,
+  commerceToolsClientFactory,
+  RedirectAndLightboxPaymentInitRequestBodyFactory,
+  CreateInitializeTransactionResponseFactory,
+  CreateInitializeTransactionRequestFactory,
+  PaymentFactory
+} from '../../../../test/test-utils';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let dtClientMock: any;
+jest.mock('axios', () => {
+  dtClientMock = {
+    post: jest.fn()
+  };
+  return {
+    create: () => dtClientMock
+  };
+});
 
 const customObjectSpy = jest.fn();
-
 jest.mock('../commercetools-service/commerce-tools-client', () => {
   return {
     ctApiRoot: commerceToolsClientFactory({ customObject: customObjectSpy })
   };
 });
 
-import {
-  RedirectAndLightboxPaymentInitRequestBodyFactory,
-  CreateInitializeTransactionResponseFactory,
-  CreateInitializeTransactionRequestFactory
-} from '../../../../test/shared-test-entities/redirect-and-lightbox-payment-init';
+import { PaymentService } from '.';
 
 const aliasExistingInCommerceTools = 'savedPaymentMethodAlias value';
 
@@ -179,22 +192,12 @@ const commerceToolsErrorWhenCustomObjectKeyIsNotExist = {
 };
 
 describe('#initRedirectAndLightbox method', () => {
-  let logger: Logger;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let loggingStream: any;
   const originalLogLevel = process.env.LOG_LEVEL;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let paymentService: any;
-  const clientMock = {
-    post: jest.fn()
-  };
-  const axiosMockFactory = () => ({
-    create: () => clientMock
-  });
+  let paymentService: PaymentService;
 
   beforeAll(async () => {
     process.env.LOG_LEVEL = 'debug';
-    jest.mock('axios', axiosMockFactory);
+
     customObjectSpy.mockReturnValue({
       body: {
         value: [{
@@ -209,19 +212,16 @@ describe('#initRedirectAndLightbox method', () => {
     });
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.resetModules();
+  });
 
-    logger = (await import('../log-service')).default;
-    /* eslint-disable @typescript-eslint/no-var-requires */
-    const { streamSym } = require('pino/lib/symbols');
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    /* @ts-ignore */
-    loggingStream = logger[streamSym];
-    jest.spyOn(loggingStream, 'write');
-
-    const { PaymentService } = (await import('./service'));
-    paymentService = new PaymentService();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let logStream: any;
+  beforeEach(async () => {
+    const loggerAndStream = loadLogServiceForTesting();
+    paymentService = new PaymentService({ logger: loggerAndStream.logger });
+    logStream = loggerAndStream.logStream;
   });
 
   afterAll(() => {
@@ -230,23 +230,26 @@ describe('#initRedirectAndLightbox method', () => {
     } else {
       delete process.env.LOG_LEVEL;
     }
-    jest.unmock('axios');
   });
 
   describe('actions creations for Redirect And Lightbox Init operation', () => {
     it('should return actions', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
-      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
-      mockPayment.custom.fields.initRequest = {
-        BON: {
-          alias: 'BON test card alias'
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any; // HACK: yup schema not allowed not declared fields
+      dtClientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
+      const mockPayment = PaymentFactory({
+        custom: {
+          fields: {
+            initRequest: {
+              BON: {
+                alias: 'BON test card alias'
+              }
+            }
+          }
+        }
+      } as unknown as Payment);
 
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
 
-      expect(clientMock.post).toBeCalledWith(
+      expect(dtClientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
         {
           ...CreateInitializeTransactionRequestFactory(),
@@ -270,7 +273,7 @@ describe('#initRedirectAndLightbox method', () => {
 
   describe('actions creations for Redirect And Lightbox Init operation with saved payment method', () => {
     it('should return actions', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
+      dtClientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
       const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
       const initializeTransactionPayload = {
         ...CreateInitializeTransactionRequestFactory(),
@@ -285,7 +288,7 @@ describe('#initRedirectAndLightbox method', () => {
 
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
 
-      expect(clientMock.post).toBeCalledWith(
+      expect(dtClientMock.post).toBeCalledWith(
         'https://apiUrl.test.fake/transactions',
         initializeTransactionPayload,
         {
@@ -304,18 +307,22 @@ describe('#initRedirectAndLightbox method', () => {
 
   describe('the redaction of logs for Redirect And Lightbox Init operation', () => {
     it('should redact logs', async () => {
-      clientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
-      const mockPayment = RedirectAndLightboxPaymentInitRequestBodyFactory().resource.obj;
-      mockPayment.custom.fields.initRequest = {
-        BON: {
-          alias: 'BON test card alias'
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any; // HACK: yup schema not allowed not declared fields
+      dtClientMock.post.mockResolvedValue(CreateInitializeTransactionResponseFactory());
+      const mockPayment = PaymentFactory({
+        custom: {
+          fields: {
+            initRequest: {
+              BON: {
+                alias: 'BON test card alias'
+              }
+            }
+          }
+        }
+      } as unknown as Payment);
 
       await paymentService.initRedirectAndLightbox(mockPayment);
 
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringContaining('"payload":{"body":{"BON":{"alias":"[REDACTED]"},"refno":"12345318909876543216","currency":"EUR","amount":1555,"paymentMethods":["VIS","PAP"],"redirect":{"successUrl":"https://google.com","cancelUrl":"https://google.com","errorUrl":"https://google.com"},"webhook":{"url":"https://webhookUrl.fake"}}},"message":"DataTrans initRequest"}')
       );
     });

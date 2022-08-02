@@ -2,7 +2,7 @@ import {
   IAnyObjectWithStringKeys,
   IAbstractRequest,
   IAbstractHeaders
-} from '../../app/interfaces';
+} from '../../../app/interfaces';
 
 export const abstractRequestFactory = (body: IAnyObjectWithStringKeys, headers: IAbstractHeaders = {}): IAbstractRequest => {
   return {

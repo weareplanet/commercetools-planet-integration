@@ -1,6 +1,7 @@
 import { Payment, type PaymentUpdateAction } from '@commercetools/platform-sdk';
 
-import configService from '../config-service';
+import { ServiceWithLogger, ServiceWithLoggerOptions } from '../log-service';
+import { ConfigService } from '../config-service';
 import {
   CommerceToolsCustomTypeKey,
   CommerceToolsCustomInteractionType,
@@ -30,7 +31,16 @@ const PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME = 'savedPaymentMethods';
 // - from the higher level - a request handler should use this service to perform business flows.
 // - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DatatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
-export class PaymentService {
+export class PaymentService extends ServiceWithLogger  {
+  private commerceToolsService: CommerceToolsService;
+  private datatransService: DatatransService;
+
+  constructor({ logger }: ServiceWithLoggerOptions) {
+    super({ logger });
+    this.commerceToolsService = new CommerceToolsService({ logger });
+    this.datatransService = new DatatransService({ logger });
+  }
+
   async initRedirectAndLightbox(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
     const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
 
@@ -42,15 +52,13 @@ export class PaymentService {
 
     const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
       payment,
-      webhookUrl: configService.getConfig().datatrans.webhookUrl,
+      webhookUrl: new ConfigService().getConfig().datatrans.webhookUrl,
       savedPaymentMethod
     });
 
-    const datatransService = new DatatransService();
-    const { transaction, location } = await datatransService
-      .createInitializeTransaction(merchantId, initializeTransactionPayload);
+    const { transaction, location } = await this.datatransService.createInitializeTransaction(merchantId, initializeTransactionPayload);
 
-    return CommerceToolsService.getActionsBuilder()
+    return this.commerceToolsService.getActionsBuilder()
       .setCustomField('transactionId', transaction.transactionId)
       .setCustomField('redirectUrl', location)
       .addInterfaceInteraction(
@@ -66,7 +74,7 @@ export class PaymentService {
   }
 
   async saveAuthorizationInCommerceTools(opts: SaveAuthorizationOptions) {
-    const payment = await CommerceToolsService.getPayment(opts.paymentKey);
+    const payment = await this.commerceToolsService.getPayment(opts.paymentKey);
 
     await this.saveAuthorizationToPayment(payment, opts);
 
@@ -74,7 +82,7 @@ export class PaymentService {
   }
 
   private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {
-    const actionsBuilder = CommerceToolsService.getActionsBuilder();
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
 
     actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
 
@@ -98,7 +106,7 @@ export class PaymentService {
       }
     });
 
-    await CommerceToolsService.updatePayment(payment, actionsBuilder.getActions());
+    await this.commerceToolsService.updatePayment(payment, actionsBuilder.getActions());
   }
 
   // TODO: it's validation and getting in one place,
@@ -115,7 +123,7 @@ export class PaymentService {
   }
 
   private async findPaymentMethod(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
-    const paymentMethodsObject = await CommerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
+    const paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
     return this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, alias);
   }
 
@@ -134,7 +142,7 @@ export class PaymentService {
 
     const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);
 
-    const  paymentMethodsObject = await CommerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+    const  paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
     if (paymentMethodsObject) {
       const paymentMethod = this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
       if (paymentMethod) { // This payment method is already saved
@@ -153,6 +161,6 @@ export class PaymentService {
       valueToBeSaved = paymentMethodsObject.value.concat(valueToBeSaved);
     }
 
-    await CommerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
+    await this.commerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
   }
 }

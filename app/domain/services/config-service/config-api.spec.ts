@@ -22,13 +22,13 @@ jest.mock('./env-loader', () => {
   return fakeConfigValues;
 });
 
-import configService from '.';
+import { ConfigService } from '.';
 
 describe('ConfigService', () => {
 
   describe('getConfig', () => {
     it('returns the loaded variable set under `commerceToolsConfig` key', () => {
-      expect(configService.getConfig()).toMatchObject(fakeConfigValues);
+      expect(new ConfigService().getConfig()).toMatchObject(fakeConfigValues);
     });
   });
 

@@ -1,7 +1,7 @@
-import pino from 'pino';
-let logger: pino.Logger;
+import { LogService } from '../../services/log-service';
+import { loadLogServiceForTesting } from '../../../../test/test-utils';
 
-function callAllLevelsOfLogs () {
+function callAllLevelsOfLogs (logger: LogService) {
   logger.trace('trace');
   logger.debug('debug');
   logger.info('info');
@@ -10,88 +10,75 @@ function callAllLevelsOfLogs () {
   logger.fatal('fatal');
 }
 
-async function prepeareLoggerForTesting() {
-  logger = (await import('.')).default;
-  /* eslint-disable @typescript-eslint/no-var-requires */
-  const { streamSym } = require('pino/lib/symbols');
-  /* eslint-disable @typescript-eslint/ban-ts-comment */
-  /* @ts-ignore */
-  const loggingStream = logger[streamSym];
-  jest.spyOn(loggingStream, 'write');
-
-  return loggingStream;
-}
-
 describe('Log levels', () => {
-  let logLevel: string;
+  let originalLogLevel: string;
 
-  beforeAll(() => {
-    logLevel = process.env.LOG_LEVEL;
+  beforeAll(/* remember the original LOG_LEVEL */ () => {
+    originalLogLevel = process.env.LOG_LEVEL as string;
+    process.env.LOG_LEVEL = 'info';
   });
-  afterAll(() => {
-    if (logLevel) {
-      process.env.LOG_LEVEL = logLevel;
+
+  afterAll(/* repair the original LOG_LEVEL */() => {
+    if (originalLogLevel) {
+      process.env.LOG_LEVEL = originalLogLevel;
     } else {
       delete process.env.LOG_LEVEL;
     }
+  });
 
+  beforeEach(() => {
     jest.resetModules();
   });
 
   describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
-    beforeEach(() => {
-      jest.resetModules();
-      process.env.LOG_LEVEL = logLevel;
-    });
-
     it('uses "trace" level and shows all logs', async () => {
       process.env.LOG_LEVEL = 'trace';
-      const loggingStream = await prepeareLoggerForTesting();
+      const { logger, logStream } = loadLogServiceForTesting();
 
-      callAllLevelsOfLogs();
+      callAllLevelsOfLogs(logger);
 
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"debug".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"info".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"warn".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"error".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"fatal".*}/)
       );
     });
 
     it('uses "warn" level and shows only warn, error and fatal logs', async () => {
       process.env.LOG_LEVEL = 'warn';
-      const loggingStream = await prepeareLoggerForTesting();
+      const { logger, logStream } = loadLogServiceForTesting();
 
-      callAllLevelsOfLogs();
+      callAllLevelsOfLogs(logger);
 
-      expect(loggingStream.write).not.toHaveBeenCalledWith(
+      expect(logStream.write).not.toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"trace".*}/)
       );
-      expect(loggingStream.write).not.toHaveBeenCalledWith(
+      expect(logStream.write).not.toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"debug".*}/)
       );
-      expect(loggingStream.write).not.toHaveBeenCalledWith(
+      expect(logStream.write).not.toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"info".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"warn".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"error".*}/)
       );
-      expect(loggingStream.write).toHaveBeenCalledWith(
+      expect(logStream.write).toHaveBeenCalledWith(
         expect.stringMatching(/{.*"message":"fatal".*}/)
       );
     });

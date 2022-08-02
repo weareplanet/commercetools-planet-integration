@@ -1,7 +1,9 @@
-import logger from '../log-service';
+import { ServiceWithLogger }  from '../log-service';
 
 import { name, version } from '../../../../package.json';
 
-export const logConnectorVersion = () => {
-  logger.info({ name, version }, 'Connector is running');
-};
+export class ConnectorVersionService extends ServiceWithLogger {
+  logVersion() {
+    this.logger.info({ name, version }, 'Connector is running');
+  }
+}

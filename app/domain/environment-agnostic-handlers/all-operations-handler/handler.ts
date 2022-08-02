@@ -1,23 +1,31 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import logger from '../../services/log-service';
+import { LogService } from '../../services/log-service';
+import { ConfigService } from '../../services/config-service';
+import { ConnectorVersionService } from '../../services/connector-version-service';
+import { OperationDetector, Operation } from '../../services/request-context-service/operation-detector';
 import {
   IAbstractRequest,
   IAbstractResponse
 } from '../../../interfaces';
-import { logConnectorVersion } from '../../services/connector-version-service';
-import { OperationDetector, Operation } from './operation-detector';
 
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';
 import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
 
-///// PREPARE A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
+// Load the app configuration in COLD START phase
+new ConfigService().getConfig();
 
+///// A MULTI-PURPOSE ABSTRACT HANDLER (A SINGLE FUNCTION WHICH IS ABLE TO PROCESS ANY OPERATION).
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
-  logConnectorVersion();
+  const logger = new LogService(req.traceContext);
+
+  new ConnectorVersionService({ logger }).logVersion();
 
   // Delegate the request to a proper handler depending on the req content
   const operation = OperationDetector.detectOperation(req);
+  if (operation) {
+    logger.debug(`Operation to be performed: ${operation}.`);
+  }
 
   switch (operation) {
     case Operation.RedirectAndLightboxInit: {

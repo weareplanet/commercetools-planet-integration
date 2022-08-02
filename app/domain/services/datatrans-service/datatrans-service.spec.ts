@@ -1,3 +1,4 @@
+import { LogService }  from '../log-service';
 import { CryptoService } from '../crypto-service';
 import { DatatransService } from '.';
 
@@ -11,13 +12,16 @@ describe('DatatransService', () => {
     const merchantId = 'merchId';
     const fakeMerchantHmacKey = 'secret1234';
 
-    const expectedSignature = CryptoService.createSha256Hmac(fakeMerchantHmacKey, timestamp + reqBody);
+    const logger =  new LogService();
+    const datatransService = new DatatransService({ logger });
+
+    const expectedSignature = new CryptoService({ logger }).createSha256Hmac(fakeMerchantHmacKey, timestamp + reqBody);
 
     beforeEach(() => {
       /* eslint-disable @typescript-eslint/no-explicit-any */
-      jest.spyOn((DatatransService as any), 'getMerchantHmacKey');
+      jest.spyOn((datatransService as any), 'getMerchantHmacKey');
       /* eslint-disable @typescript-eslint/no-explicit-any */
-      when((DatatransService as any).getMerchantHmacKey as jest.Mock)
+      when((datatransService as any).getMerchantHmacKey as jest.Mock)
         .calledWith(merchantId)
         .mockReturnValue(fakeMerchantHmacKey);
     });
@@ -32,7 +36,7 @@ describe('DatatransService', () => {
       };
 
       expect(() => {
-        DatatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
+        datatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
       }).not.toThrow();
     });
 
@@ -42,7 +46,7 @@ describe('DatatransService', () => {
       };
 
       expect(() => {
-        DatatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
+        datatransService.validateIncomingRequestSignature(merchantId, reqHeaders, reqBody);
       }).toThrow('Datatrans Signature validation failed');
     });
 

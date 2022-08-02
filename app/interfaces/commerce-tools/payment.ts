@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 // import { type Payment } from '@commercetools/platform-sdk';
 
-import configService from '../../domain/services/config-service';
+import { ConfigService } from '../../domain/services/config-service';
 import { ErrorMessages } from './error-messages';
 
 export const CommerceToolsPaymentSchema = yup.object({
@@ -25,7 +25,7 @@ export const CommerceToolsPaymentSchema = yup.object({
         .string()
         .required(ErrorMessages.missingCustomField())
         .test((value, context) => {
-          const merchantConfig = configService.getConfig().datatrans.merchants.find((mc) => mc.id === value);
+          const merchantConfig = new ConfigService().getConfig().datatrans.merchants.find((mc) => mc.id === value);
           if (!merchantConfig || !merchantConfig.password) {
             return context.createError({ message: ErrorMessages.merchantCredentialsMissing() });
           }

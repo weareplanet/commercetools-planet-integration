@@ -2,7 +2,9 @@ import { ObjectSchema } from 'yup';
 import { ObjectShape, AssertsShape, TypeOfShape } from 'yup/lib/object';
 import { ValidateOptions } from 'yup/lib/types';
 
-export class InputValidationService {
+import { ServiceWithLogger } from '../log-service';
+
+export class InputValidationService extends ServiceWithLogger {
 
   transformAndValidate<TShape extends ObjectShape>(
     value: unknown,

@@ -2,6 +2,7 @@ import {
   IAbstractRequest,
   ICommerceToolsExtensionRequest,
   IDatatransWebhookRequest,
+  getHttpHeaderValue,
   DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../interfaces';
 
@@ -17,8 +18,9 @@ enum PaymentInterface {
   DataTransRedirectIntegration = 'pp-datatrans-redirect-integration'
 }
 
+// TODO: Turn this class into a "standard" service.
+// Or maybe merge it with RequestContextService into RequestTreatmentService?
 export class OperationDetector {
-
   // Type guard for ICommerceToolsExtensionRequest
   public static isCommerceToolsRequest(req: IAbstractRequest | ICommerceToolsExtensionRequest): req is ICommerceToolsExtensionRequest {
     const request = req as ICommerceToolsExtensionRequest;
@@ -28,7 +30,7 @@ export class OperationDetector {
   // Type guard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
-    return !!request.headers && !!request.headers[DATATRANS_SIGNATURE_HEADER_NAME];
+    return !!getHttpHeaderValue(request.headers, DATATRANS_SIGNATURE_HEADER_NAME);
   }
 
   public static detectOperation = (req: IAbstractRequest) => {

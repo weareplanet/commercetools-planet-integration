@@ -1,5 +1,6 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import configService from '../../../services/config-service';
+import { ConfigService } from '../../../services/config-service';
+import { LogService } from '../../../services/log-service';
 import {
   IAbstractRequestWithTypedBody,
   IAbstractResponse
@@ -9,14 +10,17 @@ import { PaymentService, DatatransToCommerceToolsMapper } from '../../../service
 import { DatatransService } from '../../../services/datatrans-service';
 
 export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise<IAbstractResponse> => {
+  const logger = new LogService(req.traceContext);
+
   // Validate the signature of the received notification
   // TODO: when Datatrans starts to pass merchantId into the Webhook request -
   // delete `tempMerchantId` and use `req.body.merchantId` instead.
-  const tempMerchantId = configService.getConfig().datatrans.merchants[0].id;
-  DatatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, req.rawBody);
+  const tempMerchantId = new ConfigService().getConfig().datatrans.merchants[0].id;
+  const datatransService = new DatatransService({ logger });
+  datatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, req.rawBody);
 
   // Process the request body
-  const paymentService = new PaymentService();
+  const paymentService = new PaymentService({ logger });
   await paymentService.saveAuthorizationInCommerceTools({
     rawRequestBody: req.rawBody,
     paymentKey: req.body.refno,

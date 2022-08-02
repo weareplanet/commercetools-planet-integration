@@ -6,6 +6,7 @@ import {
   IAbstractRequestWithTypedBody,
   IAbstractRequestHandlerWithTypedInput,
 } from '../../../interfaces';
+import { LogService } from '../../services/log-service';
 import { InputValidationService } from '../../services/input-validation-service';
 import { ErrorsService } from '../../services/errors-service';
 
@@ -17,19 +18,20 @@ import { ErrorsService } from '../../services/errors-service';
 // This wrpper also performs some logic (input validation, errror handling etc.) common for any low-level business handler.
 export const wrapHandlerWithCommonLogic = <TRequestBody>(lowLevelHandler: IAbstractRequestHandlerWithTypedInput<TRequestBody>, inputSchema?: AnyObjectSchema): IAbstractRequestHandler => {
   return async (req: IAbstractRequest): Promise<IAbstractResponse> => {
+    const logger = new LogService(req.traceContext);
     const validateInput = () => {
       if (inputSchema) {
-        const validationService = new InputValidationService();
+        const validationService = new InputValidationService({ logger });
         req.body = validationService.transformAndValidate(req.body, inputSchema, { strict: false });
       }
     };
 
     try {
-      // place for parsing request body
       validateInput();
       return await lowLevelHandler(req as IAbstractRequestWithTypedBody<TRequestBody>); // TODO: think how to improve this brutal type cast;
     } catch (err) {
-      return ErrorsService.handleError(req, err);
+      const errorService = new ErrorsService({ logger });
+      return errorService.handleError(req, err);
     }
   };
 };
