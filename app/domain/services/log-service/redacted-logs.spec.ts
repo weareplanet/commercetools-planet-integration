@@ -1,23 +1,18 @@
 import {
+  setEnvLogLevel,
+  repairEnvLogLevel,
   loadLogServiceForTesting,
   RedirectAndLightboxPaymentInitRequestBodyFactory,
   CreateInitializeTransactionRequestFactory
 } from '../../../../test/test-utils';
 
 describe('Redacted fields', () => {
-  let originalLogLevel: string;
-
-  beforeAll(/* remember the original LOG_LEVEL */ () => {
-    originalLogLevel = process.env.LOG_LEVEL as string;
-    process.env.LOG_LEVEL = 'info';
+  beforeAll(() => {
+    setEnvLogLevel('info');
   });
 
-  afterAll(/* repair the original LOG_LEVEL */() => {
-    if (originalLogLevel) {
-      process.env.LOG_LEVEL = originalLogLevel;
-    } else {
-      delete process.env.LOG_LEVEL;
-    }
+  afterAll(() => {
+    repairEnvLogLevel();
   });
 
   beforeEach(() => {

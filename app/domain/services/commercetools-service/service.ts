@@ -101,9 +101,9 @@ export class CommerceToolsService extends ServiceWithLogger {
   }
 
   private makeXCorrelationIdHeader(): { [COMMERCETOOLS_CORRELATION_ID_HEADER_NAME]: string } | Record<string, never> {
-    if (!this.logger.requestContext) {
+    if (!this.logger.requestTraceContext) {
       return {};
     }
-    return { [COMMERCETOOLS_CORRELATION_ID_HEADER_NAME]: this.logger.requestContext.correlationId };
+    return { [COMMERCETOOLS_CORRELATION_ID_HEADER_NAME]: this.logger.requestTraceContext.correlationId };
   }
 }

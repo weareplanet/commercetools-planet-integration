@@ -1,19 +1,16 @@
-import { loadLogServiceForTesting } from '../../../../test/test-utils';
+import {
+  setEnvLogLevel,
+  repairEnvLogLevel,
+  loadLogServiceForTesting
+} from '../../../../test/test-utils';
 
 describe('Log line', () => {
-  let originalLogLevel: string;
-
-  beforeAll(/* remember the original LOG_LEVEL */ () => {
-    originalLogLevel = process.env.LOG_LEVEL as string;
-    process.env.LOG_LEVEL = 'info';
+  beforeAll(() => {
+    setEnvLogLevel('info');
   });
 
-  afterAll(/* repair the original LOG_LEVEL */() => {
-    if (originalLogLevel) {
-      process.env.LOG_LEVEL = originalLogLevel;
-    } else {
-      delete process.env.LOG_LEVEL;
-    }
+  afterAll(() => {
+    repairEnvLogLevel();
   });
 
   beforeEach(() => {

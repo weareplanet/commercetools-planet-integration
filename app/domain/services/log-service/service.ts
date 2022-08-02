@@ -49,14 +49,14 @@ const pinoSingleton = pino(pinoOptions);
 const wrapLogMethod = function(methodName: string) {
   return function(...args: unknown[]) {
     const argsWithRequestContext: unknown[] = Array.from(args);
-    if (this.requestContext) {
+    if (this.requestTraceContext) {
       if (typeof argsWithRequestContext[0] === 'object') {
         argsWithRequestContext[0] = {
           ...argsWithRequestContext[0],
-          ...this.requestContext
+          traceContext: this.requestTraceContext
         };
       } else {
-        argsWithRequestContext.unshift(this.requestContext);
+        argsWithRequestContext.unshift({ traceContext: this.requestTraceContext });
       }
     }
 
@@ -67,6 +67,8 @@ const wrapLogMethod = function(methodName: string) {
   };
 };
 
+// This service (unlike most of others) does not derive from ServiceWithLogger
+// because this service itself provides the logger (chicken and egg).
 export class LogService implements pino.BaseLogger {
   // pino.LoggerOptions allows to provide `formatters.log` to customize what to write into the underlying stream.
   // To use this option we would have to create a new pino object at least once for every request.
@@ -74,10 +76,10 @@ export class LogService implements pino.BaseLogger {
   // So our approach is to use the singleton pino instance.
   private static readonly pinoLogger: pino.Logger = pinoSingleton;
 
-  readonly requestContext?: ITraceContext;
+  readonly requestTraceContext?: ITraceContext;
 
-  constructor(requestContext?: ITraceContext) {
-    this.requestContext = requestContext;
+  constructor(requestTraceContext?: ITraceContext) {
+    this.requestTraceContext = requestTraceContext;
   }
 
   level: string; // we do not do anything with this, just had to declare this due to `implements pino.BaseLogger`

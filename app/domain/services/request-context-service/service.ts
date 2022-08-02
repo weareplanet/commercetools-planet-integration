@@ -12,13 +12,13 @@ import { LogService, ServiceWithLogger } from '../log-service';
 
 export class RequestContextService extends ServiceWithLogger {
   constructor() {
-    // This service does not expect a context-aware logger from outside,
-    // because this service is the source of the context (chicken and egg).
+    // This service (unlike most of others) does not expect a context-aware logger from outside,
+    // because this service is the source of the context.
     const contextUnawareLogger = new LogService();
     super({ logger: contextUnawareLogger });
   }
 
-  amendRequestWithTracingContext(req: IAbstractRequest): IAbstractRequest {
+  addTraceContextToRequest(req: IAbstractRequest): IAbstractRequest {
     const traceContext = this.getRequestContext(req);
     return {
       ...req,

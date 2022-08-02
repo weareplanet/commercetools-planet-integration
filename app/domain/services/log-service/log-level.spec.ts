@@ -1,5 +1,9 @@
 import { LogService } from '../../services/log-service';
-import { loadLogServiceForTesting } from '../../../../test/test-utils';
+import {
+  setEnvLogLevel,
+  repairEnvLogLevel,
+  loadLogServiceForTesting
+} from '../../../../test/test-utils';
 
 function callAllLevelsOfLogs (logger: LogService) {
   logger.trace('trace');
@@ -11,28 +15,17 @@ function callAllLevelsOfLogs (logger: LogService) {
 }
 
 describe('Log levels', () => {
-  let originalLogLevel: string;
-
-  beforeAll(/* remember the original LOG_LEVEL */ () => {
-    originalLogLevel = process.env.LOG_LEVEL as string;
-    process.env.LOG_LEVEL = 'info';
-  });
-
-  afterAll(/* repair the original LOG_LEVEL */() => {
-    if (originalLogLevel) {
-      process.env.LOG_LEVEL = originalLogLevel;
-    } else {
-      delete process.env.LOG_LEVEL;
-    }
+  afterAll(() => {
+    repairEnvLogLevel();
   });
 
   beforeEach(() => {
     jest.resetModules();
   });
 
-  describe('how LOG_LEVEL makes influence on OUTPUT stream', () => {
+  describe('how LOG_LEVEL makes impacts OUTPUT stream', () => {
     it('uses "trace" level and shows all logs', async () => {
-      process.env.LOG_LEVEL = 'trace';
+      setEnvLogLevel('trace');
       const { logger, logStream } = loadLogServiceForTesting();
 
       callAllLevelsOfLogs(logger);
@@ -58,7 +51,7 @@ describe('Log levels', () => {
     });
 
     it('uses "warn" level and shows only warn, error and fatal logs', async () => {
-      process.env.LOG_LEVEL = 'warn';
+      setEnvLogLevel('warn');
       const { logger, logStream } = loadLogServiceForTesting();
 
       callAllLevelsOfLogs(logger);

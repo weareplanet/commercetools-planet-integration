@@ -1,3 +1,11 @@
+import {
+  PaymentFactory,
+  RedirectAndLightboxWebhookRequestFactory,
+  loadLogServiceForTesting,
+  setEnvLogLevel,
+  repairEnvLogLevel
+} from '../../../../../test/test-utils';
+
 import { type Payment } from '@commercetools/platform-sdk';
 import {
   IDatatransWebhookRequestBody,
@@ -7,12 +15,8 @@ import {
 } from '../../../../interfaces';
 import { DatatransService } from '../../../services/datatrans-service';
 import { CommerceToolsService } from '../../../services/commercetools-service';
-import handler from '..';
 
-import {
-  PaymentFactory,
-  RedirectAndLightboxWebhookRequestFactory
-} from '../../../../../test/test-utils';
+import handler from '..';
 
 describe('All-operations handler', () => {
 
@@ -25,9 +29,10 @@ describe('All-operations handler', () => {
       });
 
       // An attempt to make an END-to-END test (i.e. to mock 'node-fetch' and check its call with the expected actions) appeared TOO MESSY -
-      // I couln'd find a way to stub the CT response to /oauth/token (which is tricky hidden inside Commercetools sdk).
+      // I couln'd find an easy way to stub the CT response to /oauth/token (whose processing is tricky hidden inside Commercetools sdk).
       // So a simpler, "narrower" test is implemented here - it ends
-      // on the checking of what CommerceToolsService.prototype.updatePayment was called with (that covers the majority of our logic).
+      // on the checking of what CommerceToolsService methods (updatePayment, createOrUpdateCustomObject) were called with.
+      // Basically that covers the majority of our logic, but not all.
 
       const fakeCurrentDate = '2022-07-15T18:10:00Z';
       beforeEach(() => {
@@ -179,6 +184,51 @@ describe('All-operations handler', () => {
             body: ''
           }
         );
+      });
+
+      describe('performs context-aware logging', () => {
+        beforeAll(() => {
+          setEnvLogLevel('trace');
+          jest.resetModules(); // need to reload LogService to use the new log level
+        });
+
+        afterAll(() => {
+          repairEnvLogLevel();
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let logStream: any;
+        beforeEach(/* Spy on the low-level log stream */ async () => {
+          logStream = loadLogServiceForTesting().logStream;
+        });
+
+        it('should log with trace context', async () => {
+          const fakeTraceContext = {
+            correlationId: 'Test Correlation Id',
+            paymentKey: 'Test Payment Key'
+          };
+
+          const req = {
+            ...RedirectAndLightboxWebhookRequestFactory(),
+            traceContext: fakeTraceContext
+          };
+
+          const theHandler = (await import('..')).default; // need to reload the handler after jest.resetModules()
+          await theHandler(req);
+
+          expect(logStream.write).toHaveBeenCalledWith(
+            expect.stringMatching(/.*"traceContext":{.*"correlationId":"Test Correlation Id","paymentKey":"Test Payment Key".*}.*Connector is running.*/)
+          );
+
+          expect(logStream.write).toHaveBeenCalledWith(
+            expect.stringMatching(/.*"traceContext":{.*"correlationId":"Test Correlation Id","paymentKey":"Test Payment Key".*}.*Operation to be performed: Redirect And Lightbox Webhook.*/)
+          );
+
+          // TODO: It would be great to check also the calls of logStream.write with the same traceContext and:
+          // - Updating Payment .* in CommerceTools.*/)
+          // - Requesting CustomObject from CommerceTools
+          // But in order to do that this test should be changed to be "more integration" (see "An attempt to make an END-to-END test..." comment above).
+        });
       });
     });
 
