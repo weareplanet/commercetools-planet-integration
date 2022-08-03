@@ -45,7 +45,6 @@ jobs:
           git config user.email "githubactions@planetpayment.com"
           git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
           git fetch
-#          git checkout
       - name: Bump version
         run: |
           TAG=$(git tag --sort=-creatordate | head -n 1) && \
@@ -53,7 +52,6 @@ jobs:
           export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
       - name: Modifying the CHANGELOG
-        # if present
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on 'package.json'
