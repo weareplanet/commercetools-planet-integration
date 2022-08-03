@@ -9,8 +9,10 @@ describe('RequestContextService', () => {
   describe('addTraceContextToRequest', () => {
     describe('adds `traceContext.correlationId` into the request', () => {
       it('if `X-Correlation-ID` header is PRESENT in the request - taking the value from there', () => {
-        const req: IAbstractRequest = abstractRequestFactory({}, {
-          'X-Correlation-ID': 'value-of-X-Correlation-ID-header'
+        const req: IAbstractRequest = abstractRequestFactory({
+          headers: {
+            'X-Correlation-ID': 'value-of-X-Correlation-ID-header'
+          }
         });
 
         const requestContextService = new RequestContextService();
@@ -38,9 +40,11 @@ describe('RequestContextService', () => {
 
         it('if `req.body.resource.obj.key` is PRESENT in the request body - taking the value from there', () => {
           const req: IAbstractRequest = abstractRequestFactory({
-            resource: {
-              obj: {
-                key: 'Test PaymentKey from ComerceTools'
+            body: {
+              resource: {
+                obj: {
+                  key: 'Test PaymentKey from ComerceTools'
+                }
               }
             }
           });
@@ -59,7 +63,9 @@ describe('RequestContextService', () => {
 
         it('if `req.body.refno` is PRESENT in the request body - taking the value from there', () => {
           const req: IAbstractRequest = abstractRequestFactory({
-            refno: 'Test PaymentKey from Datatrans'
+            body: {
+              refno: 'Test PaymentKey from Datatrans'
+            }
           });
 
           const requestContextService = new RequestContextService();

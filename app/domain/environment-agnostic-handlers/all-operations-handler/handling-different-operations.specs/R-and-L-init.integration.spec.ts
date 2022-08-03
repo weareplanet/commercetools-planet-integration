@@ -32,7 +32,9 @@ describe('All-operations handler', () => {
   describe('When a request matches Redirect&Lightbox Init operation criteria', () => {
 
     it('should go through the R&L Payment Initialization flow', async () => {
-      const req = abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory());
+      const req = abstractRequestFactory({
+        body: RedirectAndLightboxPaymentInitRequestBodyFactory()
+      });
 
       const result = await handler(req);
 
@@ -82,7 +84,9 @@ describe('All-operations handler', () => {
         };
 
         const req = {
-          ...abstractRequestFactory(RedirectAndLightboxPaymentInitRequestBodyFactory()),
+          ...abstractRequestFactory({
+            body: RedirectAndLightboxPaymentInitRequestBodyFactory()
+          }),
           traceContext: fakeTraceContext
         };
 

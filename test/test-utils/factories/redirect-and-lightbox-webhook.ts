@@ -1,7 +1,6 @@
 import _merge from 'lodash.merge';
 
 import { RecursivePartial } from '../types';
-
 import {
   DatatransTransactionStatus,
   DatatransPaymentMethod,
@@ -9,11 +8,10 @@ import {
   IDatatransWebhookRequestBody,
   DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../app/interfaces';
-
 import { abstractRequestFactory } from './abstract-request-factories';
 
 export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody =>  {
-  const defaultStuff = {
+  const defaultStuff = { // TODO: use PaymentFactory
     merchantId: 'Test merchantId',
     refno: 'Test refno',
     transactionId: 'Test transactionId',
@@ -51,10 +49,10 @@ export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyE
 };
 
 export const RedirectAndLightboxWebhookRequestFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}) =>  {
-  return abstractRequestFactory(
-    RedirectAndLightboxWebhookRequestBodyFactory(webhookRequestBodyExplicitStuff),
-    {
+  return abstractRequestFactory({
+    body: RedirectAndLightboxWebhookRequestBodyFactory(webhookRequestBodyExplicitStuff),
+    headers: {
       [DATATRANS_SIGNATURE_HEADER_NAME]: 't=TS,s0=SIGNATURE'
     }
-  );
+  });
 };
