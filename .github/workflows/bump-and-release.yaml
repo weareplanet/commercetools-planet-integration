@@ -1,16 +1,16 @@
 name: Bump and Release
 
 on:
-  #pull_request:
-  #  types: [ labeled ]
-  #  branches:
+  pull_request:
+    types: [ labeled ]
+    branches:
   #    - main
   #    - master
-  #    - "feat/INC-61"
-  push:
+      - "feat/INC-61"
+  #push:
     #types: [ labeled ]
-    branches:
-    - "feat/INC-61"
+    #branches:
+    #- "feat/INC-61"
 
 jobs:
   bump-and-release:
@@ -28,7 +28,8 @@ jobs:
       - name: Check and set 'major' release
         if: ${{ github.event.label.name == 'bump:major' }}
         run: echo "BUMP=major" >> $GITHUB_ENV
-      - name: Install semver-tool
+      - name: Install semver-tool 
+        # as standard ubuntu-latest doesn't have it
         run: |
           export DIR=$(mktemp -d)
           cd $DIR
@@ -48,18 +49,28 @@ jobs:
       - name: Setup git
         run: |
           git config user.email "githubactions@planetpayment.com"
-          git config user.name "GitHub Actions"
-      - name: Prepare CHANGELOG
-        # add VERSION in the first line of CHANGELOG.md
+          git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
+      - name: Modifying the CHANGELOG
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
-      - name: Prepare update
+      - name: Updating version on 'package.json'
         run: |
-          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json 
+          grep "version" package.json 
       - name: Commit changes
         run: |
           if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
           git add package.json
           git commit -m "Bump to version ${{ env.VERSION }}"
-      - name: Push
+      - name: Pushing
         run: git push
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: ${{ env.VERSION }}
+          #body_path: CHANGELOG.md
+          #draft: false
+          #prerelease: false
