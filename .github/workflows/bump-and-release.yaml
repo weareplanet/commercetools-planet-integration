@@ -1,16 +1,16 @@
 name: Bump and Release
 
 on:
-  pull_request:
-    types: [ labeled ]
-    branches:
+  #pull_request:
+  #  types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
+  #  branches:
   #    - main
   #    - master
-      - "feat/INC-61"
-  #push:
-    #types: [ labeled ]
-    #branches:
-    #- "feat/INC-61"
+  #    - "feat/INC-61"
+  push:
+    types: [ labeled ]
+    branches:
+    - "feat/INC-61"
 
 jobs:
   bump-and-release:
@@ -40,17 +40,20 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Setup git
+        run: |
+          git config user.email "githubactions@planetpayment.com"
+          git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
+          git fetch
+#          git checkout
       - name: Bump version
         run: |
           TAG=$(git tag --sort=-creatordate | head -n 1) && \
           if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
           export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
-      - name: Setup git
-        run: |
-          git config user.email "githubactions@planetpayment.com"
-          git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
       - name: Modifying the CHANGELOG
+        # if present
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on 'package.json'
