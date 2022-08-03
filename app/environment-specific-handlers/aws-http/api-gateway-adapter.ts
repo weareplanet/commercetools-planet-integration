@@ -61,8 +61,8 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     return this.createApiGatewayResponse(abstractResponse.statusCode, abstractResponse.body);
   }
 
-  private setupLogger(requestTraceContext?: ITraceContext) {
-    this.logger = new LogService(requestTraceContext);
+  private setupLogger(traceContext?: ITraceContext) {
+    this.logger = new LogService(traceContext);
   }
 
   private createApiGatewayResponse(

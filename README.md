@@ -132,7 +132,7 @@ However it's recommended to make a logger aware of the request context - that gi
 
   > Extra notes:
   > - In order to facilitate presense of the context-aware logger in all services all their classes (exported from `services/*`) are derived from `ServiceWithLogger` class having `{ logger }` as a constructor argument.
-  > - When you need, you can get the "trace context" from `logger.requestTraceContext` to use it in your purposes (for example, to include it into a request to a 3rd party).
+  > - When you need, you can get the "trace context" from `logger.traceContext` to use it in your purposes (for example, to include it into a request to a 3rd party).
 
 
 ## Programming language

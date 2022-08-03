@@ -49,14 +49,14 @@ const pinoSingleton = pino(pinoOptions);
 const wrapLogMethod = function(methodName: string) {
   return function(...args: unknown[]) {
     const argsWithRequestContext: unknown[] = Array.from(args);
-    if (this.requestTraceContext) {
+    if (this.traceContext) {
       if (typeof argsWithRequestContext[0] === 'object') {
         argsWithRequestContext[0] = {
           ...argsWithRequestContext[0],
-          traceContext: this.requestTraceContext
+          traceContext: this.traceContext
         };
       } else {
-        argsWithRequestContext.unshift({ traceContext: this.requestTraceContext });
+        argsWithRequestContext.unshift({ traceContext: this.traceContext });
       }
     }
 
@@ -76,10 +76,10 @@ export class LogService implements pino.BaseLogger {
   // So our approach is to use the singleton pino instance.
   private static readonly pinoLogger: pino.Logger = pinoSingleton;
 
-  readonly requestTraceContext?: ITraceContext;
+  readonly traceContext?: ITraceContext;
 
-  constructor(requestTraceContext?: ITraceContext) {
-    this.requestTraceContext = requestTraceContext;
+  constructor(traceContext?: ITraceContext) {
+    this.traceContext = traceContext;
   }
 
   level: string; // we do not do anything with this, just had to declare this due to `implements pino.BaseLogger`
