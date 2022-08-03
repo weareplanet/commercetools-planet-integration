@@ -87,16 +87,30 @@ logger.debug(someObject, "Some meaningful message");
 
 However it's recommended to make a logger aware of the request context - that gives an ability **to trace all log messages related to the same event processing (one call of the Connector)**.
 
-The approach is following:
+**The approach essence:**
 
-  1. At the higher possible level during a request processing (most probably - in the environment adapter) - amend `IAbstractRequest` with the "trace context":
+1. `IAbstractRequest` instance - as soon as it appears - carries the tracing information in `traceContext` field.
+2. When a `LogService` instance is being created - the mentioned `abstractRequest.traceContext` value is passed to it.
+3. Every time you log via this context-aware `LogService` instance, the tracing information is included in the log message.
+
+**In more details:**
+
+  1. At the higher possible level during a request processing (most probably - in the environment-to-agnostic adapter) - amend the `IAbstractRequest` object with the `traceContext`:
   ```
   const abstractRequestDraft: IAbstractRequest = { body: ..., headers: ...  } // all fields (taken from the original HTTP request), without `traceContext` yet
-  const abstractRequest: IAbstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
+  const abstractRequest = new RequestContextService().addTraceContextToRequest(abstractRequestDraft);
   // now abstractRequest.traceContext has a value
   ```
 
-  2. In any place where you need to log something and a request object (of either `IAbstractRequest` or `IAbstractRequestWithTypedBody` type) is accessible (i.e. in a request handlers) - do the following:
+  > Extra notes:
+  > Why "most probably - in the environment-to-agnostic adapter"?
+  > There is no such a single place in the codebase where (if you call `addTraceContextToRequest()` at) would guarantee
+  > providing `traceContext` to a request in all possible cases and soon enough
+  > (for example, in `app/domain/environment-agnostic-handlers/per-operation-handlers/any-handler-wrapper.ts` its somehow late, because some logging could already happen before).
+  > Doing that in an environment-to-agnostic adapter is a little overhead (as you have to do that in every adapter imlpemented in `app/environment-specific-handlers/*/`),
+  > but this ensures the context-aware logging ASAP (in the request processing lifecycle) and with the minimal enforces.
+
+  2. In any place where you need to log something and a request object (of either `IAbstractRequest` or `IAbstractRequestWithTypedBody` type) is accessible (i.e. in a request handler) - do the following:
   ```
   const logger = new LogService(req.traceContext); // this logger will include the "trace context" data into every log message.
 
@@ -105,7 +119,7 @@ The approach is following:
   logger.debug(someObject, "Some meaningful message");
   ```
 
-  3. To have such a context-aware logging in places where a request object is not accessible (in services etc.) - pass the context-aware logger object to that place.
+  3. To have such a context-aware logging in places where a request object is not accessible (in services etc.) - pass the context-aware logger (obtained on step #2) to that place.
   For example (from `app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/handler.ts`):
 
   ```
@@ -116,9 +130,9 @@ The approach is following:
   };
   ```
 
-  Extra notes:
-  - In order to facilitate presense of the context-aware logger in all services all their classes (exported from `services/*`) are derived from `ServiceWithLogger` class having `{ logger }` as a constructor argument.
-  - When you need, you can get the "trace context" from `logger.requestContext` to use it in your purposes (for example, to include it into a request to a 3rd party).
+  > Extra notes:
+  > - In order to facilitate presense of the context-aware logger in all services all their classes (exported from `services/*`) are derived from `ServiceWithLogger` class having `{ logger }` as a constructor argument.
+  > - When you need, you can get the "trace context" from `logger.traceContext` to use it in your purposes (for example, to include it into a request to a 3rd party).
 
 
 ## Programming language

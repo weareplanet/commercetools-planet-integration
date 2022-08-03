@@ -6,16 +6,18 @@ describe('OperationDetector', () => {
   describe('detectOperation, isCommerceToolsRequest, isDatatransRequest', () => {
     it('should return "Redirect And Lightbox Init" when its criteria are detected', () => {
       const req = abstractRequestFactory({
-        action: 'Create',
-        resource: {
-          obj: {
-            paymentMethodInfo: {
-              paymentInterface: 'pp-datatrans-redirect-integration',
-            },
-            custom: {
-              fields: {}
-            },
-            paymentStatus: {}
+        body: {
+          action: 'Create',
+          resource: {
+            obj: {
+              paymentMethodInfo: {
+                paymentInterface: 'pp-datatrans-redirect-integration',
+              },
+              custom: {
+                fields: {}
+              },
+              paymentStatus: {}
+            }
           }
         }
       });
@@ -29,8 +31,10 @@ describe('OperationDetector', () => {
     });
 
     it('should return "Redirect And Lightbox Webhook" when its criteria are detected', () => {
-      const req = abstractRequestFactory({}, {
-        'datatrans-signature': 't=TS,s0=SIGNATURE' // this header presence is the criterion
+      const req = abstractRequestFactory({
+        headers: {
+          'datatrans-signature': 't=TS,s0=SIGNATURE' // this header presence is the criterion
+        }
       });
 
       const result = OperationDetector.detectOperation(req);

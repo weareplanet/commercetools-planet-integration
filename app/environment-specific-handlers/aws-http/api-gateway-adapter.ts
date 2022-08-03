@@ -45,10 +45,13 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
       body: JSON.parse(event.body)
     };
 
-    // Amend the request with the trace context ASAP
-    const abstractRequest = new RequestContextService().amendRequestWithTracingContext(abstractRequestDraft);
+    // This action is made in an environment-to-agnostic adapter
+    // because this the most high-level place which any request obligately passes through -
+    // it ensures the context-aware logging ASAP and with the minimal enforces.
+    // You should do this call in every adapter imlpemented in `app/environment-specific-handlers/*/`.
+    const abstractRequest = new RequestContextService().addTraceContextToRequest(abstractRequestDraft);
 
-    // Now the request context is known - make this.logger aware of it
+    // Now the trace context is known - make this.logger aware of it
     this.setupLogger(abstractRequest.traceContext);
 
     return abstractRequest;
@@ -58,8 +61,8 @@ export class AwsApiGatewayAdapter implements IAbstractToEnvHandlerAdapter<APIGat
     return this.createApiGatewayResponse(abstractResponse.statusCode, abstractResponse.body);
   }
 
-  private setupLogger(requestContext?: ITraceContext) {
-    this.logger = new LogService(requestContext);
+  private setupLogger(traceContext?: ITraceContext) {
+    this.logger = new LogService(traceContext);
   }
 
   private createApiGatewayResponse(

@@ -1,6 +1,8 @@
 import { type Payment } from '@commercetools/platform-sdk';
 
 import {
+  setEnvLogLevel,
+  repairEnvLogLevel,
   loadLogServiceForTesting,
   commerceToolsClientFactory,
   RedirectAndLightboxPaymentInitRequestBodyFactory,
@@ -192,12 +194,9 @@ const commerceToolsErrorWhenCustomObjectKeyIsNotExist = {
 };
 
 describe('#initRedirectAndLightbox method', () => {
-  const originalLogLevel = process.env.LOG_LEVEL;
   let paymentService: PaymentService;
 
   beforeAll(async () => {
-    process.env.LOG_LEVEL = 'debug';
-
     customObjectSpy.mockReturnValue({
       body: {
         value: [{
@@ -212,8 +211,13 @@ describe('#initRedirectAndLightbox method', () => {
     });
   });
 
-  beforeEach(() => {
-    jest.resetModules();
+  beforeAll(() => {
+    setEnvLogLevel('debug');
+    jest.resetModules(); // need to reload LogService to use the new log level
+  });
+
+  afterAll(() => {
+    repairEnvLogLevel();
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -222,14 +226,6 @@ describe('#initRedirectAndLightbox method', () => {
     const loggerAndStream = loadLogServiceForTesting();
     paymentService = new PaymentService({ logger: loggerAndStream.logger });
     logStream = loggerAndStream.logStream;
-  });
-
-  afterAll(() => {
-    if (originalLogLevel) {
-      process.env.LOG_LEVEL = originalLogLevel;
-    } else {
-      delete process.env.LOG_LEVEL;
-    }
   });
 
   describe('actions creations for Redirect And Lightbox Init operation', () => {

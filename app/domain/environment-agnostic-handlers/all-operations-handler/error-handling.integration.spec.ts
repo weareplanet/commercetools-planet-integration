@@ -54,7 +54,7 @@ describe('Errors Service Integration', () => {
     });
 
     it('should return general error with 400', async () => {
-      const req = abstractRequestFactory({}, {});
+      const req = abstractRequestFactory({});
       const result = await handler(req);
 
       expect(result).toHaveProperty('statusCode');

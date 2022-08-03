@@ -45,12 +45,14 @@ describe('createPayment handler', () => {
 
   const requestWithOnlyRequiredFields = () => {
     return abstractRequestFactory({
-      action: 'Create',
-      resource: {
-        obj: {
-          key: 'key string value',
-          custom: {
-            fields: requiredCustomFields()
+      body: {
+        action: 'Create',
+        resource: {
+          obj: {
+            key: 'key string value',
+            custom: {
+              fields: requiredCustomFields()
+            }
           }
         }
       }
@@ -59,18 +61,20 @@ describe('createPayment handler', () => {
 
   const requestWithOptionalFields = (): IAbstractRequestWithTypedBody<IRequestBody> => {
     return abstractRequestFactory({
-      action: 'Create',
-      resource: {
-        typeId: 'typeId',
-        id: 'id',
-        obj: {
-          key: 'key string value',
-          custom: {
-            /* eslint-disable @typescript-eslint/ban-ts-comment */
-            /* @ts-ignore */
-            fields: { // TODO: if this goes more crazy - use lodash.merge
-              ...requiredCustomFields(),
-              ...optionalCustomFields()
+      body: {
+        action: 'Create',
+        resource: {
+          typeId: 'typeId',
+          id: 'id',
+          obj: {
+            key: 'key string value',
+            custom: {
+              /* eslint-disable @typescript-eslint/ban-ts-comment */
+              /* @ts-ignore */
+              fields: { // TODO: if this goes more crazy - use lodash.merge
+                ...requiredCustomFields(),
+                ...optionalCustomFields()
+              }
             }
           }
         }
@@ -497,16 +501,18 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":true, "authenticationOnly":false }';
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            id: 'id',
-            typeId: 'typeId',
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
+          body: {
+            action: 'Create',
+            resource: {
+              id: 'id',
+              typeId: 'typeId',
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
                 }
               }
             }
@@ -524,16 +530,18 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":true, "authenticationOnly":false }';
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
-                  autoSettle: false,
-                  authenticationOnly: false
+          body: {
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                    autoSettle: false,
+                    authenticationOnly: false
+                  }
                 }
               }
             }
@@ -554,14 +562,16 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "autoSettle":false }';
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
+          body: {
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
                 }
               }
             }
@@ -582,14 +592,16 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "authenticationOnly":true }';
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
+          body: {
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
                 }
               }
             }
@@ -610,14 +622,16 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = `{ "${fieldName}":"something" }`;
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
+          body: {
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
                 }
               }
             }
@@ -638,14 +652,16 @@ describe('createPayment handler', () => {
         const optCustomFields = optionalCustomFields();
         optCustomFields.initRequest = '{ "webhook":"something" }';
         const req = abstractRequestFactory({
-          action: 'Create',
-          resource: {
-            obj: {
-              key: 'key string value',
-              custom: {
-                fields: {
-                  ...requiredCustomFields(),
-                  ...optCustomFields,
+          body: {
+            action: 'Create',
+            resource: {
+              obj: {
+                key: 'key string value',
+                custom: {
+                  fields: {
+                    ...requiredCustomFields(),
+                    ...optCustomFields,
+                  }
                 }
               }
             }
