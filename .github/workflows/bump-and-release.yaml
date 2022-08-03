@@ -1,16 +1,16 @@
 name: Bump and Release
 
 on:
+  push:
+    #types: [ labeled ]
+    branches:
+    - "feat/INC-61"
   #pull_request:
   #  types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
   #  branches:
   #    - main
   #    - master
   #    - "feat/INC-61"
-  push:
-    types: [ labeled ]
-    branches:
-    - "feat/INC-61"
 
 jobs:
   bump-and-release:
