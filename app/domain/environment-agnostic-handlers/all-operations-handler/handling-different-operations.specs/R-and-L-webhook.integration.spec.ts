@@ -135,44 +135,89 @@ describe('All-operations handler', () => {
         expect(CommerceToolsService.prototype.updatePayment).toBeCalledWith(paymentFetchedFromCT, expectedActions);
       });
 
-      it('should save paymentMethod data (alias etc.) to CommerceTools', async () => {
-        await handler(req);
-
-        expect(CommerceToolsService.prototype.createOrUpdateCustomObject).toBeCalledWith(
-          'savedPaymentMethods',
-          testSavedPaymentMethodsKey,
-          [
-            {
-              paymentMethod: DatatransPaymentMethod.VIS,
-              card: {
-                alias: 'Earlier saved VIS card payment alias'
-              }
-            },
-            {
-              paymentMethod: DatatransPaymentMethod.ECA,
-              card: {
-                alias: 'New ECA card payment alias',
-                masked: '520000******0007'
+      describe('if Payment.savePaymentMethod is true', () => {
+        beforeEach(() => {
+          const paymentFetchedFromCT = PaymentFactory({
+            custom: {
+              fields: {
+                savePaymentMethod: true,
+                savedPaymentMethodsKey: 'Test payment methods key'
               }
             }
-          ]
-        );
+          } as unknown as Payment);
+          jest.spyOn(CommerceToolsService.prototype, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
+        });
+
+        it('for a regular card payment - should save the payment method to CommerceTools', async () => {
+          await handler(req);
+
+          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).toBeCalledWith(
+            'savedPaymentMethods',
+            testSavedPaymentMethodsKey,
+            [
+              {
+                paymentMethod: DatatransPaymentMethod.VIS,
+                card: {
+                  alias: 'Earlier saved VIS card payment alias'
+                }
+              },
+              {
+                paymentMethod: DatatransPaymentMethod.ECA,
+                card: {
+                  alias: 'New ECA card payment alias',
+                  masked: '520000******0007'
+                }
+              }
+            ]
+          );
+        });
+
+        it('for a Wallet payment - should NOT save the payment method to CommerceTools', async () => {
+          const req = RedirectAndLightboxWebhookRequestFactory({
+            paymentMethod: DatatransPaymentMethod.ECA,
+            card: {
+              alias: 'New ECA card payment alias',
+              masked: '520000******0007',
+              walletIndicator: 'PAY'
+            }
+          });
+          await handler(req);
+
+          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
+        });
       });
 
-      it('should NOT save paymentMethod data (alias etc.) to CommerceTools, if Payment.savePaymentMethod is false', async () => {
-        const paymentFetchedFromCT = PaymentFactory({
-          custom: {
-            fields: {
-              savePaymentMethod: false,
-              savedPaymentMethodsKey: 'Test payment methods key'
+      describe('if Payment.savePaymentMethod is false', () => {
+        beforeEach(() => {
+          const paymentFetchedFromCT = PaymentFactory({
+            custom: {
+              fields: {
+                savePaymentMethod: false
+              }
             }
-          }
-        } as unknown as Payment);
-        jest.spyOn(CommerceToolsService.prototype, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
+          } as unknown as Payment);
+          jest.spyOn(CommerceToolsService.prototype, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
+        });
 
-        await handler(req);
+        it('for a regular card payment - should NOT save the payment method to CommerceTools', async () => {
+          await handler(req);
 
-        expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalledWith();
+          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
+        });
+
+        it('for a Wallet payment - should NOT save the payment method to CommerceTools', async () => {
+          const req = RedirectAndLightboxWebhookRequestFactory({
+            paymentMethod: DatatransPaymentMethod.ECA,
+            card: {
+              alias: 'New ECA card payment alias',
+              masked: '520000******0007',
+              walletIndicator: 'PAY'
+            }
+          });
+          await handler(req);
+
+          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
+        });
       });
 
       it('should respond 200', async () => {

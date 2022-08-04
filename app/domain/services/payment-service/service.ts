@@ -139,6 +139,7 @@ export class PaymentService extends ServiceWithLogger  {
       return; // it is not requested to save the payment method for this payment
     }
     if (paymentMethodInfo.card?.walletIndicator) {
+      this.logger.debug('Ignoring savePaymentMethod=true for a wallet payment');
       return; // we don’t support recurrent payments for wallets
     }
 
