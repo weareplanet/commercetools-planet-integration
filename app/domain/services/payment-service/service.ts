@@ -136,8 +136,13 @@ export class PaymentService extends ServiceWithLogger  {
 
   private async savePaymentMethodToCustomObject(payment: Payment, paymentMethodInfo: IDatatransPaymentMethodInfo) {
     if (!(payment as unknown as ICommerceToolsPayment).custom.fields.savePaymentMethod) {
-      return; // No necessity to save
+      return; // it is not requested to save the payment method for this payment
     }
+    if (paymentMethodInfo.card?.walletIndicator) {
+      this.logger.debug('Ignoring savePaymentMethod=true for a wallet payment');
+      return; // we don’t support recurrent payments for wallets
+    }
+
     const { savedPaymentMethodsKey } = payment.custom.fields;
 
     const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);

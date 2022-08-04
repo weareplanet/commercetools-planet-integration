@@ -57,6 +57,7 @@ export type DatatransPaymentMethodDetails = {
   alias: string; // details which Datatrans provides for "card" and for any other payment method - all contain at least "alias" field
   expiryMonth?: string;
   expiryYear?: string;
+  walletIndicator?: string;
 } & IAnyObjectWithStringKeys;
 
 // This type represents a part of Datatrans request body
