@@ -5,10 +5,25 @@ import { ITraceContext } from '../../../interfaces';
 const { LOG_LEVEL = 'debug' } = process.env;
 
 const longestPathsToRedacted: string[] = [
-  // related to Payment obj in app/domain/environment-agnostic-handlers/per-operation-handlers/create-payment/request-schema.ts
+  // related to Payment obj in a request from CommerceTools
   'body.resource.obj.custom.fields.savedPaymentMethodAlias',
-  // related to DataTrans transaction request body
-  'body.*.alias'
+
+  'body.*.alias', // alias in DataTrans initRequest when alias (to be used) is passed
+
+  // TODO: Hopefully this issue will be solved in INC-95.
+  // "alias" is still present in some fields which are serialized (before logging) JSONs, at least at:
+  // ---
+  // 'payload.actions[*].transaction.custom.fields.info.alias', // alias in "addTransaction" action   (info is a serialized JSON)
+  // 'payload.transactions[*].custom.fields.info.alias',        // alias in Payment.transactions[]    (info is a serialized JSON)
+  // 'payload.actions[*].fields.message.alias',                 // alias in "addInterfaceInteraction" action  (message is a serialized JSON)
+  // 'payload.interfaceInteractions[*].fields.message.alias',   // alias in Payment.interfaceInteractions[]   (message is a serialized JSON)
+  // ---
+  // The problem is that "alias" is passed to the logger as A PART OF A STRING (ALREADY SERIALIZED JSON).
+  // For example here the value of `info` field is such a string:
+  //    logger.info({ info: "{\"card\" : {\n    \"alias\" : \"7LHXscqwAAEAAAGCaJFXvwo5MYPsAEqw\",\"fingerprint\" : \"F-dpGpA06S5lR9uk3FHZb57x\"}}" });
+  // pino.LoggerOptions.redact option allows to redact the ENTIRE `info` field value,
+  // but doesn't allow to redact only "alias" within it.
+  // Redacting the entire `info` field value often makes the log message not useful...
 ];
 
 const getAllShortedPaths = (longestPath: string): string[] => {
