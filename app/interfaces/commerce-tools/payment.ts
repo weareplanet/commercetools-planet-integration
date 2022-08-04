@@ -122,11 +122,12 @@ export const CommerceToolsPaymentSchema = yup.object({
     return true;
   });
 
-// Heck! Optional fields become required! https://javascript.plainenglish.io/a-typescript-runtime-data-validators-comparison-15f0ea2e3265#0428
-// If we won't find a good solution and it will hamper -
+// Heck!
+// After the type inferring below optional fields become required! https://javascript.plainenglish.io/a-typescript-runtime-data-validators-comparison-15f0ea2e3265#0428
+// If we don't find a good solution and it will hamper -
 // we will have to make a duplicated IPament declaration apart from PaymentSchema ((
 export type ICommerceToolsPayment = yup.TypeOf<typeof CommerceToolsPaymentSchema>;
 // TODO: consider enhancing this type with
 //    & Partial<Payment> (or & RecursivePartial<Payment>)
 // to allow any fields from CommerceTools Payment (not declared in CommerceToolsPaymentSchema) be present in this type
-// (this will allow to avoid doing `as unknown as Payment` - see R-and-L-webhook.integration.spec.ts)
+// (this will allow to avoid doing `as unknown as Payment` or `as unknown as ICommerceToolsPayment` - look though the codebase...)
