@@ -4,28 +4,6 @@ import { ITraceContext } from '../../../interfaces';
 
 const { LOG_LEVEL = 'debug' } = process.env;
 
-const longestPathsToRedacted: string[] = [
-  // related to Payment obj in a request from CommerceTools
-  'body.resource.obj.custom.fields.savedPaymentMethodAlias',
-
-  'body.*.alias', // alias in DataTrans initRequest when alias (to be used) is passed
-
-  // TODO: Hopefully this issue will be solved in INC-95.
-  // "alias" is still present in some fields which are serialized (before logging) JSONs, at least at:
-  // ---
-  // 'payload.actions[*].transaction.custom.fields.info.alias', // alias in "addTransaction" action   (info is a serialized JSON)
-  // 'payload.transactions[*].custom.fields.info.alias',        // alias in Payment.transactions[]    (info is a serialized JSON)
-  // 'payload.actions[*].fields.message.alias',                 // alias in "addInterfaceInteraction" action  (message is a serialized JSON)
-  // 'payload.interfaceInteractions[*].fields.message.alias',   // alias in Payment.interfaceInteractions[]   (message is a serialized JSON)
-  // ---
-  // The problem is that "alias" is passed to the logger as A PART OF A STRING (ALREADY SERIALIZED JSON).
-  // For example here the value of `info` field is such a string:
-  //    logger.info({ info: "{\"card\" : {\n    \"alias\" : \"7LHXscqwAAEAAAGCaJFXvwo5MYPsAEqw\",\"fingerprint\" : \"F-dpGpA06S5lR9uk3FHZb57x\"}}" });
-  // pino.LoggerOptions.redact option allows to redact the ENTIRE `info` field value,
-  // but doesn't allow to redact only "alias" within it.
-  // Redacting the entire `info` field value often makes the log message not useful...
-];
-
 const getAllShortedPaths = (longestPath: string): string[] => {
   return longestPath.split('.')
     .reduce((acc, _, index, arr) => {
@@ -34,11 +12,19 @@ const getAllShortedPaths = (longestPath: string): string[] => {
     }, []);
 };
 
-const getAllPathsToBeRedacted = (longestPaths: string[]): string[] => {
-  return longestPaths.reduce((acc, currentLongestPath) => {
-    return acc.concat(getAllShortedPaths(currentLongestPath));
-  }, []);
-};
+const pathsToBeRedacted: string[] = [
+  ...getAllShortedPaths('*.resource.obj.custom.fields.savedPaymentMethodAlias'), // Payment.savedPaymentMethodAlias in a request from CommerceTools
+
+  // "alias" field of the log Object:
+  ...getAllShortedPaths('body.*.alias'),         // alias in a Datatrans initRequest when alias (to be used) is passed to Datatrans
+  ...getAllShortedPaths('value[*].card.alias'),  // alias in a "savedPaymentMethods" Custom Object
+
+  // "alias" within a serialized JSON in some field of the log Object:
+  'actions[*].transaction.custom.fields.info',   // info in "addTransaction" action
+  'actions[*].fields.message',                   // message in "addInterfaceInteraction" action
+  '*.transactions[*].custom.fields.info',        // info in Payment.transactions[]
+  '*.interfaceInteractions[*].fields.message',   // message in Payment.interfaceInteractions[]
+];
 
 const pinoOptions: pino.LoggerOptions = {
   level: LOG_LEVEL,
@@ -54,7 +40,7 @@ const pinoOptions: pino.LoggerOptions = {
   },
   base: {}, // the same effect as of (now commented out) bindings above
   redact: {
-    paths: getAllPathsToBeRedacted(longestPathsToRedacted),
+    paths: pathsToBeRedacted,
     censor: '[REDACTED]'
   }
 };
