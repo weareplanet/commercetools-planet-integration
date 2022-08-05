@@ -22,8 +22,8 @@ const pathsToBeRedacted: string[] = [
   // "alias" within a serialized JSON in some field of the log Object:
   'actions[*].transaction.custom.fields.info',   // info in "addTransaction" action
   'actions[*].fields.message',                   // message in "addInterfaceInteraction" action
-  '*.transactions[*].custom.fields.info',        // info in Payment.transactions[]
-  '*.interfaceInteractions[*].fields.message',   // message in Payment.interfaceInteractions[]
+  'transactions[*].custom.fields.info',        // info in Payment.transactions[]
+  'interfaceInteractions[*].fields.message',   // message in Payment.interfaceInteractions[]
 ];
 
 const pinoOptions: pino.LoggerOptions = {

@@ -331,7 +331,7 @@ describe('Redacted fields', () => {
 
       const { logger, logStream } = loadLogServiceForTesting();
 
-      logger.info({ paymentPart });
+      logger.info(paymentPart);
 
       expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":.*"transactions":.*"custom":.*"fields":.*"info":"\[REDACTED\]".*"interfaceInteractions":.*"fields":.*"message":"\[REDACTED\]".*fields":.*"message":"\[REDACTED\]".*/)
