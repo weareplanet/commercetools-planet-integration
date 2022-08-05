@@ -186,20 +186,20 @@ Below is what the custom object `savedPaymentMethods` could look like.
 
 ```json
 {
- key: "userId-1234",
- container: "savedPaymentMethods",
- value: {
-    {
-        paymentMethod: "ECA",
-        card: {
-            "alias": "{alias}",
-            "masked": "424242xxxxxx4242",
-            "fingerprint": "{fingerprint}",
-            ...
-        }
-    },
-    ...
- }
+    "key": "userId-1234",
+    "container": "savedPaymentMethods",
+    "value": {
+        {
+            "paymentMethod": "ECA",
+            "card": {
+                "alias": "{alias}",
+                "masked": "424242xxxxxx4242",
+                "fingerprint": "{fingerprint}",
+                ...
+            }
+        },
+        ...
+    }
 }
 ```
 
