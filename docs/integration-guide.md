@@ -19,7 +19,7 @@ The integration guide consists of the following sections:
 
 The connector consists of a commercetools API extension and hosted lambda functions interacting with Datatrans. Your front end will solely communicate with Datatrans by writing and reading from/to commercetools objects. Commercetools provides some of the objects the connector requires by default. On top of that, you will submit custom objects and fields we introduced to support our flows.
 
-When data is passed in these objects, our API extension intercepts the changes and calls the relevant Datatrans APIs. In return, synchronous and asynchronous response data is received by the connector and written to commercetools objects to be consumed by your front end.
+When data is passed in these objects, our API extension intercepts the data and calls the relevant Datatrans APIs. In addition, synchronous and asynchronous response data is received by the connector and written to commercetools objects to be consumed by your front end.
 
 We support the most common payment flows out-of-the-box. We use sensible default values for starting and working with transactions. If you need to process additional flows, you may read the [Datatrans documentation](https://docs.datatrans.ch) and specifically [Redirect & Lightbox integration](https://docs.datatrans.ch/docs/redirect-lightbox) to understand what is possible via the gateway and use low-level options to customize the connector to your liking. For most use cases, however, you will not need to implement this.
 
@@ -239,7 +239,7 @@ You can also submit a custom init payload that may be required for advanced flow
 }
 ```
 
-### Logs Related to the connector
+### Logs Related to the Connector
 
 The connector automatically logs every request to & from Datatrans into the custom type `Payment.interfaceInteractions`.
 

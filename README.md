@@ -16,17 +16,17 @@ We built this connector so that you can quickly integrate your payment flows to 
 
 Add this connector to an existing environment or create a dedicated space in the cloud (e.g., AWS, GCP). Setup one connector for many projects or set up one for each of your projects.
 
-## Integration Overview
+## Connector Overview
 
 The connector is a module you need to install on your preferred environment that will handle the API calls to Datatrans for you and ultimately update your commercetools project with relevant transaction data whenever your customer has completed a payment.
 
 ![Overview](docs/img/overview.png)
 
-You will need to have or meet the following requirements to complete the integration:
+You will need the following to complete the integration:
 
-* Datatrans: You will need an active Datatrans merchant account and a merchantId
-* commercetools: A valid commercetools account
-* On-premise or cloud environment: Access to an on-premise environment, AWS, or GCP space to deploy the connector and let it do the magic for you.
+* Datatrans: An active Datatrans merchant account and a merchantId
+* commercetools: A commercetools account
+* On-premise or cloud environment: Access to an on-premise environment, AWS, or GCP space to deploy the connector and let it do the magic for you
 
 Next, we'll cover the features available with our connector.
 
@@ -46,7 +46,7 @@ Save your loyal customers' payment information securely and in a PCI-compliant w
 
 ### All the Payment Methods You Need
 
-By default, the connector should work with all payment methods that can be processed via the Redirect & Lightbox integration. So far, however, we officially support the following payment methods:
+The connector should work with any payment method that can be processed via the Redirect & Lightbox integration. So far, however, we officially support the following payment methods:
 
 * Cards: MasterCard, Visa, American Express, China Union Pay, Diners, Discover, JCB, Maestro, Dankort
 * Wallets: Apple Pay, Google Pay (Apple Pay is only supported via Redirect)

@@ -4,7 +4,7 @@ The guide below outlines the steps you need to take to have an environment ready
 
 To deploy the connector, you will need either access to an on-premise environment or a cloud service running Node. We provide example scripts for Amazon Web Services (AWS) deployment, the easiest and recommended option at the moment.
 
-Please note that the connector requires Node.js 16.0.0 to work. The application is implemented in Typescript. For the production environment, you must compile the program into JavaScript. Check the section [Deployment](#Deployment) below for more details related to deployment.
+Please note that the connector requires Node.js 16.0.0 to work. The application is implemented in Typescript. For the production environment, you must compile the program into JavaScript.
 
 ## Overview
 
@@ -16,7 +16,7 @@ The environment setup guide consists of the following sections:
 
 ## Environment Variables
 
-The connector uses environment variables as the application configuration. The environment variables are responsible for your Datatrans merchant configurations, and access credentials to commercetools will be stored and retrieved by the connector. You will need to define these properly for the connector to connect to commercetools and Datatrans. See the [integration guide](integration-guide.md) for more information about commercetools and Datatrans credentials.
+The connector uses environment variables as the application configuration. The environment variables are responsible for your Datatrans merchant configurations and access credentials to commercetools. You will need to define these properly for the connector to connect to commercetools and Datatrans. See the [integration guide](integration-guide.md) for more information about the relevant commercetools and Datatrans credentials.
 
 An example for your environment variables (`.env.example`) is provided at the root of our repository. Copy that file, rename it to `.env` and change the values of the variables.
 
