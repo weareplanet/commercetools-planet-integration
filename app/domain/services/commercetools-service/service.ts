@@ -34,7 +34,7 @@ export class CommerceToolsService extends ServiceWithLogger {
   }
 
   public async updatePayment(payment: Payment, actions: PaymentUpdateAction[]) {
-    this.logger.debug(actions, `Updating Payment ${payment.key} in CommerceTools...`);
+    this.logger.debug({ actions }, `Updating Payment ${payment.key} in CommerceTools...`);
 
     const res = await ctApiRoot
       .withProjectKey(this.makeWithProjectKeyOption())
