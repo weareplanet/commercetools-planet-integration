@@ -8,7 +8,7 @@ Planet is a multi-national financial services company, specialising in payments 
 
 This connector allows you to quickly connect your commercetools environments to Planet. The Planet connector will save your developers days of integration effort. Focus on your expertise and let us guide you how to best implement Planet payments in commercetools.
 
-Do you have questions? [Contact us](https://www.datatrans.ch/cont)! We'll get back to you in no time.
+Do you have questions? [Contact us](https://www.datatrans.ch/contact)! We'll get back to you in no time.
 
 ## Introduction
 

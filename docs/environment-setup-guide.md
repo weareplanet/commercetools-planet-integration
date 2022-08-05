@@ -10,11 +10,11 @@ Please note that the connector requires Node.js 16.0.0 to work. The application 
 
 The environment setup guide consists of following sections:
 
-* Setting up your environment variables [ [jump to section](#enviroment-variables) ]
+* Setting up your environment variables [ [jump to section](#environment-variables) ]
 * Deployment [ [jump to section](#environment-setup) ]
 * Setting Up commercetools [ [jump to section](#setting-up-commercetools) ]
 
-## Enviroment Variables
+## Environment Variables
 
 The connector uses environment variables as the application configuration. This is where the various Datatrans merchant configurations and access credentials to commercetools will be stored and retrieved by the connector. You will need to define these for the connector to properly connect to commercetools and Datatrans. See the [integration guide](integration-guide.md) for more information about commercetools and Datatrans credentials.
 

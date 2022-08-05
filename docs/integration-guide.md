@@ -39,7 +39,7 @@ The following items are required:
 
 ### Retrieving your Basic Auth Credentials and Your Sign Key
 
-Your basic authentication credentials and a sign key will be required for the connector to communicate properly with Datatrans. Make sure these variables are set correctly in your [environment variables](environment-setup-guide.md#enviroment-variables).
+Your basic authentication credentials and a sign key will be required for the connector to communicate properly with Datatrans. Make sure these variables are set correctly in your [environment variables](environment-setup-guide.md#environment-variables).
 
 The basic authentication credentials can be found in your merchant configuration. Login to your Datatrans merchant account and navigate to the merchant view first. This can be done by clicking the merchant view selector on the top right. Given you have sufficient access rights, you should see a tab called `UPP Administration`. Navigate next to `Security ➝ Server-to-Server services security` and toggle the checkbox to activate the additional security, if not already done. Your username (Datatrans `merchantId`) and basic auth password are now displayed on this screen.
 
@@ -67,7 +67,7 @@ Finally, to create various calls to Datatrans, you will need an API extension. T
 
 ## Connector Configuration
 
-The connector's configuration is done via environment variables. This is also where you set the commercetool API client credentials and Datatrans merchant credentials. You can read more on it [here](environment-setup-guide.md#enviroment-variables).
+The connector's configuration is done via environment variables. This is also where you set the commercetool API client credentials and Datatrans merchant credentials. You can read more on it [here](environment-setup-guide.md#environment-variables).
 
 ## Initiating Payments
 
@@ -111,7 +111,7 @@ Commercetools Payment Attribute | Required | Format | Description
 `paymentMethodInfo.method` | true | String | A string containing one or multiple payment methods. Submit only one method to skip the payment method selection and start with the specified method directly. For Google Pay and Apple Pay, you need to specify at least one card type in here (eg. `"ECA, VIS, PAY"`).
 `custom.type.typeId` | true | String | The `typeId` is the subtype of your custom type. This should be set to `type`.
 `custom.type.id` | true | String | The id of your type. This is created after your custom types were added to your commercetools project.
-`custom.fields.merchantId` | true | String | The merchantId you want to assign your transaction to. This merchantId has to be configured in your [environment variables](environment-setup-guide.md#enviroment-variables).
+`custom.fields.merchantId` | true | String | The merchantId you want to assign your transaction to. This merchantId has to be configured in your [environment variables](environment-setup-guide.md#environment-variables).
 `custom.fields.successUrl` | true | String | The URL where you want users to be redirected to if the transaction result is `success`.
 `custom.fields.cancelUrl` | true | String | The URL where you want users to be redirected to if the transaction result is `cancel`.
 `custom.fields.errorUrl` | true | String | The URL where you want users to be redirected to if the transaction result is `error`.
