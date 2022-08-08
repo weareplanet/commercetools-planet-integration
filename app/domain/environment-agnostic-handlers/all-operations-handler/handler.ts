@@ -19,6 +19,8 @@ new ConfigService().getConfig();
 export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
   const logger = new LogService(req.traceContext);
 
+  logger.debug(req, 'Entered all-operations-handler');
+
   new ConnectorVersionService({ logger }).logVersion();
 
   // Delegate the request to a proper handler depending on the req content
