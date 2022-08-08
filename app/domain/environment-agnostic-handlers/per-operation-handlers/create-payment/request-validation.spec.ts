@@ -383,6 +383,48 @@ describe('createPayment handler', () => {
         });
       });
     });
+
+    describe('when savedPaymentMethodAlias is present', () => {
+      beforeEach(() => {
+        request.body.resource.obj.custom.fields.savedPaymentMethodAlias = 'fake-alias';
+      });
+
+      describe('and savedPaymentMethodsKey is absent', () => {
+        it('responds with status 400 and the corresponding error message', async () => {
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
+          const response = await handler(request);
+
+          expect(response.body).toMatchObject({
+            message: 'Custom field savedPaymentMethodsKey is missing in Payment'
+          });
+
+          expect(response.statusCode).toEqual(400);
+        });
+      });
+    });
+
+    describe('when savedPaymentMethodAlias is absent', () => {
+      beforeEach(() => {
+        delete request.body.resource.obj.custom.fields.savedPaymentMethodAlias;
+      });
+
+      describe('and savedPaymentMethodsKey is present', () => {
+        it('responds with 200', async () => {
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+
+      describe('and savedPaymentMethodsKey is absent', () => {
+        it('responds with 200', async () => {
+          delete request.body.resource.obj.custom.fields.savedPaymentMethodsKey;
+          const response = await handler(request);
+
+          expect(response.statusCode).toEqual(200);
+        });
+      });
+    });
   });
 
   describe('savePaymentMethod specific validations', () => {
