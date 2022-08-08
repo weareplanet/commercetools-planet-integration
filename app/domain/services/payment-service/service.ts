@@ -10,6 +10,7 @@ import {
   DatatransTransactionStatus,
   IDatatransTransactionHistory,
   IDatatransPaymentMethodInfo,
+  DatatransPaymentMethod,
   ErrorMessages
 } from '../../../interfaces';
 import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
@@ -139,8 +140,18 @@ export class PaymentService extends ServiceWithLogger  {
       return; // it is not requested to save the payment method for this payment
     }
     if (paymentMethodInfo.card?.walletIndicator) {
-      this.logger.debug('Ignoring savePaymentMethod=true for a wallet payment');
+      this.logger.debug(`Ignoring savePaymentMethod=true for a Wallet payment (${paymentMethodInfo.card?.walletIndicator})`);
       return; // we don’t support recurrent payments for wallets
+    }
+    if ([
+      DatatransPaymentMethod.GPA,
+      DatatransPaymentMethod.DEA,
+      DatatransPaymentMethod.PSC,
+      DatatransPaymentMethod.SAM,
+      DatatransPaymentMethod.ELV
+    ].includes(paymentMethodInfo.paymentMethod)) {
+      this.logger.debug(`Ignoring savePaymentMethod=true for ${paymentMethodInfo.paymentMethod} APM`);
+      return; // we don’t support recurrent payments for some APMs (see INC-125)
     }
 
     const { savedPaymentMethodsKey } = payment.custom.fields;
