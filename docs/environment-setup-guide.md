@@ -11,8 +11,8 @@ Please note that the connector requires Node.js 16.0.0 to work. The application 
 The environment setup guide consists of the following sections:
 
 * Setting up your environment variables [ [jump to section](#environment-variables) ]
-* Deployment [ [jump to section](#environment-setup) ]
-* Setting Up commercetools [ [jump to section](#setting-up-commercetools) ]
+* Deployment to Amazon Web Services (AWS) [ [jump to section](#deployment-to-amazon-web-services-aws) ]
+* Deployment to On-Premise Environment [ [jump to section](#deployment-to-on-premise-environment) ]
 
 ## Environment Variables
 
@@ -31,22 +31,28 @@ Environment Variable | Format | Description
 `DT_CONNECTOR_WEBHOOK_URL` | String | The webhook URL that Datatrans will call after a transaction has been completed.
 `LOG_LEVEL` | String | Log level of which the application will show. It must be one of the following: `trace, debug, info, warn, error, fatal, silent`. It defaults to `debug`.
 
-## Deployment
+## Deployment to Amazon Web Services (AWS)
 
-To deploy on your on-premise environment, refer to the documentation [here](tbd). To deploy on Amazon Web Services, refer to the documentation [here](tbd).
-
-tbd: explaining various procedures, maybe grouping the deploy docs here
-
-## Setting Up Commercetools
-
-To correctly set up everything required on commercetools' end, the following scripts will create an API client, custom types, and an API extension. You will have to set up your tbd:xyz environment variable in `.env` for the scripts to work correctly.
-
-tbd: add 3 scripts for ct
+To deploy on Amazon Web Services, you must run the script below. Make sure to copy all files from this repository to your environment first. You must pass your AWS region as an option to the script (e.g., `eu-west-1`). This script will use your environment variables to create the commercetools' custom types and API extension and deploy the connector to your AWS space.
 
 ```shell
-command for script1
-command for script2
-command for script3
+sh ./deploy/aws/deploy-aws.sh 'eu-west-1'
 ```
+
+tbd: Check with Fabio
+
+## Deployment to On-Premise Environment
+
+To deploy on-premise, you will need to run the script below. Make sure to copy all files from this repository to your environment first. Run the scripts in the order shown below to deploy the create the API client, do the necessary deployment of the connector, and create the commercetools' custom types and API extension.
+
+```shell
+sh ./deploy/build-script.sh
+
+# deploy now your generated package
+
+sh ./deploy/commercetools/ct-setup.sh 'your-package'
+```
+
+tbd: Check with Fabio
 
 That's it for the moment. You can return to the [integration guide](integration-guide.md) once your environment is set up and come back if necessary for further configuration.

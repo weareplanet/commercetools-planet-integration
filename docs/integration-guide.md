@@ -7,9 +7,9 @@ The guide below outlines the steps you need to take to complete the integration 
 The integration guide consists of the following sections:
 
 * How it all works [ [jump to section](#how-it-all-works) ]
-* Setting up your environment [ [jump to section](#environment-setup) ]
 * Setting up Datatrans [ [jump to section](#datatrans-setup) ]
 * Setting up commercetools [ [jump to section](#commercetools-setup) ]
+* Setting up your environment [ [jump to section](#environment-setup) ]
 * Configuring the connector [ [jump to section](#connector-configuration) ]
 * Initiating payments [ [jump to section](#initiating-payments) ]
 * Frontend integration [ [jump to section](#frontend-integration) ]
@@ -17,15 +17,11 @@ The integration guide consists of the following sections:
 
 ## How It All Works
 
-The connector consists of a commercetools API extension and hosted lambda functions interacting with Datatrans. Your front end will solely communicate with Datatrans by writing and reading from/to commercetools objects. Commercetools provides some of the objects the connector requires by default. On top of that, you will submit custom objects and fields we introduced to support our flows.
+The connector consists of a commercetools API extension and hosted lambda functions interacting with Datatrans. Your frontend will solely communicate with Datatrans by writing and reading from/to commercetools objects. Commercetools provides some of the objects the connector requires by default. On top of that, you will submit custom objects and fields we introduced to support our flows.
 
-When data is passed in these objects, our API extension intercepts the data and calls the relevant Datatrans APIs. In addition, synchronous and asynchronous response data is received by the connector and written to commercetools objects to be consumed by your front end.
+When data is passed in these objects, our API extension intercepts the data and calls the relevant Datatrans APIs. In addition, synchronous and asynchronous response data is received by the connector and written to commercetools objects to be consumed by your frontend.
 
 We support the most common payment flows out-of-the-box. We use sensible default values for starting and working with transactions. If you need to process additional flows, you may read the [Datatrans documentation](https://docs.datatrans.ch) and specifically [Redirect & Lightbox integration](https://docs.datatrans.ch/docs/redirect-lightbox) to understand what is possible via the gateway and use low-level options to customize the connector to your liking. For most use cases, however, you will not need to implement this.
-
-## Environment Setup
-
-To deploy the connector, you will need access to an on-premise environment or a cloud setup running Node, e.g., Amazon Web Services (AWS). Please read the detailed [integration guide for the environment setup](environment-setup-guide.md). The connector requires Node.js 16 to work.
 
 ## Datatrans Setup
 
@@ -65,6 +61,10 @@ Custom types will have to be created in your commercetools environment to submit
 
 Finally, to create various calls to Datatrans, you will need an API extension. The API extension will be created when [setting up your environment](environment-setup-guide.md).
 
+## Environment Setup
+
+To deploy the connector, you will need access to an on-premise environment or a cloud setup running Node, e.g., Amazon Web Services (AWS). Please read the detailed [guide for the environment setup](environment-setup-guide.md). The connector requires Node.js 16 to work.
+
 ## Connector Configuration
 
 The connector's configuration is done via environment variables. This is also where you set the commercetools API client credentials and Datatrans merchant credentials. You can read more on it [here](environment-setup-guide.md#environment-variables).
@@ -92,7 +92,7 @@ Below is what your `PaymentDraft` could look like.
             "id": "{commercetoolsTypeId}"
         },
         "fields": {
-            "merchantId": "0987654321",
+            "merchantId": "1110001337",
             "successUrl": "{shopUrl}/purchase/1234?s=success",
             "errorUrl": "{shopUrl}/checkout?s=error",
             "cancelUrl": "{shopUrl}/checkout?s=cancel"
@@ -166,7 +166,7 @@ Saving card details for future payments is possible via the connector. If you se
 
 If you want to submit a token in your request to process further customer-initiated-payments (aka fast checkout, one-click checkouts), you can do so by specifying `savedPaymentMethodsKey`, the key referring to the `savedPaymentMethods` entry in which the user's payment methods are stored, and `savedPaymentMethodAlias`, a specific alias listed in that object.
 
-Please note that your front end will have to read the object to get the alias values. Typically, your front end would display a list of all saved methods for the user to choose. The selected saved payment method (alias) would then be set as a custom field when the payment is initiated.
+Please note that your frontend will have to read the object to get the alias values. Typically, your frontend would display a list of all saved methods for the user to choose. The selected saved payment method (alias) would then be set as a custom field when the payment is initiated.
 
 ```json
 {
@@ -205,7 +205,7 @@ Below is what the custom object `savedPaymentMethods` could look like.
 
 ### Choosing the Payment Methods to Display
 
-You can submit one or more payment methods in `paymentMethodInfo.method`. If you submit only one payment method (e.g., `"ECA"`), the gateway will automatically show the final payment screen for that given payment method. If you submit more than one (e.g., `"ECA, VIS, PAP, PAY"`), we will display a payment method selection, where the consumer can select their payment method on our payment form. We recommend doing this pre-selection on your front end whenever possible. For Apple Pay and Google Pay, you will need to specify at least one card supported by Apple Pay or Google Pay to render the payment page correctly. Apple Pay is currently only supported by the Redirect integration. It will only be rendered if the device accessing the payment page has Apple Pay configured correctly and the browser in use is Safari.
+You can submit one or more payment methods in `paymentMethodInfo.method`. If you submit only one payment method (e.g., `"ECA"`), the gateway will automatically show the final payment screen for that given payment method. If you submit more than one (e.g., `"ECA, VIS, PAP, PAY"`), we will display a payment method selection, where the consumer can select their payment method on our payment form. We recommend doing this pre-selection on your frontend whenever possible. For Apple Pay and Google Pay, you will need to specify at least one card supported by Apple Pay or Google Pay to render the payment page correctly. Apple Pay is currently only supported by the Redirect integration. It will only be rendered if the device accessing the payment page has Apple Pay configured correctly and the browser in use is Safari.
 
 ```json
 {
@@ -253,11 +253,11 @@ fields @timestamp, message, payload.traceContext.correlationId as correlationId,
 
 ## Frontend Integration
 
-There are currently no frontend integrations officially supported. If you want us to add official support for one of your desired front end frameworks, you may [get in touch](https://www.datatrans.ch/contact) with us.
+There are currently no frontend integrations officially supported. If you want us to add official support for one of your desired frontend frameworks, you may [get in touch](https://www.datatrans.ch/contact) with us.
 
 The response from your requests to the Create a Payment API will contain a `redirectUrl` and a `transactionId` which you can use to have the consumer's client reach the payment page. If you use the Lightbox integration, you must follow the steps outlined in the Datatrans documentation page for [Redirect & Lightbox](https://docs.datatrans.ch/docs/redirect-lightbox#lightbox-integration).
 
-We recommend doing the pre-selection of the payment method by the customer on your front end.
+We recommend doing the pre-selection of the payment method by the customer on your frontend.
 
 ## Testing
 

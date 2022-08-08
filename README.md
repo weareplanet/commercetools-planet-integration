@@ -12,7 +12,7 @@ Do you have questions? [Contact us](https://www.datatrans.ch/contact)! We'll get
 
 ## Introduction
 
-We built this connector so that you can quickly integrate your payment flows to Planet. The connector links to the Datatrans Gateway (owned by Planet) and will automatically feed valuable payment data to your commercetools environment. We built this connector with guidance from commercetools experts. We will continue to maintain this connector to support updates by commercetools constantly. To use the planet connector, you will require an existing commercetools environment and a Datatrans account. To proceed with real payments, you will need a production account at Datatrans.
+We built this connector so that you can quickly integrate your payment flows to Planet. The connector links to the Datatrans Gateway (owned by Planet) and will automatically feed valuable payment data to your commercetools environment. We built this connector with guidance from commercetools experts. We will continue to maintain this connector to support updates by commercetools. To use the planet connector, you will require an existing commercetools environment and a Datatrans account. To proceed with real payments, you will need a production account at Datatrans.
 
 Add this connector to an existing environment or create a dedicated space in the cloud (e.g., AWS, GCP). Setup one connector for many projects or set up one for each of your projects.
 
@@ -57,6 +57,10 @@ All payment methods supported by Datatrans are listed [here](https://docs.datatr
 ### Notification Module
 
 The connector provides a notification module that is asynchronously fed by the Datatrans gateway. You won't need to do manual actions - the connector picks up important payment information and adds it automatically to commercetools objects.
+
+## Open Source Contribution
+
+We deeply believe in the importance of the open source model. With our connector, we want to allow our merchants and their developers to bring ideas to this repo. Use the issues tab to file issues and feel free to add pull requests for missing features!
 
 ## Next Steps
 
