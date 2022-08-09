@@ -37,10 +37,14 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
     }
 
     default: {
-      logger.warn({
-        isCommerceToolsRequest: OperationDetector.isCommerceToolsRequest(req),
+      const details: Record<string, unknown> = {
         isDatatransRequest: OperationDetector.isDatatransRequest(req)
-      }, 'Handler not found (no supported use case was detected)');
+      };
+      if (OperationDetector.isCommerceToolsRequest(req)) {
+        details.isCommerceToolsRequest = OperationDetector.isCommerceToolsRequest(req);
+        details.commerceToolsAction = req.body.action;
+      }
+      logger.warn(details, 'Handler not found (no supported use case was detected)');
 
       return {
         statusCode: HttpStatusCode.OK,

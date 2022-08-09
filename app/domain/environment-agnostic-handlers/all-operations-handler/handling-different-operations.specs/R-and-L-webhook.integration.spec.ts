@@ -9,6 +9,7 @@ import {
 import { type Payment } from '@commercetools/platform-sdk';
 import {
   IDatatransWebhookRequestBody,
+  DatatransTransactionStatus,
   ICommerceToolsCustomPaymentMethodsObject,
   DatatransPaymentMethod,
   DATATRANS_SIGNATURE_HEADER_NAME
@@ -123,6 +124,58 @@ describe('All-operations handler', () => {
                 fields: {
                   paymentMethod: 'ECA',
                   info: '{"alias":"New ECA card payment alias","masked":"520000******0007"}',
+                },
+                type: {
+                  key: 'pp-datatrans-usedmethod-type',
+                  typeId: 'type',
+                }
+              }
+            }
+          }
+        ];
+        expect(CommerceToolsService.prototype.updatePayment).toBeCalledWith(paymentFetchedFromCT, expectedActions);
+      });
+
+      it('should update Payment in CommerceTools', async () => {
+        const reqTransmitted = RedirectAndLightboxWebhookRequestFactory({
+          status: DatatransTransactionStatus.transmitted,
+          paymentMethod: DatatransPaymentMethod.PAP,
+          PAP: {
+            alias: 'New PAP payment alias',
+            payerId: 'N95ELGLL4Xqqq'
+          }
+        });
+        delete (reqTransmitted.body as IDatatransWebhookRequestBody).card;
+
+        await handler(reqTransmitted);
+
+        const dateFromDtHistoryAuthorizeTransaction = (req.body as IDatatransWebhookRequestBody).history?.[1].date;
+        const expectedActions = [
+          { action: 'setStatusInterfaceCode', interfaceCode: 'transmitted' },
+          {
+            action: 'addInterfaceInteraction',
+            type: { typeId: 'type', key: 'pp-datatrans-interface-interaction-type' },
+            fields: {
+              message: reqTransmitted.rawBody,
+              timeStamp: fakeCurrentDate,
+              interactionType: 'webhook'
+            }
+          },
+          {
+            action: 'addTransaction',
+            transaction: {
+              type: 'Authorization',
+              state: 'Success',
+              interactionId: 'Test transactionId',
+              timestamp: dateFromDtHistoryAuthorizeTransaction,
+              amount: {
+                centAmount: 12345,
+                currencyCode: 'EUR',
+              },
+              custom: {
+                fields: {
+                  paymentMethod: 'PAP',
+                  info: '{"alias":"New PAP payment alias","payerId":"N95ELGLL4Xqqq"}',
                 },
                 type: {
                   key: 'pp-datatrans-usedmethod-type',
