@@ -174,7 +174,7 @@ describe('Redacted fields', () => {
       );
     });
 
-    it('"alias" in a savedPaymentMethods Custom Object', () => {
+    it('"alias" in a savedPaymentMethods Custom Object for "card"', () => {
       const customObject = {
         'id': 'd03aad3a-638d-46b9-bc7a-924794a1fcc1',
         'version': 2,
@@ -221,6 +221,56 @@ describe('Redacted fields', () => {
 
       expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"value":\[.*"card":{"alias":"\[REDACTED\]".*/)
+      );
+    });
+
+    it('"alias" in a savedPaymentMethods Custom Object for a method other than "card"', () => {
+      const customObject = {
+        'id': 'd03aad3a-638d-46b9-bc7a-924794a1fcc1',
+        'version': 2,
+        'versionModifiedAt': '2022-08-05T08:10:48.842Z',
+        'createdAt': '2022-08-05T07:55:07.293Z',
+        'lastModifiedAt': '2022-08-05T08:10:48.842Z',
+        'lastModifiedBy': {
+          'clientId': 'E6VZz54cZHcaW7Xs_NWw1Txe',
+          'isPlatformClient': false
+        },
+        'createdBy': {
+          'clientId': 'E6VZz54cZHcaW7Xs_NWw1Txe',
+          'isPlatformClient': false
+        },
+        'container': 'savedPaymentMethods',
+        'key': 'ct-e2e-app-payment-methods',
+        'value': [
+          {
+            'paymentMethod': 'TWI',
+            'TWI': {
+              'alias': '7LHXscqwAAEAAAGCbQArfeHJDUlkAHh_',
+              'fingerprint': 'F-ejQK0Azts8br5mnOfyjurl',
+              'masked': '424242xxxxxx4242',
+              'expiryMonth': '06',
+              'expiryYear': '25',
+              'info': {
+                'brand': 'VISA CREDIT',
+                'type': 'credit',
+                'usage': 'consumer',
+                'country': 'GB',
+                'issuer': 'DATATRANS'
+              },
+              '3D': {
+                'authenticationResponse': 'D'
+              }
+            }
+          }
+        ]
+      };
+
+      const { logger, logStream } = loadLogServiceForTesting();
+
+      logger.info(customObject);
+
+      expect(logStream.write).toBeCalledWith(
+        expect.stringMatching(/"value":\[.*"TWI":{"alias":"\[REDACTED\]".*/)
       );
     });
 
