@@ -17,7 +17,7 @@ const pathsToBeRedacted: string[] = [
 
   // "alias" field of the log Object:
   ...getAllShortedPaths('body.*.alias'),         // alias in a Datatrans initRequest when alias (to be used) is passed to Datatrans
-  ...getAllShortedPaths('value[*].card.alias'),  // alias in a "savedPaymentMethods" Custom Object
+  ...getAllShortedPaths('value[*].*.alias'),     // alias in a "savedPaymentMethods" Custom Object (for "card" and any other method)
 
   // "alias" within a serialized JSON in some field of the log Object:
   'actions[*].transaction.custom.fields.info',   // info in "addTransaction" action
