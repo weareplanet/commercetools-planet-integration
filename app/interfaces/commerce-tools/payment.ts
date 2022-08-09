@@ -57,6 +57,10 @@ export const CommerceToolsPaymentSchema = yup.object({
         .when('savePaymentMethod', {
           is: true,
           then: (thisField) => thisField.required(ErrorMessages.missingCustomField())
+        })
+        .when('savedPaymentMethodAlias', {
+          is: (value: string) => !!value,
+          then: (thisField) => thisField.required(ErrorMessages.missingCustomField())
         }),
       savedPaymentMethodAlias: yup
         .string()
