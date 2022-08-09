@@ -172,19 +172,38 @@ describe('All-operations handler', () => {
           );
         });
 
-        it('for a Wallet payment - should NOT save the payment method to CommerceTools', async () => {
-          const req = RedirectAndLightboxWebhookRequestFactory({
-            paymentMethod: DatatransPaymentMethod.ECA,
-            card: {
-              alias: 'New ECA card payment alias',
-              masked: '520000******0007',
-              walletIndicator: 'PAY'
-            }
-          });
-          await handler(req);
+        it.each([
+          [DatatransPaymentMethod.PAY],
+          [DatatransPaymentMethod.APL]
+        ])(
+          'for a Wallet payment (%s) - should NOT save the payment method to CommerceTools', async () => {
+            const req = RedirectAndLightboxWebhookRequestFactory({
+              paymentMethod: DatatransPaymentMethod.ECA,
+              card: {
+                alias: 'New ECA card payment alias',
+                masked: '520000******0007',
+                walletIndicator: '%s'
+              }
+            });
+            await handler(req);
 
-          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
-        });
+            expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
+          });
+
+        it.each([
+          [DatatransPaymentMethod.GPA],
+          [DatatransPaymentMethod.DEA],
+          [DatatransPaymentMethod.PSC],
+          [DatatransPaymentMethod.SAM],
+          [DatatransPaymentMethod.ELV]
+        ])(
+          'for %s payment method - should NOT save the payment method to CommerceTools',
+          async (paymentMethod) => {
+            const req = RedirectAndLightboxWebhookRequestFactory({ paymentMethod });
+            await handler(req);
+
+            expect(CommerceToolsService.prototype.createOrUpdateCustomObject).not.toBeCalled();
+          });
       });
 
       describe('if Payment.savePaymentMethod is false', () => {

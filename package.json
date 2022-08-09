@@ -32,7 +32,6 @@
     "axios": "^0.27.2",
     "http-status-code-const-enum": "^1.0.2",
     "husky": "^8.0.1",
-    "morphism": "^1.12.3",
     "node-fetch": "^2.6.7",
     "pino": "^8.0.0",
     "uuid": "^8.3.2",
