@@ -49,7 +49,7 @@ To use the connector, you will need a valid commercetools account. You can use a
 
 tbd: do you need to set this up manually? and if via script, how does it get credentials?
 
-A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need for the proper communication to commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs access to at least `Payments` and `Custom Objects`. The credentials are stored in the [connector's configuration](#connector-configuration). The API client will be created when [setting up your environment](environment-setup-guide.md).
+A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need to enable the communication between the connector and commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs access to at least `Payments` and `Custom Objects`. The credentials are stored in the [connector's configuration](#connector-configuration). The API client will be created when [setting up your environment](environment-setup-guide.md).
 
 ### Custom Types
 

@@ -2,17 +2,17 @@
 
 ![Version](https://img.shields.io/github/v/tag/weareplanet/commercetools-planet-integration?label=commercetools-planet-integration&color=%23000000) ![License](https://img.shields.io/badge/license-Planet-%23000000) ![Node Requirement](https://img.shields.io/badge/node-%2016.0.0-%2343853D)
 
-Need a modern approach for your online payments? Look no further. With our connector, your commercetools' projects will get instant access to dozens of payment methods, acquirers, and currencies. Offer your customers a state-of-the-art user experience for online payments.
+Need a modern approach for your online payments? Look no further. With our connector, your commercetools projects will get instant access to dozens of payment methods, acquirers, and currencies. Offer your customers a state-of-the-art user experience for online payments.
 
-Planet is a multi-national financial services company specializing in payments and tax-free solutions. As a leading payment service provider, Planet processes millions of transactions daily through various payment gateways, one of them being Datatrans. Datatrans will be the payment gateway used by the connector.
+Planet is a global financial services company specializing in payments and tax-free solutions. As a leading payment service provider, Planet processes millions of transactions daily through various payment gateways, one of them being Datatrans. Datatrans will be the payment gateway used by the connector.
 
-This connector allows you to connect your commercetools environments to Planet quickly. The Planet connector will save your developers days of integration effort. Focus on your expertise, and let us guide you on how to best implement Planet payments in commercetools.
+This connector allows you to connect your commercetools solution to Planet to process your payments in a quick and easy way. The Planet connector will save your developers days of integration effort. Focus on your expertise, and let us guide you on how to best implement Planet payments in commercetools.
 
 Do you have questions? [Contact us](https://www.datatrans.ch/contact)! We'll get back to you in no time.
 
 ## Introduction
 
-We built this connector so that you can quickly integrate your payment flows to Planet. The connector links to the Datatrans Gateway (owned by Planet) and will automatically feed valuable payment data to your commercetools environment. We built this connector with guidance from commercetools experts. We will continue to maintain this connector to support updates by commercetools. To use the planet connector, you will require an existing commercetools environment and a Datatrans account. To proceed with real payments, you will need a production account at Datatrans.
+We built this connector to simplify and speed up the integration of your payment flows with Planet. The connector links to the Datatrans Gateway (owned by Planet) and will automatically feed valuable payment data to your commercetools project. We built this connector with guidance and support from commercetools experts. We will continue to maintain this connector to be in sync with the latest releases by commercetools and Datatrans. To use the Planet connector, you will require an existing commercetools and Datatrans account. To proceed with real payments, you will need a production account at Datatrans.
 
 Add this connector to an existing environment or create a dedicated space in the cloud (e.g., AWS, GCP). Setup one connector for many projects or set up one for each of your projects.
 
