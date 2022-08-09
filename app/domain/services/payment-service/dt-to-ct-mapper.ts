@@ -32,7 +32,7 @@ export class DatatransToCommerceToolsMapper {
       case DatatransTransactionStatus.failed:
         return 'Failure';
       default:
-        throw new Error('Unexpected/unhandled Datatrans transaction status');
+        throw new Error(`Unexpected/unhandled Datatrans transaction status: ${dtTransactionStatus}`);
     }
   }
 
