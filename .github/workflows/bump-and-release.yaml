@@ -1,24 +1,20 @@
 name: Bump and Release
 
 on:
+  #pull_request:
   push:
     #types: [ labeled ]
     branches:
-    - "feat/INC-61"
-  #pull_request:
-  #  types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
-  #  branches:
-  #    - main
-  #    - master
-  #    - "feat/INC-61"
+    - main
+    - "INC-31-semantic-versioning"
 
 jobs:
   bump-and-release:
-    name: Bumps version and Release tag
+    name: Bump version and Release tag
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set 'patch' release by default
+      - name: Bump 'patch' by default
         run: |
           echo "debug : github.event.label.name = ${{ github.event.label.name }}" \
           && echo "BUMP=patch" >> $GITHUB_ENV
@@ -28,7 +24,7 @@ jobs:
       - name: Check and set 'major' release
         if: ${{ github.event.label.name == 'bump:major' }}
         run: echo "BUMP=major" >> $GITHUB_ENV
-      - name: Install semver-tool 
+      - name: Install semver-tool
         # as standard ubuntu-latest doesn't have it
         run: |
           export DIR=$(mktemp -d)
@@ -40,7 +36,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup git
+      - name: Configure the cloned repo
         run: |
           git config user.email "githubactions@planetpayment.com"
           git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
@@ -51,20 +47,21 @@ jobs:
           if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
           export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
-      - name: Modifying the CHANGELOG
+      - name: Modify CHANGELOG
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on 'package.json'
         run: |
-          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json 
-          grep "version" package.json 
-      - name: Commit changes
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package-lock.json
+          grep "version" package.json
+      - name: Commit and push changes
         run: |
           if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
           git add package.json
-          git commit -m "Bump to version ${{ env.VERSION }}"
-      - name: Pushing
-        run: git push
+          git add package-lock.json
+          git commit -m "Bump the package version to ${{ env.VERSION }}"
+          git push
       - name: Create Release
         uses: actions/create-release@v1
         env:
