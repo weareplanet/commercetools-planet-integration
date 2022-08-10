@@ -19,6 +19,7 @@ export class ErrorsService extends ServiceWithLogger {
 
     const error: Error = (err instanceof NestedError) ? err.innerError : err;
 
+    this.logger.debug({ req }, 'Request under processing');
     this.logger.error({ error }, message);
 
     if (OperationDetector.isCommerceToolsRequest(req)) {
