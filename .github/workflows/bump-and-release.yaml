@@ -53,13 +53,14 @@ jobs:
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package-lock.json
           grep "version" package.json
-      - name: Commit and push changes
+      - name: Commit changes
         run: |
           if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
           git add package.json
           git add package-lock.json
           git commit -m "Bump the package version to ${{ env.VERSION }}"
-          git push
+      - name: Push changes
+        run: git push
       - name: Create Release
         uses: actions/create-release@v1
         env:
