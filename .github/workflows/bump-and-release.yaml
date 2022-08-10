@@ -1,25 +1,21 @@
 name: Bump and Release
 
 on:
-  #pull_request:
-  #  types: [ labeled ]
-  #  branches:
-  #    - main
-  #    - master
-  #    - "feat/INC-61"
-  push:
-    types: [ labeled ]
+  pull_request:
+    types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
     branches:
-    - "feat/INC-61"
+      - main
 
 jobs:
   bump-and-release:
-    name: Bumps version and Release tag
+    name: Bump version and Release tag
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set 'patch' release by default
-        run: echo "BUMP=patch" >> $GITHUB_ENV
+      - name: Bump 'patch' by default
+        run: |
+          echo "debug : github.event.label.name = ${{ github.event.label.name }}" \
+          && echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
         if: ${{ github.event.label.name == 'bump:minor' }}
         run: echo "BUMP=minor" >> $GITHUB_ENV
@@ -27,6 +23,7 @@ jobs:
         if: ${{ github.event.label.name == 'bump:major' }}
         run: echo "BUMP=major" >> $GITHUB_ENV
       - name: Install semver-tool
+        # as standard ubuntu-latest doesn't have it
         run: |
           export DIR=$(mktemp -d)
           cd $DIR
@@ -41,7 +38,6 @@ jobs:
         run: |
           git config user.email "githubactions@planetpayment.com"
           git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
-          git checkout main
           git fetch
       - name: Bump version
         run: |
@@ -49,37 +45,23 @@ jobs:
           if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
           export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
-      - name: Setup git
+      - name: Modify CHANGELOG
         run: |
-          git config user.email "githubactions@planetpayment.com"
-          git config user.name "GitHub Actions"
-      - name: Prepare CHANGELOG
-        run: |
-          echo "${{ github.event.pull_request.body }}" | csplit -s - "/##/"
-          echo "# Changelog
-
-          ## ${{ env.VERSION }}
-          " >> CHANGELOG.tmp
-          grep "^*" xx01 >> CHANGELOG.tmp
-          grep -v "^# " CHANGELOG.md >> CHANGELOG.tmp
-          cp CHANGELOG.tmp CHANGELOG.md
-      - name: Prepare README
-        run: |
-          export MAJOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f1)
-          export MINOR=$(echo "${{ env.VERSION }}" | cut -d'.' -f2)
-      - name: Prepare update
+          if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
+      - name: Updating version on package.json and package-lock.json
         run: |
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
-      - name: Commit changes
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package-lock.json
+          grep "version" package.json
+      - name: Commit and push changes
         run: |
-          echo 'git status:'
+          git checkout main
           git status
           if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
           git add package.json
           git add package-lock.json
           git commit -m "Bump the package version to ${{ env.VERSION }}"
-      - name: Push changes
-        run: git push
+          git push
       - name: Create Release
         uses: actions/create-release@v1
         env:
