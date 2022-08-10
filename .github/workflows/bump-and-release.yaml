@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Bump 'patch' by default
         run: |
+          echo "debug : github.event = ${{ github.event }}" \
+          echo "debug : github.event.labels = ${{ github.event.labels }}" \
           echo "debug : github.event.label.name = ${{ github.event.label.name }}" \
           && echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
