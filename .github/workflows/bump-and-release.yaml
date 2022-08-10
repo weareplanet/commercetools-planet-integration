@@ -1,12 +1,10 @@
 name: Bump and Release
 
 on:
-  #pull_request:
-  push:
-    #types: [ labeled ]
+  pull_request:
+    types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
     branches:
-    - main
-    - "INC-31-semantic-versioning"
+      - main
 
 jobs:
   bump-and-release:
@@ -50,7 +48,7 @@ jobs:
       - name: Modify CHANGELOG
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
-      - name: Updating version on 'package.json'
+      - name: Updating version on package.json and package-lock.json
         run: |
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package-lock.json
