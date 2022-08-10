@@ -2,12 +2,14 @@ name: Bump and Release
 
 on:
   pull_request:
-    types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
+    # types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
+    types: [ closed ]
     branches:
       - main
 
 jobs:
   bump-and-release:
+    if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
     name: Bump version and Release tag
     runs-on: ubuntu-latest
 
