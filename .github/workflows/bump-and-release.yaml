@@ -37,12 +37,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Configure the cloned repo
-        run: |
-          git config user.email "githubactions@planetpayment.com"
-          git config user.name "GHA '${{ github.workflow }}' workflow, on behalf of ${{ github.actor }}."
-          git checkout main
-          git fetch
       - name: Bump version
         run: |
           TAG=$(git tag --sort=-creatordate | head -n 1) && \
@@ -57,7 +51,7 @@ jobs:
         run: |
           echo "${{ github.event.pull_request.body }}" | csplit -s - "/##/"
           echo "# Changelog
-
+          
           ## ${{ env.VERSION }}
           " >> CHANGELOG.tmp
           grep "^*" xx01 >> CHANGELOG.tmp
@@ -72,21 +66,7 @@ jobs:
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
       - name: Commit changes
         run: |
-          echo 'git status:'
-          git status
-          if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
-          git add package.json
-          git add package-lock.json
-          git commit -m "Bump the package version to ${{ env.VERSION }}"
-      - name: Push changes
+          git add CHANGELOG.md README.md package.json
+          git commit -m "GHA - Bump to version ${{ env.VERSION }}"
+      - name: Push
         run: git push
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: ${{ env.VERSION }}
-          #body_path: CHANGELOG.md
-          #draft: false
-          #prerelease: false
