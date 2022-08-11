@@ -25,12 +25,14 @@ jobs:
         run: echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
         # if: ${{ github.event.label.name == 'bump:minor' }}
-        if: ${{ "${env.PR_LABELS[*]}" =~ "bump:minor" }}
-        run: echo "BUMP=minor" >> $GITHUB_ENV
+        # run: echo "BUMP=minor" >> $GITHUB_ENV
+        run: |
+          if [[ "${ env.PR_LABELS[*] }" =~ "bump:minor" ]] then; echo "BUMP=minor" >> $GITHUB_ENV; fi
       - name: Check and set 'major' release
         # if: ${{ github.event.label.name == 'bump:major' }}
-        if: ${{ "${env.PR_LABELS[*]}" =~ "bump:major" }}
-        run: echo "BUMP=major" >> $GITHUB_ENV
+        # run: echo "BUMP=major" >> $GITHUB_ENV
+        run: |
+          if [[ "${ env.PR_LABELS[*] }" =~ "bump:major" ]] then; echo "BUMP=major" >> $GITHUB_ENV; fi
       - name: Install semver-tool
         # as standard ubuntu-latest doesn't have it
         run: |
@@ -54,6 +56,7 @@ jobs:
           if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
           echo "Tag: $TAG"
           export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
+          echo "The calculated new version is $NEW_VERSION"
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
       - name: Modify CHANGELOG
         run: |
