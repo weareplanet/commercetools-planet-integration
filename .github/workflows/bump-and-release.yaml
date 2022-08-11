@@ -2,7 +2,7 @@ name: Bump and Release
 
 on:
   pull_request:
-    # types: [ labeled ] # remove this to have it bumped for minor automatically OR it will use present labels to bump version
+    # types: [ labeled ]
     types: [ closed ]
     branches:
       - main
