@@ -15,12 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Bump 'patch' by default
+      - name: Dump GitHub event
+        env:
+          GITHUB_EVENT: ${{ toJson(github.event) }}
         run: |
-          echo "debug : github.event:" \
-          for key in "${github.event[@]}"; do echo $key; done \
-          echo "debug : github.event.pull_request.labels: ${{ github.event.pull_request.labels }}" \
-          && echo "BUMP=patch" >> $GITHUB_ENV
+          echo "$GITHUB_EVENT"
+      - name: Bump 'patch' by default
+        run: echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
         if: ${{ github.event.label.name == 'bump:minor' }}
         run: echo "BUMP=minor" >> $GITHUB_ENV
