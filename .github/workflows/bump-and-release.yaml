@@ -20,19 +20,20 @@ jobs:
           GITHUB_EVENT: ${{ toJson(github.event) }}
         run: |
           echo "$GITHUB_EVENT"
-          echo "PR_LABELS=${{ github.event.pull_request.labels }}" >> $GITHUB_ENV
       - name: Bump 'patch' by default
         run: echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
         # if: ${{ github.event.label.name == 'bump:minor' }}
-        # run: echo "BUMP=minor" >> $GITHUB_ENV
-        run: |
-          if [[ "${ ${{env.PR_LABELS}}[*] }" =~ "bump:minor" ]]; then echo "BUMP=minor" >> $GITHUB_ENV; fi
+        if: ${{ contains( github.event.pull_request.labels.*.name, 'bump:minor') }}
+        run: echo "BUMP=minor" >> $GITHUB_ENV
+        # run: |
+        #   if [[ "${ ${{github.event.pull_request.labels}}[*] }" =~ "bump:minor" ]]; then echo "BUMP=minor" >> $GITHUB_ENV; fi
       - name: Check and set 'major' release
         # if: ${{ github.event.label.name == 'bump:major' }}
-        # run: echo "BUMP=major" >> $GITHUB_ENV
-        run: |
-          if [[ "${ ${{env.PR_LABELS}}[*] }" =~ "bump:major" ]]; then echo "BUMP=major" >> $GITHUB_ENV; fi
+        if: ${{ contains( github.event.pull_request.labels.*.name, 'bump:major') }}
+        run: echo "BUMP=major" >> $GITHUB_ENV
+        # run: |
+        #   if [[ "${ ${{github.event.pull_request.labels}}[*] }" =~ "bump:major" ]]; then echo "BUMP=major" >> $GITHUB_ENV; fi
       - name: Install semver-tool
         # as standard ubuntu-latest doesn't have it
         run: |
