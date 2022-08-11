@@ -20,14 +20,16 @@ jobs:
           GITHUB_EVENT: ${{ toJson(github.event) }}
         run: |
           echo "$GITHUB_EVENT"
-          echo "debug : github.event.pull_request.labels: ${{ github.event.pull_request.labels }}"
+          echo "PR_LABELS=${{ github.event.pull_request.labels }}" >> $GITHUB_ENV
       - name: Bump 'patch' by default
         run: echo "BUMP=patch" >> $GITHUB_ENV
       - name: Check and set 'minor' release
-        if: ${{ github.event.label.name == 'bump:minor' }}
+        # if: ${{ github.event.label.name == 'bump:minor' }}
+        if: ${{ "${env.PR_LABELS[*]}" =~ "bump:minor" }}
         run: echo "BUMP=minor" >> $GITHUB_ENV
       - name: Check and set 'major' release
-        if: ${{ github.event.label.name == 'bump:major' }}
+        # if: ${{ github.event.label.name == 'bump:major' }}
+        if: ${{ "${env.PR_LABELS[*]}" =~ "bump:major" }}
         run: echo "BUMP=major" >> $GITHUB_ENV
       - name: Install semver-tool
         # as standard ubuntu-latest doesn't have it
