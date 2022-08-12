@@ -3,7 +3,8 @@ import {
   repairEnvLogLevel,
   loadLogServiceForTesting,
   RedirectAndLightboxPaymentInitRequestBodyFactory,
-  CreateInitializeTransactionRequestFactory
+  CreateInitializeTransactionRequestFactory,
+  abstractRequestFactory
 } from '../../../../test/test-utils';
 
 describe('Redacted fields', () => {
@@ -33,6 +34,22 @@ describe('Redacted fields', () => {
 
       expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"body":{.*,"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
+      );
+    });
+
+    it('"body.resource.obj.custom.fields.savedPaymentMethodAlias"', () => {
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
+      const commerceToolsExtensionRequestWithBodyOnly = {
+        body: redirectAndLightboxPaymentInitRequestBody,
+      };
+
+      const { logger, logStream } = loadLogServiceForTesting();
+
+      logger.info({ req: commerceToolsExtensionRequestWithBodyOnly });
+
+      expect(logStream.write).toBeCalledWith(
+        expect.stringMatching(/"payload":{"req".*{.*"body":{.*,"custom":{.*,"fields":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
       );
     });
 
@@ -100,7 +117,7 @@ describe('Redacted fields', () => {
       );
     });
 
-    it('"savedPaymentMethodAlias"', () => {
+    it('"savedPaymentMethodAlias" (at the top level)', () => {
       const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
       redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
       const commerceToolsExtensionRequestWithBodyOnly = {
@@ -113,6 +130,71 @@ describe('Redacted fields', () => {
 
       expect(logStream.write).toBeCalledWith(
         expect.stringMatching(/"payload":{"key":"refno".*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
+      );
+    });
+
+    it('"savedPaymentMethodAlias" in a validation error log message', () => {
+      const msg = {
+        payload: {
+          error: {
+            value: {
+              resource: {
+                obj: {
+                  custom: {
+                    fields: {
+                      initRequest: {},
+                      savedPaymentMethodAlias: '7LHXscqwAAEAAAGCbQ5u7XjzHbaRAO91',
+                      cancelUrl: 'http://localhost:3000/cancel',
+                      errorUrl: 'http://localhost:3000/error',
+                      successUrl: 'http://localhost:3000/success',
+                      merchantId: '1110002457'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+
+      const { logger, logStream } = loadLogServiceForTesting();
+
+      logger.info(msg);
+
+      expect(logStream.write).toBeCalledWith(
+        expect.stringMatching(/"payload":{.*"error":{.*"savedPaymentMethodAlias":"\[REDACTED\]".*/)
+      );
+    });
+
+    it('"savedPaymentMethodAlias" (within a serialized JSON) in rawBody', () => {
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
+      const commerceToolsExtensionRequestWithBodyOnly = abstractRequestFactory({
+        body: redirectAndLightboxPaymentInitRequestBody
+      });
+
+      const { logger, logStream } = loadLogServiceForTesting();
+
+      logger.info(commerceToolsExtensionRequestWithBodyOnly);
+
+      expect(logStream.write).toBeCalledWith(
+        expect.stringMatching(/"payload":{.*"rawBody":"\[REDACTED\]".*/)
+      );
+    });
+
+    it('"savedPaymentMethodAlias" (within a serialized JSON) in req.rawBody', () => {
+      const redirectAndLightboxPaymentInitRequestBody = RedirectAndLightboxPaymentInitRequestBodyFactory();
+      redirectAndLightboxPaymentInitRequestBody.resource.obj.custom.fields.savedPaymentMethodAlias = 'savedPaymentMethodAlias';
+      const commerceToolsExtensionRequestWithBodyOnly = abstractRequestFactory({
+        body: redirectAndLightboxPaymentInitRequestBody
+      });
+
+      const { logger, logStream } = loadLogServiceForTesting();
+
+      logger.info({ req: commerceToolsExtensionRequestWithBodyOnly });
+
+      expect(logStream.write).toBeCalledWith(
+        expect.stringMatching(/"payload":{"req":{.*"rawBody":"\[REDACTED\]".*/)
       );
     });
   });
