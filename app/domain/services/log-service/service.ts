@@ -13,17 +13,20 @@ const getAllShortedPaths = (longestPath: string): string[] => {
 };
 
 const pathsToBeRedacted: string[] = [
-  ...getAllShortedPaths('*.resource.obj.custom.fields.savedPaymentMethodAlias'), // Payment.savedPaymentMethodAlias in a request from CommerceTools
+  // savedPaymentMethodAlias
+  ...getAllShortedPaths('*.*.resource.obj.custom.fields.savedPaymentMethodAlias'), // Payment.savedPaymentMethodAlias in a request from CommerceTools
+  ...getAllShortedPaths('*.error.value.resource.obj.custom.fields.savedPaymentMethodAlias'), // savedPaymentMethodAlias within validation error log message
 
   // "alias" field of the log Object:
   ...getAllShortedPaths('body.*.alias'),         // alias in a Datatrans initRequest when alias (to be used) is passed to Datatrans
   ...getAllShortedPaths('value[*].*.alias'),     // alias in a "savedPaymentMethods" Custom Object (for "card" and any other method)
 
-  // "alias" within a serialized JSON in some field of the log Object:
+  // "alias" or "savedPaymentMethodAlias" within a serialized JSON in some field of the log Object:
   'actions[*].transaction.custom.fields.info',   // info in "addTransaction" action
   'actions[*].fields.message',                   // message in "addInterfaceInteraction" action
-  'transactions[*].custom.fields.info',        // info in Payment.transactions[]
-  'interfaceInteractions[*].fields.message',   // message in Payment.interfaceInteractions[]
+  'transactions[*].custom.fields.info',          // info in Payment.transactions[]
+  'interfaceInteractions[*].fields.message',     // message in Payment.interfaceInteractions[]
+  ...getAllShortedPaths('*.*.rawBody')           // IAbstractRequest.rawBody
 ];
 
 const pinoOptions: pino.LoggerOptions = {
