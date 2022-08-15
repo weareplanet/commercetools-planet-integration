@@ -6,7 +6,7 @@
 # 2022-07 - Planet Payments
 #
 # - run this script at the root folder of the cloned repo
-#   (using "bash deploy/commercetools/07-build-package.sh")
+#   (using "bash deploy/07-build-package.sh")
 #
 # REQUIREMENTS:
 # - Planet Payment Connector GIT repo cloned locally

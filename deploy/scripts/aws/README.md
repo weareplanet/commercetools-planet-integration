@@ -23,7 +23,7 @@ Some steps' details aren't covered by this procedure, like obtaining Datatrans c
 
 This procedure was developed and tested on Ubuntu Linux 20.04 and _should_ run ok on other Linux distros and "UNIX-like" OSs (like MacOS).
 =======
-## Summary 
+## Summary
 
 This procedure helps on deploying a sample Planet Payment CommerceTools connector, which runs as a Lambda function. It's a reference and maybe isn't suitable for usage on production systems - it doesn't take into account any other existing AWS resources.
 There are scripts and templates for deployment that can be used several times to create any desired number of infrastructure stacks.
@@ -53,7 +53,7 @@ This procedure was developed and tested on Ubuntu Linux 20.04 and _should_ run o
 <<<<<<< HEAD
 - a Bash shell (others can do the trick although this wasn't throughly tested here)
 =======
-- a Bash shell 
+- a Bash shell
 >>>>>>> ef7f739 (INC-5 - major refactor)
 - AWS CLI properly installed for the OS/shell
 - this repository cloned
@@ -70,7 +70,7 @@ This procedure was developed and tested on Ubuntu Linux 20.04 and _should_ run o
 
 You can skip this step if you already have the Datatrans setup done and all information below.
 
-Details on the needed information regarding the needed ENV vars can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration) altogether with links for how to get them. This procedure doesn't cover in details how to setup Datatrans (account, credentials). 
+Details on the needed information regarding the needed ENV vars can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration) altogether with links for how to get them. This procedure doesn't cover in details how to setup Datatrans (account, credentials).
 A mild suggestion is to look [here](https://docs.datatrans.ch/docs/home).
 
 From the setup, you must get the following pieces of information:
@@ -97,7 +97,7 @@ From this setup, when creating the API client, you must get the following pieces
 
 | Item | Type | Usage at Lambda ENV var | Usage at `ct-setup.sh` ENV var|
 |---|---|---|---|
-|`CommerceTools API URL`| URL | **CT_API_URL** | **CT_API_URL** 
+|`CommerceTools API URL`| URL | **CT_API_URL** | **CT_API_URL**
 |`CommerceTools AUTH URL`| URL | **CT_AUTH_URL** | **CT_AUTH_URL** |
 |`CommerceTools PROJECT ID/KEY`| string | **CT_PROJECT_ID** |**CT_PROJECT_ID** |
 |`CommerceTools CLIENT ID`| string | **CT_CLIENT_ID** | **CT_CLIENT_ID** |
@@ -158,7 +158,7 @@ The .env file will look like this:
 # https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration
 #
 #
-##### CommerceTools - API Operations 
+##### CommerceTools - API Operations
 # (API-Client creation, API Extension creation and Custom Fields Types creation)
 #
 # all variables must belong to a single project, declared below in CT_PROJECT_ID (from CommerceTools CTP_PROJECT_KEY)
@@ -174,7 +174,7 @@ AWS_API_EXTENSION_SECRET="to be filled by 05-aws-deploy.sh in step 5"
 AWS_LAMBDA_ARN="to be filled by 05-aws-deploy.sh in step 5"
 #
 #
-# these credentials and scopes relate to the FIRST API-Client within CommerceTools project, 
+# these credentials and scopes relate to the FIRST API-Client within CommerceTools project,
 # as mentioned here: https://docs.commercetools.com/api/authorization#creating-an-api-client
 # !!!!! DO NOT USE THIS FOR YOUR NEW API-CLIENT, use it just for its creation !!!!!
 CT_CLIENT_ID="clientIDhash to be filled up by merchant"
@@ -213,7 +213,7 @@ _will create a few custom fields types within the project, using JSON files with
 
    (_an example:   **`bash 05-aws-deploy.sh prod01 eu-west-1`**_)
 - Take a look at the CloudFormation dashboard and wait for the stack creation completion, it should take a few minutes.
-- The Lambda function name will be `planetpaymentcommtool-STACKID`, where STACKID is your provided value (this name can be customized within the script, read its comments before changing anything in it). 
+- The Lambda function name will be `planetpaymentcommtool-STACKID`, where STACKID is your provided value (this name can be customized within the script, read its comments before changing anything in it).
 >>>>>>> ef7f739 (INC-5 - major refactor)
 
 A few details about the supporting files
@@ -224,7 +224,7 @@ A few details about the supporting files
 | **planetpaymentconnector-stack-template.yaml** | A CloudFormation (CF) template that creates all infrastructure resources within an user-specified AWS account and region. It is copied then customized by cf-deploy.sh to create CF stacks. Do not use as-is. Avoid changing it if not sure on how CloudFormation works. |
 | **cf-deploy.sh** | Shell script to create a CF stack, using the planetpaymentconnector-stack-template.yaml. Each run with different input parameters will render a different stack (with its own Lambda function and permissions) allowing multiple functions to work.|
 
-**Notes about _cf-deploy.sh** 
+**Notes about _cf-deploy.sh**
 1. After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging or versioning, for example.
 2. Inside `cf-deploy.sh` there are a few pre-filled ENV vars for the Lambda function. **These ENV vars values can be modified in the script prior to running it, using the information from steps 1 and 2. This can save time on the step 6 ahead.**
 
@@ -327,7 +327,7 @@ _**Requisites**_
 
 Run the script **from the cloned repository root folder:**
 
-> **`bash ./deploy/commercetools/07-build-package.sh`**
+> **`bash ./deploy/07-build-package.sh`**
 
 Wait a few minutes for completion then look at the .zip filename in the output. Use this file for the next step.
 <br><br>
