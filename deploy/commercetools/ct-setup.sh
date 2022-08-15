@@ -4,8 +4,8 @@
 # 2022-07 - Planet Payments
 # This script is just an example, the final real-life implementation may be quite different.
 
-# It will iterate over JSON files present at script's folder and create the 
-# custom field types into CommerceTools project accordingly. 
+# It will iterate over JSON files present at script's folder and create the
+# custom field types into CommerceTools project accordingly.
 # Each file represents a custom field type.
 
 # REQUIREMENTS:
@@ -39,9 +39,8 @@ ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
 echo "   ## Got an access token from CommerceTools: ${ACCESS_TOKEN}"
 
 for filename in ./types/*.json; do
-	echo " "
 	typeKey=$(basename "$filename" .json)
-	echo "##### Checking if '${typeKey}' type exists in CommerceTools..."
+	echo "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
 
 	statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
 		-X GET ${CT_API_URL}/${CT_PROJECT_ID}/types/key=${typeKey} -i \
@@ -74,7 +73,7 @@ for filename in ./types/*.json; do
 	fi
 
 done
-echo " "
-echo "##### Done."
+
+echo "\n##### Done."
 
 exit 0
