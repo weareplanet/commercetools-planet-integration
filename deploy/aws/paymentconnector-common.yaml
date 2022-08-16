@@ -87,7 +87,7 @@ Resources:
           };
       Description: Lambda function for Payment Connector, without API Gateway.
       FunctionName: !Ref "lambdaFunctionDummy"
-      Handler: "app/environment-specific-handlers/aws-lambda-via-arn/index.allOperationsHandler"
+      Handler: "app/environment-specific-handlers/aws-lambda-via-http/index.allOperationsHandler"
       MemorySize: 128
       Role: !GetAtt LambdaIamRole.Arn
       Runtime: nodejs16.x
