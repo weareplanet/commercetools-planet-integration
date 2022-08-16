@@ -55,13 +55,15 @@ export class AwsArnGatewayAdapter implements IAbstractToEnvHandlerAdapter<unknow
     statusCode: number,
     body: IAbstractBody
   ) {
+    const payload = (typeof body === 'string')
+      ? JSON.parse(body.toString())
+      : body as Record<string, unknown>;
+
     const response = {
-      statusCode,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body
+      responseType: 'UpdateRequest',
+      ...payload
     };
+
     return response;
   }
 
