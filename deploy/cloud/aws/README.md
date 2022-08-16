@@ -49,14 +49,14 @@ A mild suggestion is to look [here](https://docs.datatrans.ch/docs/home).
 In tis step, from the Datatrans setup, you must get these variables: **DT_MERCHANTS**, **DT_PROD_API_URL** and **DT_TEST_API_URL**.
 <br><br>
 
-### STEP 2 - **Setup CommerceTools, part 1** <p>
+### STEP 2 - **Setup CommerceTools - part 1 - create API Client** <p>
 You can skip this step if you already have the CommerceTools setup done and all required information below.
 
 **Details about the variables needed by Planet Payment CommerceTools connector can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration).**
 
 This procedure covers _PARTIALLY_ how to setup CommerceTools. A suggestion is to look [here](https://docs.commercetools.com/getting-started/#create-an-api-client).
 
-From this step, after creating the first API-client, you must get these variables: **CT_API_URL**, **CT_AUTH_URL**, **CT_PROJECT_ID**, **CT_CLIENT_ID**, **CT_CLIENT_SECRET** and **CTP_SCOPES**.
+From this step, after creating the first API-client, you must get these variables: **CT_API_URL**, **CT_AUTH_URL**, **CT_PROJECT_ID**, **CT_CLIENT_ID**, **CT_CLIENT_SECRET** and **CT_SCOPES**.
 
 
 <br>
@@ -71,54 +71,13 @@ From this step, after creating the first API-client, you must get these variable
 
 From the two steps above you will have a set of variables, modify the file `deploy/commercetools/.env` and include the variables and values as `KEY="VALUE"` pairs in it.
 
-The .env file will look like this:
-```
-# Variables for Planet Payment CommerceTools Connector
-#
-# for more details over the variables:
-# https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration
-#
-#
-##### CommerceTools - API Operations
-# (API-Client creation, API Extension creation and Custom Fields Types creation)
-#
-# all variables must belong to a single project, declared below in CT_PROJECT_ID (from CommerceTools CTP_PROJECT_KEY)
-#
-CT_PROJECT_ID="planetpayment-connector"
-#
-# new API-Extension name - to be used on step 6
-CT_NEW_API_EXTENSION_NAME="prod01apiext"
-#
-# new API-Extension AWS credentials - to be used in Step 6
-AWS_API_EXTENSION_ACCESS_KEY="to be filled by 05-aws-deploy.sh in step 5"
-AWS_API_EXTENSION_SECRET="to be filled by 05-aws-deploy.sh in step 5"
-AWS_LAMBDA_ARN="to be filled by 05-aws-deploy.sh in step 5"
-#
-#
-# these credentials and scopes relate to the FIRST API-Client within CommerceTools project,
-# as mentioned here: https://docs.commercetools.com/api/authorization#creating-an-api-client
-# !!!!! DO NOT USE THIS FOR YOUR NEW API-CLIENT, use it just for its creation !!!!!
-CT_CLIENT_ID="clientIDhash to be filled up by merchant"
-CT_CLIENT_SECRET="clientSECREThash to be filled up by merchant"
-CT_API_URL="https://api.us-central1.gcp.commercetools.com"
-CT_AUTH_URL="https://auth.us-central1.gcp.commercetools.com"
-CTP_SCOPES="manage_project:${CT_PROJECT_ID}"
-#
-##### Datatrans Variables
-DT_CONNECTOR_WEBHOOK_URL="https://url.for.webhook/v1/dt-webhook"
-DT_MERCHANTS='[{"id": "0123456789", "password": "AasecretPassw0rd", "environment": "test", "dtHmacKey": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz98765432100123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst"}]'
-DT_PROD_API_URL="https://api.PROD.datatrans.com/v1"
-DT_TEST_API_URL="https://api.sandbox.datatrans.com/v1"
-
-```
-
-### STEP 4 - **Setup CommerceTools, part 2** <p>
+### STEP 4 - **Setup CommerceTools - part 2** <p>
 
 With the `.env` file above ready, proceed executing the following shell scripts:
 
-Run, in `deploy/commercetools/` folder:
+In `deploy/commercetools/` folder, run:
 
-> **`bash 02-custom-types-setup.sh`** <br>
+> **`bash custom-types-setup.sh`** <br>
 _will create a few custom fields types within the project, using JSON files within `deploy/commercetools/types` folder_
 
 <br>
@@ -130,9 +89,9 @@ _will create a few custom fields types within the project, using JSON files with
 - Define an **ID** for the new stack, with no special characters or spaces in it, like "prod01" or "Develop02" - this will be **STACKID**
 - Define on which region it will be deployed, like "eu-west-1" or "us-east-2" - this will be **AWSREGION**
 - At the shell run this script providing the two parameters defined above:
-   > `bash 05-aws-deploy.sh STACKID AWSREGION`
+   > `bash aws-deploy.sh STACKID AWSREGION`
 
-   (_an example:   **`bash 05-aws-deploy.sh prod01 eu-west-1`**_)
+   (_an example:   **`bash aws-deploy.sh prod01 eu-west-1`**_)
 - Take a look at the CloudFormation dashboard and wait for the stack creation completion, it should take a few minutes.
 - The Lambda function name will be `planetpaymentcommtool-STACKID`, where STACKID is your provided value (this name can be customized within the script, read its comments before changing anything in it).
 
@@ -140,10 +99,10 @@ A few details about the supporting files
 
 | File | Purpose and Details |
 | ---- | ------- |
-| **planetpaymentconnector-stack-template.yaml** | A CloudFormation (CF) template that creates all infrastructure resources within an user-specified AWS account and region. It is copied then customized by 05-aws-deploy.sh to create CF stacks. <p>**Do not use as-is.** Avoid changing it if not sure on how CloudFormation works. |
-| **05-aws-deploy.sh** | Shell script to create a CF stack, using the _planetpaymentconnector-stack-template.yaml_ file. Each run with different input parameters will render a different stack (with its own Lambda function and permissions) allowing multiple functions to work concurrently.|
+| **planetpaymentconnector-stack-template.yaml** | A CloudFormation (CF) template that creates all infrastructure resources within an user-specified AWS account and region. It is copied then customized by aws-deploy.sh to create CF stacks. <p>**Do not use as-is.** Avoid changing it if not sure on how CloudFormation works. |
+| **aws-deploy.sh** | Shell script to create a CF stack, using the _planetpaymentconnector-stack-template.yaml_ file. Each run with different input parameters will render a different stack (with its own Lambda function and permissions) allowing multiple functions to work concurrently.|
 
->**A note about _05-aws-deploy.sh_** <p>After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging but _not versioning_, as it contains sensitive information regarding Datatrans and CommerceTools.
+>**A note about _aws-deploy.sh_** <p>After each running the customized stack template will be stored at the same folder where the script ran. Can be useful for debugging but _not versioning_, as it contains sensitive information regarding Datatrans and CommerceTools.
 
 <br>
 
@@ -153,7 +112,7 @@ After runnning step 5 successfully, proceed executing this shell script:
 
 Run, in `deploy/commercetools/` folder:
 
-> **`bash 06-api-extension-setup.sh`** <p>
+> **`bash api-extension-setup.sh`** <p>
 _will setup the API Extension into CommerceTools_
 
 <br>
@@ -168,7 +127,7 @@ _**Requisites**_
 
 Run the script **from the cloned repository root folder:**
 
-> **`bash ./deploy/07-build-package.sh`**
+> **`bash ./deploy/make-deploy-package.sh`**
 
 Wait a few minutes for completion then look at the .zip filename in the output. Use this file for the next step.
 <br><br>

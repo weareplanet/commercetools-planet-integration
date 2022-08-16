@@ -15,28 +15,28 @@
 #   You can get some insights about the variables semantics in README.md at this repository root.
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
-echo "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
+echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
 #####
 # get ENV VARS from local static file
 # (yes, having sensitive information within a static file isn't a best practice)
-echo "\n##### importing and checking ENV vars"
+echo -e "\n##### importing and checking ENV vars"
 set -a
 source <(cat .env | sed -e '/^#/d;/^\s*$/d')
 set +a
 #env | grep "^CT.*" # uncomment for debugging
 for var in "${!CT@}"; do
-    #echo "var is ${var} with value '${!var}'" # uncomment for debugging
+    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     if [ -z "${!var}" ] ; then
-        echo "      $var is null or not set properly, get value '${!var}'"
+        echo -e "      $var is null or not set properly, get value '${!var}'"
         exit 1
     fi
 done
-echo "   ## done."
+echo -e "   ## done."
 #
 ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
      --basic --user "${CT_CLIENT_ID}:${CT_CLIENT_SECRET}" \
      -X POST \
-     -d "grant_type=client_credentials&scope=${CTP_SCOPES}" |\
+     -d "grant_type=client_credentials&scope=${CT_SCOPES}" |\
      jq -r '.access_token')
 
 # An access token example
@@ -47,11 +47,11 @@ ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
 #	"scope":"manage_project:planetpayment-discovery"
 #}
 
-echo "##### Got an access token from CommerceTools: ${ACCESS_TOKEN}"
+echo -e "##### Got an access token from CommerceTools: ${ACCESS_TOKEN}"
 
 for filename in ./types/*.json; do
 	typeKey=$(basename "$filename" .json)
-	echo "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
+	echo -e "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
 
 	statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
 		-X GET ${CT_API_URL}/${CT_PROJECT_ID}/types/key=${typeKey} -i \
@@ -59,7 +59,7 @@ for filename in ./types/*.json; do
 
 	if [[ $statusCode -eq 404 ]]
 	then
-		echo "   ## Type DOES NOT exists. Creating it..."
+		echo -e "   ## Type DOES NOT exists. Creating it..."
 
 		statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
 			-X POST ${CT_API_URL}/${CT_PROJECT_ID}/types -i \
@@ -69,22 +69,22 @@ for filename in ./types/*.json; do
 
 		if [[ $statusCode -eq 201 ]]
 		then
-			echo "   ## Type '${typeKey}' successfully created!"
+			echo -e "   ## Type '${typeKey}' successfully created!"
 		else
-			echo "   !! Got HTTP ${statusCode} when creating type. Not expected!"
+			echo -e "   !! Got HTTP ${statusCode} when creating type. Not expected!"
 			exit 1
 		fi
 
 	elif [[ $statusCode -eq 200 ]]
 	then
-		echo "   ## Type does exists, skipping its creation."
+		echo -e "   ## Type does exists, skipping its creation."
 	else
-		echo "   !! Oh no, got an HTTP ${statusCode}. Not expected."
+		echo -e "   !! Oh no, got an HTTP ${statusCode}. Not expected."
 		exit 1
 	fi
 
 done
 
-echo "\n##### Done."
+echo -e "\n##### Done."
 
 exit 0
