@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'http-status-code-const-enum';
 import {
   IAbstractToEnvHandlerAdapter,
   IAbstractRequest,
@@ -67,16 +66,6 @@ export class AwsArnGatewayAdapter implements IAbstractToEnvHandlerAdapter<unknow
   }
 
   private handleError(request: IAbstractRequest, err: Error) {
-    if (err.message.includes('Unexpected token')) {
-      return this.abstractResponseToCloud({
-        statusCode: HttpStatusCode.BAD_REQUEST,
-        body: {
-          message: `Error of body parsing: ${err.message}`,
-          code: 'InvalidInput',
-          errors: [err]
-        }
-      });
-    }
 
     const errorsService = new ErrorsService({ logger: this.logger });
 
