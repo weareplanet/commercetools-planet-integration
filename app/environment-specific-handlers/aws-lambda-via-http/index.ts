@@ -22,7 +22,7 @@
 // So we should either duplicate its logic here
 // or rewrite it so that it becomes at least zero-dependent.
 
-import { AwsApiGatewayAdapter } from './api-gateway-adapter';
+import { AwsApiGatewayAdapter } from './aws-lambda-http-adapter';
 import { allOperationHandler as envAgnosticAllOpsHandler }  from '../../domain/environment-agnostic-handlers';
 
 const awsApiGatewayAdapter = new AwsApiGatewayAdapter();
