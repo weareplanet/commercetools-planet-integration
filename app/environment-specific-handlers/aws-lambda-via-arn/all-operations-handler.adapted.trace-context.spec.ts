@@ -56,7 +56,9 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
           };
         });
 
-      await allOperationsApiGatewayHandler({});
+      const event = { 'payload': 'something' };
+
+      await allOperationsApiGatewayHandler(event);
 
       expect(fakeAllOpsAgnosticHandler).toHaveBeenCalledWith(
         expect.objectContaining({ traceContext: fakeTraceContext })

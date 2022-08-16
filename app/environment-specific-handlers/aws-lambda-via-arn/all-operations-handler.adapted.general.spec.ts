@@ -41,8 +41,8 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
         );
 
         expect(response).toMatchObject({
-          statusCode: 200,
-          body: fakeAbstractResponse200.body
+          responseType: 'UpdateRequest',
+          ...(fakeAbstractResponse200.body as Record<string, unknown>)
         });
       });
 
@@ -67,8 +67,7 @@ describe('allOperationsHandler as an AWS Lambda function behind AWS API Gateway'
         );
 
         expect(response).toMatchObject({
-          statusCode: 400,
-          body: fakeAbstractResponse400.body
+          ...(fakeAbstractResponse400.body as Record<string, unknown>)
         });
       });
     });
