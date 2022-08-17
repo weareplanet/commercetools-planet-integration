@@ -61,26 +61,20 @@ if [ ! -f ${ENVFILE} ]; then
 fi
 echo -e "   ## done.\n"
 
-echo -e "##### importing and checking ENV vars"
+echo -e "\n##### Setting ENV vars"
 set -a
 source <(cat ${ENVFILE} | sed -e '/^#/d;/^\s*$/d;')
 set +a
-#env | grep "^CT.*" # uncomment for debugging
-for var in "${!CT@}"; do
-    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
+
+echo -e "\n##### Importing and checking ENV vars"
+REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS DT_CONNECTOR_WEBHOOK_URL)
+for var in "${REQUIRED_CT_VARS[@]}"; do
+    # echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     if [ -z "${!var}" ] ; then
-        echo -e "      $var is null or maybe not set properly, get value '${!var}'"
+        echo -e "\tMissed the required environmebt variable $var"
         exit 1
     fi
 done
-for var in "${!DT@}"; do
-    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
-    if [ -z "${!var}" ] ; then
-        echo -e "      $var is null or maybe not set properly, get value '${!var}'"
-        exit 1
-    fi
-done
-echo -e "   ## done.\n"
 
 # checks if the AWS credentials are ok
 echo -e "##### getting AWS credentials"
