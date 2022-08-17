@@ -30,6 +30,7 @@ jest.mock('../commercetools-service/commerce-tools-client', () => {
 });
 
 import { PaymentService } from '.';
+import { DTConstants } from '../datatrans-service/constants';
 
 const aliasExistingInCommerceTools = 'savedPaymentMethodAlias value';
 
@@ -86,7 +87,7 @@ describe('#initRedirectAndLightbox method', () => {
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
 
       expect(dtClientMock.post).toBeCalledWith(
-        'https://apiUrl.test.fake/transactions',
+        DTConstants.apiUrls.test + '/transactions',
         {
           ...CreateInitializeTransactionRequestFactory(),
           BON: {
@@ -162,7 +163,7 @@ describe('#initRedirectAndLightbox method', () => {
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
 
       expect(dtClientMock.post).toBeCalledWith(
-        'https://apiUrl.test.fake/transactions',
+        DTConstants.apiUrls.test + '/transactions',
         initializeTransactionPayload,
         {
           auth: {
@@ -245,7 +246,7 @@ describe('#initRedirectAndLightbox method', () => {
       const result = await paymentService.initRedirectAndLightbox(mockPayment);
 
       expect(dtClientMock.post).toBeCalledWith(
-        'https://apiUrl.test.fake/transactions',
+        DTConstants.apiUrls.test + '/transactions',
         initializeTransactionPayload,
         {
           auth: {

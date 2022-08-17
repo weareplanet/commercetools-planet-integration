@@ -11,10 +11,6 @@ jest.mock('./env-loader', () => {
       apiUrl: 'https://apiUrl.test',
     },
     datatrans: {
-      apiUrls: {
-        test: 'https://testUrl.test',
-        prod: 'https://prodUrl.test'
-      },
       webhookUrl: 'https://webhookUrl.test',
       merchants: [{ id: 'id', password: 'password', environment: 'test', dtHmacKey: 'HMAC key' }],
     }

@@ -29,16 +29,6 @@ const CommerceToolsConfigSchema = yup.object({
 });
 
 const DatatransConfigSchema = yup.object({
-  apiUrls: yup.object({
-    test: yup
-      .string()
-      .url('DT_TEST_API_URL must be a valid URL')
-      .required('DT_TEST_API_URL is required'),
-    prod: yup
-      .string()
-      .url('DT_PROD_API_URL must be a valid URL')
-      .required('DT_PROD_API_URL is required'),
-  }),
   webhookUrl: yup
     .string()
     .url('DT_CONNECTOR_WEBHOOK_URL must be a valid URL')

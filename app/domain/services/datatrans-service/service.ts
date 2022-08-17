@@ -12,6 +12,7 @@ import {
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
+import { DTConstants } from './constants';
 
 // Only this service knows how to communicate with Datatrans.
 // It is unaware of business flows.
@@ -56,9 +57,11 @@ export class DatatransService extends ServiceWithLogger {
     this.logger.debug({ body: transactionData }, 'DataTrans initRequest');
 
     const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
+
     const baseUrl = merchant.environment === DatatransEnvironment.TEST
-      ? this.config.apiUrls.test
-      : this.config.apiUrls.prod;
+      ? DTConstants.apiUrls.test
+      : DTConstants.apiUrls.prod;
+
     const merchantAuth = {
       username: merchant.id,
       password: merchant.password
