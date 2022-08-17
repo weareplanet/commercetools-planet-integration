@@ -27,6 +27,7 @@ dist/
 
 # dotenv environment variables file
 .env
+!deploy/.env
 
 # Coverage directory used by tools like istanbul
 coverage/
