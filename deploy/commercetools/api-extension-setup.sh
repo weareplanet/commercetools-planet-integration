@@ -37,6 +37,10 @@ echo -e "\n##### Got an access token from CommerceTools: '${ACCESS_TOKEN}'"
 # Create a new API-Extension
 #
 # CommerceTools API docs: https://docs.commercetools.com/api/projects/api-extensions#create-extension
+# CommerceTools API-Extension can be one of two types: HTTP and AwsLambda.
+# If CT_API_EXTENSION_URL environment variable is provided - the extension of HTTP destination type will be created.
+# Otherwise - if  CT_API_EXTENSION_AWS_LAMBDA_ARN and CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY and CT_API_EXTENSION_AWS_LAMBDA_SECRET
+# environment variables are provided - the extension of AwsLambda destination type will be created.
 if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
   echo -e "\n##### Creating the new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
   statusCode=$(curl --write-out '%{http_code}' --silent -o commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
