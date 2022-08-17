@@ -31,28 +31,56 @@ Environment Variable | Format | Description
 `DT_CONNECTOR_WEBHOOK_URL` | String | The webhook URL that Datatrans will call after a transaction has been completed.
 `LOG_LEVEL` | String | Log level of which the application will show. It must be one of the following: `trace, debug, info, warn, error, fatal, silent`. It defaults to `debug`.
 
-## Deployment to Amazon Web Services (AWS)
+There are a few extra variables necessary for the initial system setup - see comments in `deploy/.env`.
+
+
+## Deployment
+
+> TBD:
+>
+> We see two ways of how to deploy the connector (and document it):
+>
+> Manual:
+>
+> 1. initial manual step (put CT Client credentials into `./deploy/.env` etc.)
+> 2. **manual step** (`source ./deploy/.env`)
+> 3. **manual step** (`sh ./deploy/commercetools/custom-types-setup.sh`)
+> 4. **manual step** (`sh ./deploy/commercetools/api-extension-setup.sh`)
+> 5. **manual step**
+> 6. **manual step**
+>
+> Automated:
+>
+> 1. initial manual step (put CT Client credentials into .env etc.)
+> 2. **invoke a master deploy script** (./aws_deploy.sh or another)
+>
+> So far only the 1st way is implemented. The 2nd one is at least not completed.
+> See also: https://github.com/weareplanet/commercetools-planet-integration/pull/70
+
+### Deployment to Amazon Web Services (AWS)
 
 To deploy on Amazon Web Services, you must run the script below. Make sure to copy all files from this repository to your environment first. You must pass your AWS region as an option to the script (e.g., `eu-west-1`). This script will use your environment variables to create the commercetools' custom types and API extension and deploy the connector to your AWS space.
 
 ```shell
-sh ./deploy/aws/deploy-aws.sh 'eu-west-1'
+sh ./deploy/cloud/aws/aws-deploy.sh 'eu-west-1'
 ```
 
-tbd: Check with Fabio
+### Deployment to On-Premise Environment
 
-## Deployment to On-Premise Environment
+To deploy on-premise, you will need to run the scripts below.
 
-To deploy on-premise, you will need to run the script below. Make sure to copy all files from this repository to your environment first. Run the scripts in the order shown below to deploy the create the API client, do the necessary deployment of the connector, and create the commercetools' custom types and API extension.
+Make sure to copy all files from this repository to your environment first. Run the scripts in the order shown below to deploy the connector and create the commercetools' custom types and API extension.
 
 ```shell
-sh ./deploy/build-script.sh
-
-# deploy now your generated package
-
-sh ./deploy/commercetools/ct-setup.sh 'your-package'
+sh ./deploy/make-deploy-package.sh
 ```
 
-tbd: Check with Fabio
+Then deploy the generated package (zip file) according to specificity of your environment.
+
+> If you would like to run the Connector in some long-living process (Express application etc.) or in some specific "Function as a service" -
+> likely you will be interested in the direct use of `app/domain/environment-agnostic-handlers/all-operations-handler`, i.e.:
+> ```
+> import { allOperationsHandler }  from 'app/domain/environment-agnostic-handlers/all-operations-handler';
+> ```
 
 That's it for the moment. You can return to the [integration guide](integration-guide.md) once your environment is set up and come back if necessary for further configuration.
