@@ -5,6 +5,7 @@
 # Planet Payment - Commerce Tools api-extension setup
 # 2022-07 - Planet Payments
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - setup API-Extension on CommerceTools, started at ${NOW}."
 
@@ -41,9 +42,11 @@ echo -e "\n##### Got an access token from CommerceTools: '${ACCESS_TOKEN}'"
 # If CT_API_EXTENSION_URL environment variable is provided - the extension of HTTP destination type will be created.
 # Otherwise - if  CT_API_EXTENSION_AWS_LAMBDA_ARN and CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY and CT_API_EXTENSION_AWS_LAMBDA_SECRET
 # environment variables are provided - the extension of AwsLambda destination type will be created.
+CT_API_EXTENSION_URL=${CT_API_EXTENSION_URL:-""}
 if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
   echo -e "\n##### Creating the new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
-  statusCode=$(curl --write-out '%{http_code}' --silent -o commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
+  # TODO(pbourke): the following is not idempotent, add a check
+  statusCode=$(curl --write-out '%{http_code}' --silent -o ${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
   -X POST ${CT_API_URL}/${CT_PROJECT_ID}/extensions \
   --header "Authorization: Bearer ${ACCESS_TOKEN}" \
   --header 'Content-Type: application/json' \
@@ -61,11 +64,12 @@ if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
     ],
     "key" : "${CT_API_EXTENSION_NAME}"
   }
-  DATA
-  )
+DATA
+)
 elif [[ ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ARN" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_SECRET" ]]; then
   echo -e "\n##### Creating the new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'AWSLambda'..."
-  statusCode=$(curl --write-out '%{http_code}' --silent -o commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
+  # TODO(pbourke): the following is not idempotent, add a check
+  statusCode=$(curl --write-out '%{http_code}' --silent -o ${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
   -X POST ${CT_API_URL}/${CT_PROJECT_ID}/extensions \
   --header "Authorization: Bearer ${ACCESS_TOKEN}" \
   --header 'Content-Type: application/json' \
@@ -85,8 +89,8 @@ elif [[ ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ARN" && ! -z "$CT_API_EXTENSION_AWS_L
     ],
     "key" : "${CT_API_EXTENSION_NAME}"
   }
-  DATA
-  )
+DATA
+)
 else
   echo -e "Either CT_API_EXTENSION_URL or CT_API_EXTENSION_AWS_LAMBDA_ARN+CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY+CT_API_EXTENSION_AWS_LAMBDA_SECRET must be present in the environment"
   exit 1
@@ -102,5 +106,3 @@ fi
 
 # evidences... uncomment for debugging
 echo -e "\t## All done.\n"
-
-exit 0

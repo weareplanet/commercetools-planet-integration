@@ -32,10 +32,11 @@
 # and delete the stack (can use AWS CLI too).
 #
 # a few preparations....
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 STACKNAME="planetpaymentcommtool"
 STACKID=$(echo $1 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
 AWSREGION=$(echo $2 | tr '[:upper:]' '[:lower:]') # make it lowercase
-ENVFILE="../../commercetools/.env"
+ENVFILE="${SCRIPT_DIR}/../../commercetools/.env"
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
@@ -89,28 +90,35 @@ echo -e "   ## done.\n"
 echo -e "########## deploying $STACKNAME-$STACKID in AWS region $AWSREGION"
 echo -e "\n##### Creating CF template file: ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
 echo -e "   ## (this file will be kept after stack creation)"
-cp planetpaymentconnector-stack-template.yaml ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
+OUTPUT_YAML="${SCRIPT_DIR}/${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
+cp ${SCRIPT_DIR}/planetpaymentconnector-stack-template.yaml ${OUTPUT_YAML}
 
 echo -e "\n   ## personalizing the template file"
-sed -i -e "s/STACKNAME/$STACKNAME/g" ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
-sed -i -e "s/STACKID/$STACKID/g" ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
-sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
+sed -i -e "s/STACKNAME/$STACKNAME/g" ${OUTPUT_YAML}
+sed -i -e "s/STACKID/$STACKID/g" ${OUTPUT_YAML}
+sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${OUTPUT_YAML}
 echo -e "   ## done."
 echo -e "\n   ## updating template variables with '.env' contents"
 #env | grep "^CT.*" # uncomment for debugging
 for var in "${!CT@}"; do
     #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
-    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
+    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
 #env | grep "^DT.*" # uncomment for debugging
 for var in "${!DT@}"; do
     #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
-    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml
+    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
 echo -e "   ## done.\n"
 
 echo -e "##### Starting CF deploy for $STACKNAME-$STACKID stack in $AWSREGION region...."
-aws cloudformation deploy --region $AWSREGION --stack-name $STACKNAME-$STACKID --template-file ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+set +e
+aws cloudformation describe-stacks --region ${AWSREGION} --stack-name ${STACKNAME}-${STACKID} &> /dev/null
+# TODO(pbourke): support stack updates
+if [[ $? != 0 ]]; then
+    aws cloudformation deploy --region $AWSREGION --stack-name $STACKNAME-$STACKID --template-file ${OUTPUT_YAML} --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+fi
+set -e
 echo -e "   ## done.\n"
 
 echo -e "##### Updating Lambda Function ENV var configuation for DT_CONNECTOR_WEBHOOK_URL ..."
@@ -145,4 +153,3 @@ echo -e "   ## done with this .env file.\n"
 echo -e "##### supposedly, we're all done"
 echo -e "##### check the cli output here and CloudFormation stack Events output in $AWSREGION\n"
 echo -e "##### at the stack Outputs there's the FunctionURL for the Lambda function"
-exit 0

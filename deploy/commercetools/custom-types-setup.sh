@@ -14,10 +14,13 @@
 #    even in the 'admin' profile)
 #   You can get some insights about the variables semantics in README.md at this repository root.
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ENVFILE="${SCRIPT_DIR}/.env"
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
 
 echo -e "\n##### Importing and checking ENV vars"
+source ${ENVFILE}
 REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID)
 for var in "${REQUIRED_ENV_VARS[@]}"; do
     echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
@@ -35,7 +38,7 @@ ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
 
 echo -e "##### Got an access token from CommerceTools: ${ACCESS_TOKEN}"
 
-for filename in $( dirname -- "$0"; )/types/*.json; do
+for filename in ${SCRIPT_DIR}/types/*.json; do
 	typeKey=$(basename "$filename" .json)
 	echo -e "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
 
@@ -72,5 +75,3 @@ for filename in $( dirname -- "$0"; )/types/*.json; do
 done
 
 echo -e "\n##### Done."
-
-exit 0
