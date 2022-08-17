@@ -44,9 +44,9 @@ There are a few extra variables necessary for the initial system setup - see com
 >
 > 1. initial manual step (put CT Client credentials into `./deploy/.env` etc.)
 > 2. **manual step** (`source ./deploy/.env`)
-> 3. **manual step** (cd `./deploy/commercetools`)
-> 4. **manual step** (`sh ./custom-types-setup.sh`)
-> 5. **manual step** (`sh ./api-extension-setup.sh`)
+> 3. **manual step** (`sh ./deploy/commercetools/custom-types-setup.sh`)
+> 4. **manual step** (`sh ./deploy/commercetools/api-extension-setup.sh`)
+> 5. **manual step**
 > 6. **manual step**
 >
 > Automated:

@@ -16,40 +16,26 @@
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
-#####
-# get ENV VARS from local static file
-# (yes, having sensitive information within a static file isn't a best practice)
-echo -e "\n##### importing and checking ENV vars"
-set -a
-source <(cat .env | sed -e '/^#/d;/^\s*$/d')
-set +a
-#env | grep "^CT.*" # uncomment for debugging
-for var in "${!CT@}"; do
-    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
+
+echo -e "\n##### Importing and checking ENV vars"
+REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID)
+for var in "${REQUIRED_ENV_VARS[@]}"; do
+    echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     if [ -z "${!var}" ] ; then
-        echo -e "      $var is null or not set properly, get value '${!var}'"
+        echo -e "\tMissed the required environmebt variable $var"
         exit 1
     fi
 done
-echo -e "   ## done."
-#
+
 ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
      --basic --user "${CT_CLIENT_ID}:${CT_CLIENT_SECRET}" \
      -X POST \
      -d "grant_type=client_credentials&scope=${CT_SCOPES}" |\
      jq -r '.access_token')
 
-# An access token example
-#{
-#	"access_token":"XaWPOpr5lk1-ZKNXFeYbh5NhSeqnaF_u",
-#	"token_type":"Bearer",
-#	"expires_in":172800,
-#	"scope":"manage_project:planetpayment-discovery"
-#}
-
 echo -e "##### Got an access token from CommerceTools: ${ACCESS_TOKEN}"
 
-for filename in ./types/*.json; do
+for filename in $( dirname -- "$0"; )/types/*.json; do
 	typeKey=$(basename "$filename" .json)
 	echo -e "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
 

@@ -10,7 +10,7 @@ echo -e "\n########## Planet Payment CommerceTools connector - setup API-Extensi
 
 #####
 echo -e "\n##### Importing and checking ENV vars"
-REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID CT_API_EXTENSION_NAME)
+REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID CT_API_EXTENSION_NAME)
 for var in "${REQUIRED_ENV_VARS[@]}"; do
     # echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     if [ -z "${!var}" ] ; then
