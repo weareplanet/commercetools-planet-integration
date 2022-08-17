@@ -1,6 +1,6 @@
 # Integration Guide - Commercetools Connector for Planet
 
-The guide below outlines the steps you need to take to complete the integration to Planet via the Datatrans payment gateway. Please read the [introduction page](../readme.md) first and understand the concept and the existing features before proceeding with the integration.
+The guide below outlines the steps you need to take to complete the integration to Planet via the Datatrans payment gateway. Please read the [introduction page](https://github.com/weareplanet/commercetools-planet-integration) first and understand the concept and the existing features before proceeding with the integration.
 
 ## Overview
 

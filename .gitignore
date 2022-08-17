@@ -26,6 +26,7 @@ node_modules/
 dist/
 
 # environment variables file
+.env
 env
 
 # Coverage directory used by tools like istanbul

@@ -1,6 +1,6 @@
 # Environment Setup Guide - Commercetools Connector for Planet
 
-The guide below outlines the steps you need to take to have an environment ready to host the connector. Please read the [introduction page](../readme.md) first and understand the concept and the existing features before proceeding with the integration.
+The guide below outlines the steps you need to take to have an environment ready to host the connector. Please read the [introduction page](https://github.com/weareplanet/commercetools-planet-integration) first and understand the concept and the existing features before proceeding with the integration.
 
 To deploy the connector, you will need either access to an on-premise environment or a cloud service running Node. We provide example scripts for Amazon Web Services (AWS) deployment, the easiest and recommended option at the moment.
 
@@ -11,14 +11,13 @@ Please note that the connector requires Node.js 16.0.0 to work. The application 
 The environment setup guide consists of the following sections:
 
 * Setting up your environment variables [ [jump to section](#environment-variables) ]
-* Deployment to Amazon Web Services (AWS) [ [jump to section](#deployment-to-amazon-web-services-aws) ]
-* Deployment to On-Premise Environment [ [jump to section](#deployment-to-on-premise-environment) ]
+* Deploying the connector to Amazon Web Services (AWS) [ [jump to section](#deployment-to-amazon-web-services-aws) ]
 
 ## Environment Variables
 
 The connector uses environment variables as the application configuration. The environment variables are responsible for your Datatrans merchant configurations and access credentials to commercetools. You will need to define these properly for the connector to connect to commercetools and Datatrans. See the [integration guide](integration-guide.md) for more information about the relevant commercetools and Datatrans credentials.
 
-An example for your environment variables (`.env.example`) is provided at the root of our repository. Copy that file, rename it to `.env` and change the values of the variables.
+To get started, clone this repository to your desired environment. An example for your environment variables (`.env.example`) is provided at the root of our repository. Copy that file to `deploy/.env`,  and change the values of the variables.
 
 Environment Variable | Format | Description
 -----------|-----------|-----------
@@ -31,56 +30,64 @@ Environment Variable | Format | Description
 `DT_CONNECTOR_WEBHOOK_URL` | String | The webhook URL that Datatrans will call after a transaction has been completed.
 `LOG_LEVEL` | String | Log level of which the application will show. It must be one of the following: `trace, debug, info, warn, error, fatal, silent`. It defaults to `debug`.
 
-There are a few extra variables necessary for the initial system setup - see comments in `deploy/.env`.
+If you are deploying the connector to Amazon Web Services, you also need to configure the environment variables below.
 
+Environment Variable | Format | Description
+-----------|-----------|-----------
+`CT_API_EXTENSION_AWS_LAMBDA_ARN` | String | ARN of the connector deployed as an AWS Lambda.
+`CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY` | String | Key to access the connector deployed as an AWS Lambda via ARN.
+`CT_API_EXTENSION_AWS_LAMBDA_SECRET` | String | Secret to access the connector deployed as an AWS Lambda via ARN.
 
-## Deployment
+## Deployment to Amazon Web Services (AWS)
 
-> TBD:
->
-> We see two ways of how to deploy the connector (and document it):
->
-> Manual:
->
-> 1. initial manual step (put CT Client credentials into `./deploy/.env` etc.)
-> 2. **manual step** (`source ./deploy/.env`)
-> 3. **manual step** (`sh ./deploy/commercetools/custom-types-setup.sh`)
-> 4. **manual step** (`sh ./deploy/commercetools/api-extension-setup.sh`)
-> 5. **manual step**
-> 6. **manual step**
->
-> Automated:
->
-> 1. initial manual step (put CT Client credentials into .env etc.)
-> 2. **invoke a master deploy script** (./aws_deploy.sh or another)
->
-> So far only the 1st way is implemented. The 2nd one is at least not completed.
-> See also: https://github.com/weareplanet/commercetools-planet-integration/pull/70
+There are several shell scripts in /deploy that you need to call to deploy the connector into AWS correctly and create the commercetools required custom types and API extension. While we only have examples for AWS, the connector should, in theory, also be deployable on GCP. Only proceed with this chapter after defining your [environment variables](#environment-variables). Follow the order below to ensure the correct creation of the connector's prerequisites.
 
-### Deployment to Amazon Web Services (AWS)
+### Setting up commercetools Custom Types
 
-To deploy on Amazon Web Services, you must run the script below. Make sure to copy all files from this repository to your environment first. You must pass your AWS region as an option to the script (e.g., `eu-west-1`). This script will use your environment variables to create the commercetools' custom types and API extension and deploy the connector to your AWS space.
+Run the following script to create the custom types required by the connector.
 
 ```shell
-sh ./deploy/cloud/aws/aws-deploy.sh 'eu-west-1'
+sh ./deploy/commercetools/custom-types-setup.sh
 ```
 
-### Deployment to On-Premise Environment
+This script will take the various required types defined in `deploy/commercetools/types`.
 
-To deploy on-premise, you will need to run the scripts below.
+### Creating your AWS CloudFormation Stack
 
-Make sure to copy all files from this repository to your environment first. Run the scripts in the order shown below to deploy the connector and create the commercetools' custom types and API extension.
+Run the script below to create the AWS CloudFormation Stack. This script will use your environment variables to deploy the connector to your AWS ARN. When running this script, you will need to pass a stack ID (e.g., prod01, develop01) and an AWS region (e.g., eu-west-1).
+
+```shell
+sh ./deploy/cloud/aws/aws-deploy.sh STACKID REGION
+```
+
+After a few minutes, AWS CloudFormation should show your newly created stack. The Lambda function's name will be `planetpaymentcommtool-STACKID`. If you need to customize the stack template, you may check our CloudFormation template located at `/deploy/cloud/aws/planetpaymentconnector-stack-template.yaml`. We do recommend leaving this file as is.
+
+### Setting up the commercetools API Extension
+
+After deploying the connector successfully to AWS or an on-premise environment, you can proceed with setting up commercetools' API extension with the script below.
+
+```shell
+sh ./deploy/commercetools/api-extension-setup.sh
+```
+
+### Creating the Package Build
+
+To build the Node.js package, you can now run the script below. The script will create a lean .zip package to avoid size constraints when updating the Lambda function. Don't forget that Node.js 16 is required.
 
 ```shell
 sh ./deploy/make-deploy-package.sh
 ```
 
-Then deploy the generated package (zip file) according to specificity of your environment.
+After a few minutes, a .zip file will be available that you can use for the next and final step.
 
-> If you would like to run the Connector in some long-living process (Express application etc.) or in some specific "Function as a service" -
-> likely you will be interested in the direct use of `app/domain/environment-agnostic-handlers/all-operations-handler`, i.e.:
-> ```
-> import { allOperationsHandler }  from 'app/domain/environment-agnostic-handlers/all-operations-handler';
-> ```
+### Deploying the Package
 
-That's it for the moment. You can return to the [integration guide](integration-guide.md) once your environment is set up and come back if necessary for further configuration.
+Run the command below to deploy the .zip package into the Lambda function created within your AWS CloudFormation Stack. Set `AWSREGION`, `STACKID` and `yourpackagename.zip` properly.
+
+```shell
+aws lambda update-function-code --region=AWSREGION --function-name=planetpaymentcommtool-STACKID --zip-file=fileb://package.zip
+```
+
+After updating the Lambda function, don't forget to update the `DT_CONNECTOR_WEBHOOK_URL` environment variable. This variable must be equal to `FunctionURL` from your Lambda function.
+
+That's it for the moment. You can return to the [integration guide](integration-guide.md) once your environment is set up and return if necessary for further environment configuration.
