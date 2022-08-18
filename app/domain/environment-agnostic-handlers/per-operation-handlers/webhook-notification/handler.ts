@@ -13,11 +13,24 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const logger = new LogService(req.traceContext);
 
   // Validate the signature of the received notification
-  // TODO: when Datatrans starts to pass merchantId into the Webhook request -
-  // delete `tempMerchantId` and use `req.body.merchantId` instead.
-  const tempMerchantId = new ConfigService().getConfig().datatrans.merchants[0].id;
+  const merchantId = req.body.merchantId;
+  if (!merchantId) {
+    throw new Error('merchantId is missing in request body');
+  }
+
+  const config = new ConfigService().getConfig();
+  const merchant = config.datatrans.merchants.find(
+    (merchant: { id: string; }) => merchant.id == merchantId
+  );
+
+  logger.debug({ id: req.body.merchantId, merchant });
+
+  if (!merchant) {
+    throw new Error('merchant with given ID is missing in request body');
+  }
+
   const datatransService = new DatatransService({ logger });
-  datatransService.validateIncomingRequestSignature(tempMerchantId, req.headers, req.rawBody);
+  datatransService.validateIncomingRequestSignature(merchant.id, req.headers, req.rawBody);
 
   // Process the request body
   const paymentService = new PaymentService({ logger });
