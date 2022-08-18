@@ -1,5 +1,4 @@
 import { HttpStatusCode } from 'http-status-code-const-enum';
-import { ConfigService } from '../../../services/config-service';
 import { LogService } from '../../../services/log-service';
 import {
   IAbstractRequestWithTypedBody,
@@ -13,14 +12,11 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const logger = new LogService(req.traceContext);
 
   // Validate the signature of the received notification
-  const config = new ConfigService().getConfig();
-
-  const merchant = config.datatrans.merchants.find(
-    (merchant: { id: string; }) => merchant.id == req.body.merchantId
-  );
-
   const datatransService = new DatatransService({ logger });
-  datatransService.validateIncomingRequestSignature(merchant.id, req.headers, req.rawBody);
+
+  datatransService.validateIncomingRequestSignature(
+    req.body.merchantId, req.headers, req.rawBody
+  );
 
   // Process the request body
   const paymentService = new PaymentService({ logger });
