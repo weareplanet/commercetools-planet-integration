@@ -9,10 +9,11 @@ import {
   DATATRANS_SIGNATURE_HEADER_NAME
 } from '../../../app/interfaces';
 import { abstractRequestFactory } from './abstract-request-factories';
+import { ConfigService } from '../../../app/domain/services/config-service';
 
-export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody =>  {
+export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody => {
   const defaultStuff = { // TODO: use PaymentFactory
-    merchantId: 'Test merchantId',
+    merchantId: new ConfigService().getConfig().datatrans?.merchants?.[0]?.id,
     refno: 'Test refno',
     transactionId: 'Test transactionId',
     status: DatatransTransactionStatus.authorized,
@@ -48,7 +49,7 @@ export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyE
   );
 };
 
-export const RedirectAndLightboxWebhookRequestFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}) =>  {
+export const RedirectAndLightboxWebhookRequestFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}) => {
   return abstractRequestFactory({
     body: RedirectAndLightboxWebhookRequestBodyFactory(webhookRequestBodyExplicitStuff),
     headers: {
