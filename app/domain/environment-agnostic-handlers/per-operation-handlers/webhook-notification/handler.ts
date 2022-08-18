@@ -13,20 +13,11 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const logger = new LogService(req.traceContext);
 
   // Validate the signature of the received notification
-
-  const merchantId = req.body.merchantId;
-  if (!merchantId) {
-    throw new Error('merchantId is missing in request body');
-  }
-
   const config = new ConfigService().getConfig();
-  const merchant = config.datatrans.merchants.find(
-    (merchant: { id: string; }) => merchant.id == merchantId
-  );
 
-  if (!merchant) {
-    throw new Error('merchant with given ID is missing in request body');
-  }
+  const merchant = config.datatrans.merchants.find(
+    (merchant: { id: string; }) => merchant.id == req.body.merchantId
+  );
 
   const datatransService = new DatatransService({ logger });
   datatransService.validateIncomingRequestSignature(merchant.id, req.headers, req.rawBody);

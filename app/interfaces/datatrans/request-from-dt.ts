@@ -9,6 +9,7 @@ import {
   DatatransPaymentMethod,
   DatatransHistoryAction
 } from './entities';
+import { ConfigService } from '../../domain/services/config-service';
 
 export const DATATRANS_SIGNATURE_HEADER_NAME = 'Datatrans-Signature';
 
@@ -30,8 +31,14 @@ export type IDatatransTransactionHistory = IDatatransTransactionHistoryItem[];
 export const DatatransWebhookRequestBodySchema = yup.object({
   merchantId: yup
     .string()
-    // .required(), TODO: uncomment this when Datatrans starts to provide this field
-    .optional(),
+    .required()
+    .test((value, context) => {
+      const merchantConfig = new ConfigService().getConfig().datatrans.merchants.find((mc) => mc.id === value);
+      if (!merchantConfig || !merchantConfig.password) {
+        return context.createError({ message: 'Merchant credentials are missing' });
+      }
+      return true;
+    }),
   refno: yup  // Corresponds to Payment.key in CommerceTools
     .string()
     .required(),
