@@ -25,7 +25,7 @@
 # 3) and valid set of AWS credentials with administrator access level,
 #    as IAM objects are required
 #    (credentials can be an awscli profile or env vars)
-# 4) '.env' file with the required ENV vars filled
+# 4) 'env' file with the required ENV vars filled
 #
 # To delete the stack,
 # just go to the CloudFormation Dashboard at the account and region where it was created
@@ -36,7 +36,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 STACKNAME="planetpaymentcommtool"
 STACKID=$(echo $1 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
 AWSREGION=$(echo $2 | tr '[:upper:]' '[:lower:]') # make it lowercase
-ENVFILE="${SCRIPT_DIR}/../../commercetools/.env"
+ENVFILE="${SCRIPT_DIR}/../../env"
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
@@ -57,7 +57,7 @@ echo -e "   ## done.\n"
 
 echo -e "##### performing file checks ..."
 if [ ! -f ${ENVFILE} ]; then
-   echo -e "   !! '.env' file was not found - it must be filled and present at 'deploy/commercetools/' folder."
+   echo -e "   !! 'env' file was not found - it must be filled and present under ${ENVFILE}."
    exit 3
 fi
 echo -e "   ## done.\n"
@@ -98,7 +98,7 @@ sed -i -e "s/STACKNAME/$STACKNAME/g" ${OUTPUT_YAML}
 sed -i -e "s/STACKID/$STACKID/g" ${OUTPUT_YAML}
 sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${OUTPUT_YAML}
 echo -e "   ## done."
-echo -e "\n   ## updating template variables with '.env' contents"
+echo -e "\n   ## updating template variables with 'env' contents"
 #env | grep "^CT.*" # uncomment for debugging
 for var in "${!CT@}"; do
     #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging

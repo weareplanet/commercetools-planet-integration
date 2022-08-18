@@ -5,6 +5,7 @@ set -euo pipefail
 DEPLOY_SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 function deploy_aws {
+  source ${ENV_FILE}
   source ${DEPLOY_SCRIPT_DIR}/commercetools/custom-types-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/cloud/aws/aws-deploy.sh ${STACK_ID} ${AWS_REGION}
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
@@ -27,6 +28,7 @@ EOF
 }
 
 ENV="${ENV:-""}"
+ENV_FILE="${ENV_FILE:-${DEPLOY_SCRIPT_DIR}/env}"
 STACK_ID="${STACK_ID:-resources}"
 AWS_REGION="${AWS_REGION:-eu-west-1}"
 

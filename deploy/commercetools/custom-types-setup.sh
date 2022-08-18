@@ -9,18 +9,16 @@
 
 # REQUIREMENTS:
 # - "jq" and "curl" installed in the shell/os to be used
-# - a .env file (at the same folder as this script) with the variables needed to run.
+# - a env file with the variables needed to run.
 #   (some of the variables come from the first API-Client created, that must have "Manage API client" scope on - this isn't enabled by default
 #    even in the 'admin' profile)
 #   You can get some insights about the variables semantics in README.md at this repository root.
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-ENVFILE="${SCRIPT_DIR}/.env"
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
 
 echo -e "\n##### Importing and checking ENV vars"
-source ${ENVFILE}
 REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID)
 for var in "${REQUIRED_ENV_VARS[@]}"; do
     echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
