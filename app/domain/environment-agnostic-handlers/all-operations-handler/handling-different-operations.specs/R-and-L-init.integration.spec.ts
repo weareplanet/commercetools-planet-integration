@@ -19,7 +19,7 @@ jest.mock('axios', () => {
 });
 
 import handler from '..';
-import { DTConstants } from '../../../services/datatrans-service/constants';
+import { DatatransURL } from '../../../../interfaces';
 
 describe('All-operations handler', () => {
   beforeEach(/* Prevent real requests to datatrans, use the stubbed result */() => {
@@ -40,7 +40,7 @@ describe('All-operations handler', () => {
       const result = await handler(req);
 
       expect(dtHttpClientMock.post).toBeCalledWith(
-        DTConstants.apiUrls.test + '/transactions',
+        DatatransURL.TEST + '/transactions',
         CreateInitializeTransactionRequestFactory(),
         {
           auth: {
