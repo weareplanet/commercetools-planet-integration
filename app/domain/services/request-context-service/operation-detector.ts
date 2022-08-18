@@ -3,7 +3,8 @@ import {
   ICommerceToolsExtensionRequest,
   IDatatransWebhookRequest,
   getHttpHeaderValue,
-  DATATRANS_SIGNATURE_HEADER_NAME
+  DATATRANS_SIGNATURE_HEADER_NAME,
+  ActionRequestedOnPayment
 } from '../../../interfaces';
 
 // eslint-disable-next-line no-prototype-builtins
@@ -11,7 +12,8 @@ const hasProperties = (obj: object, fields: string[]) => obj && fields.every((fi
 
 export enum Operation {
   RedirectAndLightboxInit = 'Redirect And Lightbox Init',
-  RedirectAndLightboxWebhook = 'Redirect And Lightbox Webhook'
+  RedirectAndLightboxWebhook = 'Redirect And Lightbox Webhook',
+  StatusCheck = 'Status Check'
 }
 
 enum PaymentInterface {
@@ -39,6 +41,9 @@ export class OperationDetector {
       if (this.isRedirectAndLightboxInitOperation(req)) {
         return Operation.RedirectAndLightboxInit;
       }
+      if (this.isStatusCheck(req)) {
+        return Operation.StatusCheck;
+      }
     } else if (this.isDatatransRequest(req)) {
       return Operation.RedirectAndLightboxWebhook;
     }
@@ -54,5 +59,13 @@ export class OperationDetector {
       && payment?.paymentMethodInfo?.paymentInterface === PaymentInterface.DataTransRedirectIntegration
       && !hasProperties(payment?.custom?.fields, ['transactionId'])
       && !payment?.paymentStatus?.interfaceCode;
+  }
+
+  private static isStatusCheck(req: ICommerceToolsExtensionRequest): boolean {
+    const reqBody = req.body;
+    const payment = reqBody.resource.obj;
+
+    return reqBody.action === 'Update'
+      && payment?.custom?.fields.action == ActionRequestedOnPayment.status;
   }
 }
