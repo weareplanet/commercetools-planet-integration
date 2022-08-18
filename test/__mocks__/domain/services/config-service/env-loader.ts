@@ -7,10 +7,6 @@ export default {
     apiUrl: 'https://apiUrl.fake',
   },
   datatrans: {
-    apiUrls: {
-      test: 'https://apiUrl.test.fake',
-      prod: 'https://apiUrl.prod.fake'
-    },
     webhookUrl: 'https://webhookUrl.fake',
     merchants: [
       {

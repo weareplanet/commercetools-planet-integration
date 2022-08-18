@@ -46,7 +46,7 @@ A mild suggestion is to look [here](https://docs.datatrans.ch/docs/home).
 
 **Details about the variables needed by Planet Payment CommerceTools connector can be found [here](https://github.com/weareplanet/commercetools-planet-integration/tree/main#enviroment-configuration).**
 
-In tis step, from the Datatrans setup, you must get these variables: **DT_MERCHANTS**, **DT_PROD_API_URL** and **DT_TEST_API_URL**.
+In tis step, from the Datatrans setup, you must get **DT_MERCHANTS**.
 <br><br>
 
 ### STEP 2 - **Setup CommerceTools - part 1 - create API Client** <p>

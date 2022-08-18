@@ -1,5 +1,10 @@
 import { IAnyObjectWithStringKeys } from '../extras';
 
+export enum DatatransURL {
+    PROD = 'https://api.PROD.datatrans.com/v1',
+    TEST = 'https://api.sandbox.datatrans.com/v1'
+}
+
 export enum DatatransEnvironment {
   PROD = 'prod',
   TEST = 'test'

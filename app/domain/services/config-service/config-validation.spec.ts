@@ -17,8 +17,6 @@ describe('Connector config validations', () => {
     CT_PROJECT_ID,
     CT_AUTH_URL,
     CT_API_URL,
-    DT_TEST_API_URL,
-    DT_PROD_API_URL,
     DT_MERCHANTS,
     DT_CONNECTOR_WEBHOOK_URL
   } = process.env;
@@ -45,10 +43,6 @@ describe('Connector config validations', () => {
       apiUrl: CT_API_URL,
     },
     datatrans: {
-      apiUrls: {
-        test: DT_TEST_API_URL,
-        prod: DT_PROD_API_URL
-      },
       webhookUrl: DT_CONNECTOR_WEBHOOK_URL,
       merchants: DT_MERCHANTS,
     }
@@ -63,10 +57,6 @@ describe('Connector config validations', () => {
       apiUrl: 'https://apiUrl.test',
     },
     datatrans: {
-      apiUrls: {
-        test: 'https://testUrl.test',
-        prod: 'https://prodUrl.test'
-      },
       webhookUrl: 'https://webhookUrl.test',
       merchants: [{ id: 'id', password: 'password', environment: 'test', dtHmacKey: 'HMAC key' }],
     }
@@ -97,16 +87,6 @@ describe('Connector config validations', () => {
       process.env.CT_API_URL = envVars.commerceTools.apiUrl;
     } else {
       delete process.env.CT_API_URL;
-    }
-    if (envVars.datatrans.apiUrls.test) {
-      process.env.DT_TEST_API_URL = envVars.datatrans.apiUrls.test;
-    } else {
-      delete process.env.DT_TEST_API_URL;
-    }
-    if (envVars.datatrans.apiUrls.prod) {
-      process.env.DT_PROD_API_URL = envVars.datatrans.apiUrls.prod;
-    } else {
-      delete process.env.DT_PROD_API_URL;
     }
     if (envVars.datatrans.webhookUrl) {
       process.env.DT_CONNECTOR_WEBHOOK_URL = envVars.datatrans.webhookUrl;
@@ -234,95 +214,6 @@ describe('Connector config validations', () => {
   });
 
   describe('Datatrans config validations', () => {
-    describe('apiUrls validations', () => {
-      describe('apiUrls.prod', () => {
-        it('when prod URL is absent - should throw an error', async () => {
-          setProcessEnvVars({
-            ...testEnvVarsValues,
-            datatrans: {
-              ...testEnvVarsValues.datatrans,
-              apiUrls: {
-                ...testEnvVarsValues.datatrans.apiUrls,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                prod: undefined
-              }
-            }
-          });
-
-          await expect(loadConfig())
-            .rejects
-            .toThrowError('DT_PROD_API_URL is required');
-
-          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
-        });
-
-        it('when prod URL is malformed - should throw an error', async () => {
-          setProcessEnvVars({
-            ...testEnvVarsValues,
-            datatrans: {
-              ...testEnvVarsValues.datatrans,
-              apiUrls: {
-                ...testEnvVarsValues.datatrans.apiUrls,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                prod: 'incorrect URL'
-              }
-            }
-          });
-
-          await expect(loadConfig())
-            .rejects
-            .toThrowError('DT_PROD_API_URL must be a valid URL');
-
-          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
-        });
-      });
-
-      describe('apiUrls.test', () => {
-        it('when test URL is absent - should throw an error', async () => {
-          setProcessEnvVars({
-            ...testEnvVarsValues,
-            datatrans: {
-              ...testEnvVarsValues.datatrans,
-              apiUrls: {
-                ...testEnvVarsValues.datatrans.apiUrls,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                test: undefined
-              }
-            }
-          });
-
-          await expect(loadConfig())
-            .rejects
-            .toThrowError('DT_TEST_API_URL is required');
-
-          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
-        });
-
-        it('when test URL is malformed - should throw an error', async () => {
-          setProcessEnvVars({
-            ...testEnvVarsValues,
-            datatrans: {
-              ...testEnvVarsValues.datatrans,
-              apiUrls: {
-                ...testEnvVarsValues.datatrans.apiUrls,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                test: 'incorrect URL'
-              }
-            }
-          });
-
-          await expect(loadConfig())
-            .rejects
-            .toThrowError('DT_TEST_API_URL must be a valid URL');
-
-          expect(logger.debug).not.toHaveBeenCalledWith(expect.anything, 'Loaded configuration');
-        });
-      });
-    });
 
     describe('webhookUrl validations', () => {
       it('when absent - should throw an error', async () => {

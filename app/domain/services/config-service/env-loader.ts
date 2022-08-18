@@ -9,10 +9,6 @@ const configFromEnv: IAppConfig = {
     apiUrl: process.env.CT_API_URL,
   },
   datatrans: {
-    apiUrls: {
-      test: process.env.DT_TEST_API_URL,
-      prod: process.env.DT_PROD_API_URL,
-    },
     webhookUrl: process.env.DT_CONNECTOR_WEBHOOK_URL,
     // TODO: likely it'd be better to not do JSON.parse here, but delegate it to Yup.
     // Or (less desirable), if here - then add some error handling...

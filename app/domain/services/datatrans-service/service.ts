@@ -8,7 +8,8 @@ import {
   IDatatransInitializeTransaction,
   DatatransEnvironment,
   getHttpHeaderValue,
-  DATATRANS_SIGNATURE_HEADER_NAME
+  DATATRANS_SIGNATURE_HEADER_NAME,
+  DatatransURL
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
@@ -56,9 +57,11 @@ export class DatatransService extends ServiceWithLogger {
     this.logger.debug({ body: transactionData }, 'DataTrans initRequest');
 
     const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
+
     const baseUrl = merchant.environment === DatatransEnvironment.TEST
-      ? this.config.apiUrls.test
-      : this.config.apiUrls.prod;
+      ? DatatransURL.TEST
+      : DatatransURL.PROD;
+
     const merchantAuth = {
       username: merchant.id,
       password: merchant.password

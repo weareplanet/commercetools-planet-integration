@@ -59,8 +59,6 @@ Resources:
           CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the CommerceTools project
           DT_CONNECTOR_WEBHOOK_URL: "DT_CONNECTOR_WEBHOOK_URL_PLACEHOLDER" # as an URL from AWS Lambda function itself
           DT_MERCHANTS: 'DT_MERCHANTS_PLACEHOLDER' # as a stringified JSON containing id, password, environment and HMAC key, using single quotes to avoid issues with double-quotes within the JSON
-          DT_PROD_API_URL: "DT_PROD_API_URL_PLACEHOLDER" # as an URL from Datatrans PRODUCTION API URL
-          DT_TEST_API_URL: "DT_TEST_API_URL_PLACEHOLDER" # as an URL from Datatrans TEST/SANDBOX API URL
           LOG_LEVEL: "debug" # change to INFO after debugging whatever is needed
 
   LambdaFunctionURL:
