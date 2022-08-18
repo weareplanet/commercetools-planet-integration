@@ -42,7 +42,6 @@ echo -e "\n##### Got an access token from CommerceTools: '${ACCESS_TOKEN}'"
 # If CT_API_EXTENSION_URL environment variable is provided - the extension of HTTP destination type will be created.
 # Otherwise - if  CT_API_EXTENSION_AWS_LAMBDA_ARN and CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY and CT_API_EXTENSION_AWS_LAMBDA_SECRET
 # environment variables are provided - the extension of AwsLambda destination type will be created.
-CT_API_EXTENSION_URL=${CT_API_EXTENSION_URL:-""}
 if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
   echo -e "\n##### Creating the new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
   # TODO(pbourke): the following is not idempotent, add a check
