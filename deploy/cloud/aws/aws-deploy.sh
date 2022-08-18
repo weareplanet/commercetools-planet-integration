@@ -3,35 +3,33 @@
 # Planet Payment - Commerce Tools connector AWS deployment
 # 2022-07 - Planet Payments
 #
-# deploys a CloudFormation stack using a template file
-# copying it to a new file and changing some placeholders to customize stack contents
+# Deploys a CloudFormation stack using a template file copying it to a new file and changing some
+# placeholders to customize stack contents
 #
-# The CloudFormation stack contains the Lambda function and accessory objects needed within AWS.
-# It has the prefix "planetpaymentcommtool-" (can be changed within the STACKNAME variable below)
+# The CloudFormation stack contains the Lambda function and accessory objects needed within AWS. It
+# has the prefix "planetpaymentcommtool-" (can be changed within the STACKNAME variable below)
 #
-# The Lambda function will be created with a single code snippet that will be modified
-# after the first package deployment.
+# The Lambda function will be created with a single code snippet that will be modified after the
+# first package deployment.
 #
-# requires TWO user inputs
+# Requires TWO user inputs:
 # STACKID - a simple name to identify this stack within others, 25 characters maximum
 #             (if API-Gateway is going to be used this will be mandatory to identify routes)
 # AWSREGION - which AWS region to use within the account credentials
 # !!!! this script DOESN'T validate its inputs contents
-#      but checks if the STACKID is smaller than 25 characters to avoid issues with AWS IAM (objects there are 64-characters long).
+#      but checks if the STACKID is smaller than 25 characters to avoid issues with AWS IAM (objects
+#      there are 64-characters long).
 #
 # Requirements:
 # 1) a bash-like shell
 # 2) AWS CLI installed in this shell
-# 3) and valid set of AWS credentials with administrator access level,
-#    as IAM objects are required
+# 3) A valid set of AWS credentials with administrator access level, as IAM objects are required
 #    (credentials can be an awscli profile or env vars)
 # 4) 'env' file with the required ENV vars filled
 #
-# To delete the stack,
-# just go to the CloudFormation Dashboard at the account and region where it was created
-# and delete the stack (can use AWS CLI too).
-#
-# a few preparations....
+# To delete the stack, go to the CloudFormation Dashboard at the account and region where it was
+# created and delete the stack (can use AWS CLI too).
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 STACKNAME="planetpaymentcommtool"
 STACKID=$(echo $1 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
@@ -67,10 +65,9 @@ set -a
 source <(cat ${ENVFILE} | sed -e '/^#/d;/^\s*$/d;')
 set +a
 
-echo -e "\n##### Importing and checking ENV vars"
+echo -e "\n##### Checking ENV vars"
 REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS DT_CONNECTOR_WEBHOOK_URL)
 for var in "${REQUIRED_CT_VARS[@]}"; do
-    # echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     if [ -z "${!var}" ] ; then
         echo -e "\tMissed the required environmebt variable $var"
         exit 1
@@ -81,7 +78,7 @@ done
 echo -e "##### getting AWS credentials"
 CHECKAWS=$(aws sts get-caller-identity)
 if [ $? != 0 ]; then
-    echo -e "   !! Oh no, something went wrong with your AWS credentials."
+    echo -e "   !! error: something went wrong with your AWS credentials."
     echo -e "   !! If using SSO, try to refresh then copy the NEW env vars from the account SSO landing page."
     exit 0
 fi
@@ -99,14 +96,10 @@ sed -i -e "s/STACKID/$STACKID/g" ${OUTPUT_YAML}
 sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${OUTPUT_YAML}
 echo -e "   ## done."
 echo -e "\n   ## updating template variables with 'env' contents"
-#env | grep "^CT.*" # uncomment for debugging
 for var in "${!CT@}"; do
-    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
-#env | grep "^DT.*" # uncomment for debugging
 for var in "${!DT@}"; do
-    #echo -e "var is ${var} with value '${!var}'" # uncomment for debugging
     sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
 echo -e "   ## done.\n"
@@ -128,8 +121,6 @@ LAMBDAFUNCTIONNAME=$(aws cloudformation --region ${AWSREGION} describe-stacks --
 LAMBDAFUNCTIONURL=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
                     --query "Stacks[0].Outputs[?OutputKey=='LambdaFunctionURL'].OutputValue" --output text)
 # yes, awscli cannot update a SINGLE variable, it changes the entire set, so to add or change one, you must have all others...
-#echo -e "LAMBDAFUNCTIONNAME: ${LAMBDAFUNCTIONNAME}" #uncomment for debugging
-#echo -e "LAMBDAFUNCTIONURL: ${LAMBDAFUNCTIONURL}" #uncomment for debugging
 ALLLAMBDAENVVARS=$(aws lambda get-function-configuration --region ${AWSREGION} --function-name ${LAMBDAFUNCTIONNAME} | \
     jq --compact-output ".Environment + {\"Variables\": (.Environment.Variables + {\"DT_CONNECTOR_WEBHOOK_URL\": \"${LAMBDAFUNCTIONURL}v1/dt-webhook\"})}")
 echo -e "   ## changing Lambda ENV var..."
@@ -149,7 +140,6 @@ sed -i "/^CT_API_EXTENSION_AWS_LAMBDA_SECRET/c\CT_API_EXTENSION_AWS_LAMBDA_SECRE
 sed -i "/^CT_API_EXTENSION_AWS_LAMBDA_ARN/c\CT_API_EXTENSION_AWS_LAMBDA_ARN=\"${LAMBDAARN}\"" ${ENVFILE}
 echo -e "   ## done with this .env file.\n"
 
-# it's the end
-echo -e "##### supposedly, we're all done"
+echo -e "##### Done"
 echo -e "##### check the cli output here and CloudFormation stack Events output in $AWSREGION\n"
 echo -e "##### at the stack Outputs there's the FunctionURL for the Lambda function"

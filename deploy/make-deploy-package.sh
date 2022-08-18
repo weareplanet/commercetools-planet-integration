@@ -5,9 +5,6 @@
 # Planet Payment - Commerce Tools - building package for Lambda function
 # 2022-07 - Planet Payments
 #
-# - run this script at the root folder of the cloned repo
-#   (using "bash deploy/make-deploy-package.sh")
-#
 # REQUIREMENTS:
 # - Planet Payment Connector GIT repo cloned locally
 # - Node.js v16.x installed
