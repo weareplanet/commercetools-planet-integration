@@ -2,11 +2,7 @@
 
 set -euo pipefail
 
-DEPLOY_SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-ENV="${ENV:-aws}"
-STACK_ID="${STACK_ID:-mystack}"
-AWS_REGION="${AWS_REGION:-eu-west-1}"
+DEPLOY_SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 function deploy_aws {
   source ${DEPLOY_SCRIPT_DIR}/commercetools/custom-types-setup.sh
@@ -17,13 +13,49 @@ function deploy_aws {
     --function-name=planetpaymentcommtool-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
 }
 
+function usage {
+	cat << EOF
+
+Deploys the Planet Payment commercetools connector.
+
+Usage: $0 -e environment [-s stack_id]
+
+Arguments:
+-e Target environment, one of: 'aws'
+-s (Optional) Name of the infra stack created. Default: 'connector'
+EOF
+}
+
+ENV="${ENV:-""}"
+STACK_ID="${STACK_ID:-resources}"
+AWS_REGION="${AWS_REGION:-eu-west-1}"
+
+while getopts "e:s:" OPTION; do
+    case $OPTION in
+    e)
+        ENV=$OPTARG
+        if [[ ! $ENV =~ aws ]]; then
+          usage
+          exit 1
+        fi
+        ;;
+    s)
+        STACK_ID=$OPTARG
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+    esac
+done
+
 case $ENV in
   aws)
     deploy_aws
     ;;
 
   *)
-    echo "error: Target environment ${ENV} is not supported. Check value for ENV is correct."
+    usage
     exit 1
     ;;
 esac
