@@ -1,4 +1,8 @@
-import { Payment, type PaymentUpdateAction } from '@commercetools/platform-sdk';
+import {
+  type Payment,
+  type Transaction,
+  type PaymentUpdateAction
+} from '@commercetools/platform-sdk';
 
 import { ServiceWithLogger, ServiceWithLoggerOptions } from '../log-service';
 import { ConfigService } from '../config-service';
@@ -16,6 +20,7 @@ import {
 import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommerceToolsMapper, PaymentMethodInfoForCommerceTools } from './dt-to-ct-mapper';
+import { CommerceToolsPaymentActionsBuilder } from '../commercetools-service/commerce-tools-payment-actions-builder';
 
 type SaveAuthorizationOptions = {
   rawRequestBody: string;
@@ -80,6 +85,43 @@ export class PaymentService extends ServiceWithLogger  {
     await this.saveAuthorizationToPayment(payment, opts);
 
     await this.savePaymentMethodToCustomObject(payment, opts.ctCustomPaymentMethod);
+  }
+
+  async checkStatus(payment: Payment): Promise<PaymentUpdateAction[]> {
+    this.logger.debug(payment.transactions, '--- Transactions');
+
+    const transactionsToBeChecked = payment.transactions.filter((t) => {
+      return ['Authorization', 'Refund'].includes(t.type);
+    });
+
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
+    const getActionsByTransaction = (t: Transaction) => {
+      return this.handleTransactionStatusUpdate(payment, t, actionsBuilder);
+    };
+
+    await Promise.all(transactionsToBeChecked.map(getActionsByTransaction));
+
+    return actionsBuilder.getActions();
+  }
+
+  private async handleTransactionStatusUpdate(payment: Payment, transaction: Transaction, actionsBuilder: CommerceToolsPaymentActionsBuilder): Promise<void> {
+    const { merchantId } = payment.custom.fields;
+    const statusResponseBody = await this.datatransService.getTransactionStatus(merchantId, transaction.interactionId);
+
+    switch (transaction.type) {
+      case 'Authorization':
+        actionsBuilder.setStatus({ interfaceCode: statusResponseBody.status });
+        await this.savePaymentMethodToCustomObject(
+          payment,
+          DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(statusResponseBody).ctCustomPaymentMethod
+        );
+        // do not break - fall through - below is a common logic for both Authorization and Refund
+      case 'Refund':
+        actionsBuilder.changeTransactionState(transaction.id, DatatransToCommerceToolsMapper.inferCtTransactionState(statusResponseBody.status));
+        break;
+      default:
+        // ignore a transaction of any other type
+    }
   }
 
   private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {

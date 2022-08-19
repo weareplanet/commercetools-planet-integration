@@ -7,10 +7,11 @@ import {
 import {
   PaymentUpdateAction,
   TypeResourceIdentifier,
-  TransactionDraft
+  TransactionDraft,
+  TransactionState
 } from '@commercetools/platform-sdk';
 
-export class CommerceToolsActionsBuilder {
+export class CommerceToolsPaymentActionsBuilder {
   private actions: PaymentUpdateAction[] = [];
 
   makeCustomTypeReference(typeKey: CommerceToolsCustomTypeKey): TypeResourceIdentifier {
@@ -48,6 +49,14 @@ export class CommerceToolsActionsBuilder {
     });
 
     return this;
+  }
+
+  changeTransactionState(transactionId: string, state: TransactionState) {
+    this.actions.push({
+      action: 'changeTransactionState',
+      transactionId,
+      state
+    });
   }
 
   addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | IAnyObjectWithStringKeys) {

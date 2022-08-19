@@ -11,6 +11,7 @@ import {
 // Import all possible operation handlers
 import createPaymentHandler from '../per-operation-handlers/create-payment';
 import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
+import statusCheckHandler from '../per-operation-handlers/status-check';
 
 // Load the app configuration in COLD START phase
 new ConfigService().getConfig();
@@ -30,6 +31,10 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
   switch (operation) {
     case Operation.RedirectAndLightboxInit: {
       return createPaymentHandler(req);
+    }
+
+    case Operation.StatusCheck: {
+      return statusCheckHandler(req);
     }
 
     case Operation.RedirectAndLightboxWebhook: {

@@ -27,6 +27,7 @@
         "quotes": ["error", "single"],
         "no-trailing-spaces": ["error"],
         "eol-last": ["error", "always"],
+        "no-fallthrough": "off",
         "@typescript-eslint/no-unused-vars": [2, { "args": "none" }]
     }
 }
