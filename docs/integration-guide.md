@@ -1,6 +1,6 @@
 # Integration Guide - Commercetools Connector for Planet
 
-The guide below outlines the steps you need to take to complete the integration to Planet via the Datatrans payment gateway. Please read the [introduction page](../readme.md) first and understand the concept and the existing features before proceeding with the integration.
+The guide below outlines the steps you need to take to complete the integration to Planet via the Datatrans payment gateway. Please read the [introduction page](https://github.com/weareplanet/commercetools-planet-integration) first and understand the concept and the existing features before proceeding with the integration.
 
 ## Overview
 
@@ -51,7 +51,7 @@ To use the connector, you will need a valid commercetools account. You can use a
 
 tbd: do you need to set this up manually? and if via script, how does it get credentials?
 
-A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need to enable the communication between the connector and commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs access to at least `Payments` and `Custom Objects`. The credentials are stored in the [connector's configuration](#connector-configuration). The API client will be created when [setting up your environment](environment-setup-guide.md).
+A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need to enable the communication between the connector and commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs access to at least `Payments` and `Custom Objects`. You need to define these credentials during your [environment setup](#environment-setup). The API client will also be created when setting up your environment.
 
 ### Custom Types
 
