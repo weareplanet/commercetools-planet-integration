@@ -8,15 +8,10 @@
     "transpile": "tsc",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
-    "package": "cd dist && rm -rf ./package/$STAGE && cp ../serverless.yml . && ln -sf ../node_modules . && serverless package --stage $STAGE --region $AWS_REGION --verbose --package ./package/$STAGE/",
-    "package:local-dev": "cross-env STAGE=local-dev AWS_REGION=local-fake-region npm run package",
-    "package:aws-dev": "cross-env STAGE=v1 AWS_REGION=eu-west-1 npm run package",
     "test:base": "cross-env NODE_ENV=test STAGE=local-dev jest --runInBand --coverage",
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
-    "start:local-dev": "cross-env SLS_DEBUG=* NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_OPTIONS=\"-r dotenv/config\" ts-node-dev --project ./tsconfig.json --respawn -- $(which sls) offline --stage local-dev --region us-east-1",
-    "start:local-dev:formatted": "npm run start:local-dev | pino-pretty -t HH:MM:ss",
     "prepare": "husky install"
   },
   "keywords": [
@@ -58,8 +53,6 @@
     "lint-staged": "^13.0.1",
     "lodash.merge": "^4.6.2",
     "pino-pretty": "^8.0.0",
-    "serverless": "^3.19.0",
-    "serverless-offline": "^8.8.1",
     "ts-jest": "^28.0.4",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.7.3"
