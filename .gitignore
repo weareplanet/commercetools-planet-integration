@@ -32,8 +32,5 @@ dist/
 # Coverage directory used by tools like istanbul
 coverage/
 
-# Serverless directories
-.serverless/
-
 # OS quirks
 .DS_Store
