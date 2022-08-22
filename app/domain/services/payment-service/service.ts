@@ -32,7 +32,7 @@ const PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME = 'savedPaymentMethods';
 // - from the higher level - a request handler should use this service to perform business flows.
 // - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DatatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
-export class PaymentService extends ServiceWithLogger  {
+export class PaymentService extends ServiceWithLogger {
   private commerceToolsService: CommerceToolsService;
   private datatransService: DatatransService;
 
@@ -158,7 +158,12 @@ export class PaymentService extends ServiceWithLogger  {
 
     const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);
 
-    const  paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+    const paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+
+    this.logger.warn(paymentMethodDetailsToBeSaved);
+
+    this.logger.warn(paymentMethodsObject);
+
     if (paymentMethodsObject) {
       const paymentMethod = this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
       if (paymentMethod) { // This payment method is already saved
