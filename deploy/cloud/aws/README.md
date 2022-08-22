@@ -11,10 +11,10 @@ Some steps are manual and others uses scripts to perform tasks. Steps 1 and 2 de
 | ---- | ---- | ----|
 | 1 | [Setup Datatrans](#step-1---setup-datatrans) | Setup access and get credentials. <p> Manual procedure with outputs to use in step 3. |
 | 2 | [Setup CommerceTools, <p>part 1](#step-2---setup-commercetools-part-1) | Setup access and get credentials, Setup first API-Client. <p> Manual procedure with outputs to use in step 3. |
-| 3 | [ENV var file preparation](#step-3---lambda-env-vars-adjustments) | Modify `.env` file with variables from steps 1 and 2. Manual procedure. <p>_**This `.env` file is used by the scripts on steps 4, 5 and 6.**_ |
-| 4 | [Setup CommerceTools, <p>part 2](#step-4---setup-commercetools-part-2) | Register custom field types (script + JSON files), create API Extensions. <p> Uses shell scripts and the `.env` file.  |
-| 5 | [Create AWS infrastructure](#step-5---create-aws-infrastructure) | Creates an AWS infrastructure stack to support the Lambda function. <p>Uses a shell script, a CloudFormation template, `.env` file plus input parameters. |
-| 6 | [Setup CommerceTools, <p>part 3](#step-6---setup-commercetools-part-3) | Create API Extensions. <p> Uses shell scripts and the `.env` file. |
+| 3 | [ENV var file preparation](#step-3---lambda-env-vars-adjustments) | Modify `env` file with variables from steps 1 and 2. Manual procedure. <p>_**This `env` file is used by the scripts on steps 4, 5 and 6.**_ |
+| 4 | [Setup CommerceTools, <p>part 2](#step-4---setup-commercetools-part-2) | Register custom field types (script + JSON files), create API Extensions. <p> Uses shell scripts and the `env` file.  |
+| 5 | [Create AWS infrastructure](#step-5---create-aws-infrastructure) | Creates an AWS infrastructure stack to support the Lambda function. <p>Uses a shell script, a CloudFormation template, `env` file plus input parameters. |
+| 6 | [Setup CommerceTools, <p>part 3](#step-6---setup-commercetools-part-3) | Create API Extensions. <p> Uses shell scripts and the `env` file. |
 | 7 | [Package Build](#step-7---package-build) | Builds a package from the current branch. <p> Uses a shell script and outputs a .zip file to be used in the Lambda function. |
 | 8 | [Package Deploy](#step-8---package-deploy) | Single-line AWS CLI command to deploy the .zip package from step 7. <p>Manual procedure. |
 
@@ -69,11 +69,13 @@ From this step, after creating the first API-client, you must get these variable
 <br>
 ### STEP 3 - **ENV var file preparation** <p>
 
-From the two steps above you will have a set of variables, modify the file `deploy/commercetools/.env` and include the variables and values as `KEY="VALUE"` pairs in it.
+From the two steps above you will have a set of variables. Copy the example environment file from
+`deploy/env.example` to `deploy/env`, and update it with the variables and values in the form
+`KEY="VALUE"`.
 
 ### STEP 4 - **Setup CommerceTools - part 2** <p>
 
-With the `.env` file above ready, proceed executing the following shell scripts:
+With the `env` file above ready, proceed executing the following shell scripts:
 
 In `deploy/commercetools/` folder, run:
 
@@ -85,7 +87,7 @@ _will create a few custom fields types within the project, using JSON files with
 ### STEP 5 - **Create AWS infrastructure** <p>
 
 - Make sure that your AWS credenntials are OK (valid, refreshed, etc)
-- The script needs the `.env` file modified by the step 3.
+- The script needs the `env` file modified by the step 3.
 - Define an **ID** for the new stack, with no special characters or spaces in it, like "prod01" or "Develop02" - this will be **STACKID**
 - Define on which region it will be deployed, like "eu-west-1" or "us-east-2" - this will be **AWSREGION**
 - At the shell run this script providing the two parameters defined above:
