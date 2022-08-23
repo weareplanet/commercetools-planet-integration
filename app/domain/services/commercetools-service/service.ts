@@ -65,10 +65,8 @@ export class CommerceToolsService extends ServiceWithLogger {
         })
         .execute();
     } catch (err) {
-      if (err.code == 404) {
-        this.logger.debug(err.body.message);
-        return null;
-      }
+      this.logger.error(err.body.message);
+      return null;
     }
 
     this.logger.debug(res.body, 'Response from CommerceTools to the CustomObject request.');
