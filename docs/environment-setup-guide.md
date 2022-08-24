@@ -21,7 +21,7 @@ The connector uses environment variables as the application configuration. The e
 To get started, clone this repository to your desired environment. Copy the file `deploy/env.example` to `deploy/env` and change the values of the variables in your newly added file. This file will be required to deploy the connector successfully. For security reasons, remove this file after deployment is complete.
 
 Environment Variable | Format | Description
------------|-----------|-----------
+:-----------|:-----------|:-----------
 `CT_CLIENT_ID` | String | The API Client's `Client ID` is required to communicate with commercetools.
 `CT_CLIENT_SECRET` | String | The API Client's `Client Secret` is required to communicate with commercetools.
 `CT_AUTH_URL` | String | The API Client's `Auth URL` is required to communicate with commercetools (e.g., `https://auth.us-central1.gcp.commercetools.com`).
@@ -35,19 +35,27 @@ Environment Variable | Format | Description
 To quickly set up everything, run the command below. Check the following chapters if you need details about the individual deployment steps. Only proceed with this command after defining your [environment variables](#environment-variables).
 
 ```shell
-sh ./deploy/master-script.sh --target-cloud-environment AWS --commercetools-extension-type HTTP
+sh ./deploy/deploy.sh --target-cloud-environment AWS --commercetools-extension-type HTTP
 ```
 
 The master script supports the arguments below.
 
 Argument | Accepted Values | Description
------------|-----------|-----------
+:-----------|:-----------|:-----------
 `--target-cloud-environment` | `AWS` | The environment you will deploy the connector to.
 `--commercetools-extension-type` | `HTTP`, `AWSLAMBDA` | The commercetools API extension type you would like to use. We recommend HTTP.
 
 ## Manual Deployment to Amazon Web Services (AWS)
 
 Read this chapter if you wish to manually deploy the connector to Amazon Web Services (AWS). There are several shell scripts in /deploy that you need to call to deploy the connector into AWS correctly and create the commercetools required custom types and API extension. Only proceed with this chapter after defining your [environment variables](#environment-variables), especially the extra variables needed for a manual deployment to AWS. Follow the order below to ensure the correct creation of the connector's prerequisites.
+
+### Adding the Source of your Environment Variables
+
+Run the following command to set the source of your environment variables.
+
+```shell
+source ./deploy/env
+```
 
 ### Setting up commercetools Custom Types
 
