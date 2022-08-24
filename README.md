@@ -4,7 +4,7 @@
 
 Need a modern approach for your online payments? Look no further. With our connector, your commercetools projects will get instant access to dozens of payment methods, acquirers, and currencies. Offer your customers a state-of-the-art user experience for online payments.
 
-Planet is a global financial services company specializing in payments and tax-free solutions. As a leading payment service provider, Planet processes millions of transactions daily through various payment gateways, one of them being Datatrans. Datatrans will be the payment gateway used by the connector.
+Planet provides integrated software, payment, and technology solutions for its customers and partners, helping them unlock the benefits of a more connected and digital world. Planet serves global players, including Accor, Bulgari, Hermès, Kering, and Lufthansa Group. As a leading payment service provider, Planet processes millions of transactions daily through various of their owned payment gateways, one of them being Datatrans - the payment gateway the connector uses.
 
 This connector allows you to connect your commercetools solution to Planet to process your payments in a quick and easy way. The Planet connector will save your developers days of integration effort. Focus on your expertise, and let us guide you on how to best implement Planet payments in commercetools.
 
