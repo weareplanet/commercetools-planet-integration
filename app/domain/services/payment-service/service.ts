@@ -135,6 +135,13 @@ export class PaymentService extends ServiceWithLogger {
     });
   }
 
+  private filterPaymentMethodsByFingerprint(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, fingerprint: string): IDatatransPaymentMethodInfo[] {
+    return paymentMethodsObject?.value?.filter((method) => {
+      const currentFingerprint = DatatransToCommerceToolsMapper.getPaymentMethodDetails(method)?.details?.fingerprint;
+      return currentFingerprint != fingerprint;
+    });
+  }
+
   private async savePaymentMethodToCustomObject(payment: Payment, paymentMethodInfo: IDatatransPaymentMethodInfo) {
     if (!(payment as unknown as ICommerceToolsPayment).custom.fields.savePaymentMethod) {
       return; // it is not requested to save the payment method for this payment
@@ -179,8 +186,11 @@ export class PaymentService extends ServiceWithLogger {
     ];
 
     if (paymentMethodsObject) { // Need to amend already existing Custom Object
-      valueToBeSaved = paymentMethodsObject.value.concat(valueToBeSaved);
+      const fingerprint = paymentMethodDetailsToBeSaved.details?.fingerprint?.toString();
+      valueToBeSaved = this.filterPaymentMethodsByFingerprint(paymentMethodsObject, fingerprint).concat(valueToBeSaved);
     }
+
+    this.logger.warn(valueToBeSaved);
 
     await this.commerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
   }
