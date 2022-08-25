@@ -211,7 +211,7 @@ describe('All-operations handler', () => {
               {
                 paymentMethod: DatatransPaymentMethod.VIS,
                 card: {
-                  alias: 'Earlier saved VIS card payment alias'
+                  alias: 'Earlier saved VIS card payment alias',
                 }
               },
               {

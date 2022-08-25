@@ -138,7 +138,7 @@ export class PaymentService extends ServiceWithLogger {
   private filterPaymentMethodsByFingerprint(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, fingerprint: string): IDatatransPaymentMethodInfo[] {
     return paymentMethodsObject?.value?.filter((method) => {
       const currentFingerprint = DatatransToCommerceToolsMapper.getPaymentMethodDetails(method)?.details?.fingerprint;
-      return currentFingerprint != fingerprint;
+      return !currentFingerprint || currentFingerprint != fingerprint;
     });
   }
 
@@ -187,7 +187,12 @@ export class PaymentService extends ServiceWithLogger {
 
     if (paymentMethodsObject) { // Need to amend already existing Custom Object
       const fingerprint = paymentMethodDetailsToBeSaved.details?.fingerprint?.toString();
-      valueToBeSaved = this.filterPaymentMethodsByFingerprint(paymentMethodsObject, fingerprint).concat(valueToBeSaved);
+
+      const savedValues = fingerprint
+        ? this.filterPaymentMethodsByFingerprint(paymentMethodsObject, fingerprint)
+        : paymentMethodsObject.value;
+
+      valueToBeSaved = savedValues.concat(valueToBeSaved);
     }
 
     this.logger.warn(valueToBeSaved);
