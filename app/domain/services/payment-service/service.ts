@@ -191,8 +191,6 @@ export class PaymentService extends ServiceWithLogger {
       valueToBeSaved = savedValues.concat(valueToBeSaved);
     }
 
-    this.logger.warn(valueToBeSaved);
-
     await this.commerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
   }
 }
