@@ -49,9 +49,7 @@ To use the connector, you will need a valid commercetools account. You can use a
 
 ### API Client
 
-tbd: do you need to set this up manually? and if via script, how does it get credentials?
-
-A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need to enable the communication between the connector and commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs access to at least `Payments` and `Custom Objects`. You need to define these credentials during your [environment setup](#environment-setup). The API client will also be created when setting up your environment.
+A commercetools API client has a `client_id`, `secret`, `API URL`, and `Auth URL`, which you will need to enable the communication between the connector and commercetools. You can refer to commercetools' explanation [here](https://docs.commercetools.com/merchant-center/api-clients). You will also need to know your commercetools' `projectKey`, the project's name. The API client needs manage & view permissions for various commercetools objects, including `Payments`, `Types`, and `Extensions`. To set the right permissions for the connector's API client, use the commercetools UI and select `Admin client` from the scopes preset dropdown. You need to define these credentials during your [environment setup](#environment-setup).
 
 ### Custom Types
 
@@ -106,27 +104,27 @@ Below is what your `PaymentDraft` could look like.
 The attributes that can be sent to the Create a Payment API as a `PaymentDraft` are outlined below.
 
 Commercetools Payment Attribute | Required | Format | Description
----------|---------|---------|---------
-`key` | true | String, 1-20 chars | The reference you want to use for your transaction.
-`amountPlanned.centAmount` | true | Integer | The amount in cents for your transaction. It needs to be 0 to create a dedicated registration.
-`amountPlanned.currencyCode` | true | String, 3-letter ISO-4217 | The currency for your transaction.
-`paymentMethodInfo.method` | true | String | A string containing one or multiple payment methods. Submit only one method to skip the payment method selection and start with the specified method directly. For Google Pay and Apple Pay, you need to specify at least one card type in here (eg. `"ECA, VIS, PAY"`).
-`custom.type.typeId` | true | String | The `typeId` is the subtype of your custom type. This should be set to `type`.
-`custom.type.id` | true | String | The id of your type. This is created after you added your custom types to your commercetools project.
-`custom.fields.merchantId` | true | String | The merchantId you want to assign your transaction to. This merchantId has to be configured in your [environment variables](environment-setup-guide.md#environment-variables).
-`custom.fields.successUrl` | true | String | The URL you want users to be redirected to if the transaction result is `success`.
-`custom.fields.cancelUrl` | true | String | The URL you want users to be redirected to if the transaction result is `cancel`.
-`custom.fields.errorUrl` | true | String | The URL you want users to be redirected to if the transaction result is `error`.
-`custom.fields.language` | false | String, 2-chars ISO-639-1 | The language you want to display on the Redirect & Lightbox integration. The supported languages are displayed [here](https://docs.datatrans.ch/docs/redirect-lightbox#language-support).
-`custom.fields.savePaymentMethod` | false | Boolean | If enabled, the connector will store the user's payment method (alias) for future payments in custom type `savedPaymentMethods`. You must use this in pair with `savedPaymentMethodsKey`.
-`custom.fields.savePaymentMethodsKey` | false | String | Use this attribute to specify the key under which a user's saved payment methods are stored in the custom type `savedPaymentMethods`. Use a user's login or a unique Id as the key.
-`custom.fields.savedPaymentMethodAlias` | false | String | Set this value for using a previously saved payment method. The value must match a specific alias in the custom object `savedPaymentMethods`, key `savedPaymentMethodsKey`.
-`custom.fields.initRequest` | false | String | Used to define advanced flows not covered by the connector yet. You should use this with caution, and you may want to get in touch with us before using this.
+:---------|:---------|:---------|:---------
+`key` | Yes | String, 1-20 chars | The reference you want to use for your transaction.
+`amountPlanned.centAmount` | Yes | Integer | The amount in cents for your transaction. It needs to be 0 to create a dedicated registration.
+`amountPlanned.currencyCode` | Yes | String, 3-letter ISO-4217 | The currency for your transaction.
+`paymentMethodInfo.method` | Yes | String | A string containing one or multiple payment methods. Submit only one method to skip the payment method selection and start with the specified method directly. For Google Pay and Apple Pay, you need to specify at least one card type in here (eg. `"ECA, VIS, PAY"`).
+`custom.type.typeId` | Yes | String | The `typeId` is the subtype of your custom type. This should be set to `type`.
+`custom.type.id` | Yes | String | The id of your type. This is created after you added your custom types to your commercetools project.
+`custom.fields.merchantId` | Yes | String | The merchantId you want to assign your transaction to. This merchantId has to be configured in your [environment variables](environment-setup-guide.md#environment-variables).
+`custom.fields.successUrl` | Yes | String | The URL you want users to be redirected to if the transaction result is `success`.
+`custom.fields.cancelUrl` | Yes | String | The URL you want users to be redirected to if the transaction result is `cancel`.
+`custom.fields.errorUrl` | Yes | String | The URL you want users to be redirected to if the transaction result is `error`.
+`custom.fields.language` | No | String, 2-chars ISO-639-1 | The language you want to display on the Redirect & Lightbox integration. The supported languages are displayed [here](https://docs.datatrans.ch/docs/redirect-lightbox#language-support).
+`custom.fields.savePaymentMethod` | No | Boolean | If enabled, the connector will store the user's payment method (alias) for future payments in custom type `savedPaymentMethods`. You must use this in pair with `savedPaymentMethodsKey`.
+`custom.fields.savePaymentMethodsKey` | No | String | Use this attribute to specify the key under which a user's saved payment methods are stored in the custom type `savedPaymentMethods`. Use a user's login or a unique Id as the key.
+`custom.fields.savedPaymentMethodAlias` | No | String | Set this value for using a previously saved payment method. The value must match a specific alias in the custom object `savedPaymentMethods`, key `savedPaymentMethodsKey`.
+`custom.fields.initRequest` | No | String | Used to define advanced flows not covered by the connector yet. You should use this with caution, and you may want to get in touch with us before using this.
 
 Below are the additional payment attributes in `Payment`, returned by the connector after the Payment object has been created.
 
 Commercetools Payment Attribute | Format | Description
----------|---------|---------
+:---------|:---------|:---------
 `custom.fields.transactionId` | String | The `transactionId` by Datatrans.
 `custom.fields.redirectUrl` | String | The `redirectUrl` where you should redirect your user to proceed with their transaction.
 
@@ -137,7 +135,7 @@ The connector passes the provided payment attributes to Datatrans's [init endpoi
 The connector currently automatically settles transactions (aka auto-settle, auto-capture). Check the table below to understand the mapping from commercetools' payment attributes to the Datatrans API.
 
 Datatrans Parameter | Commercetools Payment Attribute
----------|----------
+:---------|:----------
  `refno` | `key`
  `amount` | `amountPlanned.centAmount`
  `currency` | `amountPlanned.currencyCode`
