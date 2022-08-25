@@ -12,7 +12,7 @@ The environment setup guide consists of the following sections:
 
 * Setting up your environment variables [ [jump to section](#environment-variables) ]
 * Quick Setup [ [jump to section](#quick-setup) ]
-* Manually deploying the connector to Amazon Web Services (AWS) [ [jump to section](#manual-deployment-to-amazon-web-services-aws) ]
+* Manually deploying the connector [ [jump to section](#manual-deployment) ]
 
 ## Environment Variables
 
@@ -45,19 +45,19 @@ Argument | Accepted Values | Description
 `--target-cloud-environment` | `AWS` | The environment you will deploy the connector to.
 `--commercetools-extension-type` | `HTTP`, `AWSLAMBDA` | The commercetools API extension type you would like to use. We recommend HTTP.
 
-## Manual Deployment to Amazon Web Services (AWS)
+## Manual Deployment
 
-Read this chapter if you wish to manually deploy the connector to Amazon Web Services (AWS). There are several shell scripts in /deploy that you need to call to deploy the connector into AWS correctly and create the commercetools required custom types and API extension. Only proceed with this chapter after defining your [environment variables](#environment-variables), especially the extra variables needed for a manual deployment to AWS. Follow the order below to ensure the correct creation of the connector's prerequisites.
+Read this chapter if you wish to manually deploy the connector (e.g., to Amazon Web Services). There are several shell scripts in /deploy that you need to call to deploy the connector into AWS correctly and create the commercetools required custom types and API extension. Follow the order below to ensure the correct creation of the connector's prerequisites.
 
-### Adding the Source of your Environment Variables
+### Preparing your Environment Variables
 
-Run the following command to set the source of your environment variables.
+Only proceed with the command below after defining your [environment variables](#environment-variables), especially the extra variables needed for a manual deployment to AWS. Run the following command to export the variables from your prepared `env` file to your environment.
 
 ```shell
 source ./deploy/env
 ```
 
-### Setting up commercetools Custom Types
+### Creating the commercetools Custom Types
 
 Run the following script to create the custom types required by the connector.
 
@@ -67,7 +67,7 @@ sh ./deploy/commercetools/custom-types-setup.sh
 
 This script will take the various required types defined in `deploy/commercetools/types`.
 
-### Creating your AWS CloudFormation Stack
+### Creating the AWS CloudFormation Stack
 
 Run the script below to create the AWS CloudFormation Stack. This script will use your environment variables to deploy the connector to your AWS ARN. When running this script, you must pass a stack id (e.g., prod01, develop01) and an AWS region (e.g., eu-west-1).
 
@@ -79,9 +79,9 @@ sh ./deploy/cloud/aws/aws-deploy.sh STACKID REGION
 
 After a few minutes, AWS CloudFormation should show your newly created stack. The Lambda function's name will be ct-planet-connector-{STACKID}. If you need to customize the stack template, you may check our CloudFormation template located at `/deploy/cloud/aws/stack-template.yaml`. We do recommend leaving this file as is.
 
-### Setting up the commercetools API Extension
+### Creating the commercetools API Extension
 
-After deploying the connector successfully to AWS or an on-premise environment, you can proceed with setting up commercetools' API extension with the script below.
+After deploying the connector successfully to AWS or an on-premise environment, you can proceed with creating commercetools' API extension with the script below.
 
 ```shell
 sh ./deploy/commercetools/api-extension-setup.sh
