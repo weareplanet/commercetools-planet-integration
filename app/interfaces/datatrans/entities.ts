@@ -63,6 +63,7 @@ export type DatatransPaymentMethodDetails = {
   expiryMonth?: string;
   expiryYear?: string;
   walletIndicator?: string;
+  fingerprint?: string;
 } & IAnyObjectWithStringKeys;
 
 // This type represents a part of Datatrans request body
