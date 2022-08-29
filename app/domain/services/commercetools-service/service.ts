@@ -6,7 +6,7 @@ import {
 
 import { ServiceWithLogger } from '../log-service/service-with-logger';
 import { ctApiRoot } from './commerce-tools-client';
-import { CommerceToolsActionsBuilder } from './commerce-tools-actions-builder';
+import { CommerceToolsPaymentActionsBuilder } from './commerce-tools-payment-actions-builder';
 import { ConfigService } from '../config-service';
 import { COMMERCETOOLS_CORRELATION_ID_HEADER_NAME } from '../../../interfaces';
 
@@ -14,7 +14,7 @@ import { COMMERCETOOLS_CORRELATION_ID_HEADER_NAME } from '../../../interfaces';
 // It is unaware of business flows.
 export class CommerceToolsService extends ServiceWithLogger {
   public getActionsBuilder() {
-    return new CommerceToolsActionsBuilder();
+    return new CommerceToolsPaymentActionsBuilder();
   }
 
   public async getPayment(paymentKey: string): Promise<Payment> {

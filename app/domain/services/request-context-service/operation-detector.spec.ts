@@ -45,6 +45,30 @@ describe('OperationDetector', () => {
       expect(OperationDetector.isDatatransRequest(req)).toBe(true);
     });
 
+    it('should return "Status Check" when its criteria are detected', () => {
+      const req = abstractRequestFactory({
+        body: {
+          action: 'Update',
+          resource: {
+            obj: {
+              custom: {
+                fields: {
+                  action: 'status'
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const result = OperationDetector.detectOperation(req);
+
+      expect(result).toEqual('Status Check');
+
+      expect(OperationDetector.isCommerceToolsRequest(req)).toBe(true);
+      expect(OperationDetector.isDatatransRequest(req)).toBe(false);
+    });
+
     it('should return an empty string if no any supported operation is detected', () => {
       const req = abstractRequestFactory({}); // no headers
 

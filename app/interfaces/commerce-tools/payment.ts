@@ -4,6 +4,10 @@ import * as yup from 'yup';
 import { ConfigService } from '../../domain/services/config-service';
 import { ErrorMessages } from './error-messages';
 
+export enum ActionRequestedOnPayment {
+  status = 'status' // status check should be performed
+}
+
 export const CommerceToolsPaymentSchema = yup.object({
   key: yup.string()
     .required(ErrorMessages.missingPaymentField())
@@ -21,6 +25,10 @@ export const CommerceToolsPaymentSchema = yup.object({
   }).optional(),
   custom: yup.object({
     fields: yup.object({
+      action: yup
+        .mixed<ActionRequestedOnPayment>()
+        .oneOf(Object.values(ActionRequestedOnPayment))
+        .optional(),
       merchantId: yup
         .string()
         .required(ErrorMessages.missingCustomField())
@@ -126,8 +134,7 @@ export const CommerceToolsPaymentSchema = yup.object({
     return true;
   });
 
-// Heck!
-// After the type inferring below optional fields become required! https://javascript.plainenglish.io/a-typescript-runtime-data-validators-comparison-15f0ea2e3265#0428
+// In the type inferred below optional schema fields become required :( https://javascript.plainenglish.io/a-typescript-runtime-data-validators-comparison-15f0ea2e3265#0428
 // If we don't find a good solution and it will hamper -
 // we will have to make a duplicated IPament declaration apart from PaymentSchema ((
 export type ICommerceToolsPayment = yup.TypeOf<typeof CommerceToolsPaymentSchema>;

@@ -26,8 +26,8 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
     paymentStatus: req.body.status,
     transactionId: req.body.transactionId,
     transactionHistory: req.body.history,
-    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to kepp PaymentService abstracted from dealing with any "Request"
-    ...DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(req.body) // req.body matches to the required argument type
+    // It would be good to hide DatatransToCommerceToolsMapper from the handler, but I even more want to keep PaymentService abstracted from dealing with "Request"
+    ...DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(req.body)
   });
 
   return {

@@ -2,14 +2,17 @@ import axios, { AxiosInstance } from 'axios';
 
 import { ServiceWithLogger, ServiceWithLoggerOptions } from '../log-service';
 import { ConfigService } from '../config-service';
-import { IDatatransConfig } from '../config-service/schema';
+import {
+  IDatatransConfig,
+  IDatatransMerchantConfig
+} from '../config-service/schema';
 import {
   type IAbstractHeaders,
   IDatatransInitializeTransaction,
-  DatatransEnvironment,
+  DatatransURL,
   getHttpHeaderValue,
   DATATRANS_SIGNATURE_HEADER_NAME,
-  DatatransURL
+  IDatatransWebhookRequestBody
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
@@ -20,13 +23,6 @@ export class DatatransService extends ServiceWithLogger {
   private config: IDatatransConfig;
   private client: AxiosInstance;
   private cryptoService: CryptoService;
-
-  // TODO: Maybe move this method to ConfigService
-  private getMerchantHmacKey(merchantId: string): string {
-    return new ConfigService().getConfig()
-      .datatrans.merchants.find((mc) => mc.id === merchantId)
-      .dtHmacKey; // Presence of the merchant configuration was already validated, so here we don't care
-  }
 
   constructor({ logger }: ServiceWithLoggerOptions) {
     super({ logger });
@@ -52,29 +48,19 @@ export class DatatransService extends ServiceWithLogger {
     }
   }
 
-  // TODO: make this method static?
   async createInitializeTransaction(merchantId: string, transactionData: IDatatransInitializeTransaction) {
     this.logger.debug({ body: transactionData }, 'DataTrans initRequest');
 
-    const merchant = this.config.merchants?.find(({ id }) => merchantId === id);
-
-    const baseUrl = merchant.environment === DatatransEnvironment.TEST
-      ? DatatransURL.TEST
-      : DatatransURL.PROD;
-
-    const merchantAuth = {
-      username: merchant.id,
-      password: merchant.password
-    };
+    const merchantConfig = this.getMerchantConfig(merchantId);
 
     const { data: transaction, headers: { location } } = await this.client.post(
-      `${baseUrl}/transactions`,
+      `${this.getDatatransBaseUrl(merchantConfig)}/transactions`,
       transactionData,
       {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8'
         },
-        auth: merchantAuth
+        auth: this.prepareDatatransAuth(merchantConfig)
       }
     );
 
@@ -83,6 +69,53 @@ export class DatatransService extends ServiceWithLogger {
     return {
       transaction,
       location
+    };
+  }
+
+  async getTransactionStatus(merchantId: string, transactionId: string): Promise<IDatatransWebhookRequestBody> {
+    this.logger.debug({ transactionId }, 'DataTrans statusRequest');
+
+    const merchantConfig = this.getMerchantConfig(merchantId);
+
+    const { data: transactionInfo } = await this.client.get(
+      `${this.getDatatransBaseUrl(merchantConfig)}/transactions/${transactionId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        auth: this.prepareDatatransAuth(merchantConfig)
+      }
+    );
+
+    this.logger.debug({ body: transactionInfo }, 'DataTrans statusResponse');
+
+    return transactionInfo;
+  }
+
+  private getMerchantHmacKey(merchantId: string): string {
+    return new ConfigService().getConfig()
+      .datatrans.merchants.find((mc) => mc.id === merchantId)
+      .dtHmacKey; // Presence of the merchant configuration was validated on config load, so here we don't care
+  }
+
+  private getMerchantConfig(merchantId: string): IDatatransMerchantConfig {
+    return this.config.merchants?.find(({ id }) => merchantId === id);
+  }
+
+  private getDatatransBaseUrl(merchant: IDatatransMerchantConfig): DatatransURL {
+    // Presence of the merchant configuration
+    // (particulalry merchant.environment value)
+    // was validated on config load, so here we don't care
+    return DatatransURL[merchant.environment.toUpperCase() as keyof typeof DatatransURL];
+  }
+
+  private prepareDatatransAuth(merchant: IDatatransMerchantConfig) {
+    // Presence of the merchant configuration
+    // (particulalry merchant.id and password)
+    // was validated on config load, so here we don't care
+    return {
+      username: merchant.id,
+      password: merchant.password
     };
   }
 }
