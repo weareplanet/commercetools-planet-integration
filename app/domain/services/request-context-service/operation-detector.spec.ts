@@ -69,6 +69,31 @@ describe('OperationDetector', () => {
       expect(OperationDetector.isDatatransRequest(req)).toBe(false);
     });
 
+    it('should return "Refund" when its criteria are detected', () => {
+      const req = abstractRequestFactory({
+        body: {
+          action: 'Update',
+          resource: {
+            obj: {
+              transactions: [
+                {
+                  type: 'Refund',
+                  state: 'Initial'
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const result = OperationDetector.detectOperation(req);
+
+      expect(result).toEqual('Refund');
+
+      expect(OperationDetector.isCommerceToolsRequest(req)).toBe(true);
+      expect(OperationDetector.isDatatransRequest(req)).toBe(false);
+    });
+
     it('should return an empty string if no any supported operation is detected', () => {
       const req = abstractRequestFactory({}); // no headers
 

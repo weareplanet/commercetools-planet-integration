@@ -79,6 +79,41 @@ export class PaymentService extends ServiceWithLogger {
       .getActions();
   }
 
+  async refund(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
+    // TODO
+
+    // const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
+
+    // let savedPaymentMethod;
+    // const needToUseSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
+    // if (needToUseSavedPaymentMethod) {
+    //   savedPaymentMethod = await this.validateSavedPaymentMethodExistense(savedPaymentMethodsKey, savedPaymentMethodAlias);
+    // }
+
+    // const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
+    //   payment,
+    //   webhookUrl: new ConfigService().getConfig().datatrans.webhookUrl,
+    //   savedPaymentMethod
+    // });
+
+    // const { transaction, location } = await this.datatransService.createInitializeTransaction(merchantId, initializeTransactionPayload);
+
+    // return this.commerceToolsService.getActionsBuilder()
+    //   .setCustomField('transactionId', transaction.transactionId)
+    //   .setCustomField('redirectUrl', location)
+    //   .addInterfaceInteraction(
+    //     CommerceToolsCustomInteractionType.initRequest,
+    //     { body: initializeTransactionPayload }
+    //   )
+    //   .addInterfaceInteraction(
+    //     CommerceToolsCustomInteractionType.initResponse,
+    //     { body: transaction, headers: { location } }
+    //   )
+    //   .setStatus({ interfaceCode: 'Initial' })
+    //   .getActions();
+    return [];
+  }
+
   async saveAuthorizationInCommerceTools(opts: SaveAuthorizationOptions) {
     const payment = await this.commerceToolsService.getPayment(opts.paymentKey);
 
