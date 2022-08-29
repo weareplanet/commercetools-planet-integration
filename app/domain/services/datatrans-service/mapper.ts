@@ -1,15 +1,14 @@
 import {
   IDatatransInitializeTransaction,
+  IDatatransRefundTransaction,
   ICommerceToolsPayment,
   DatatransPaymentMethod,
   IDatatransPaymentMethodInfo
 } from '../../../interfaces';
 
-interface IInputParametersForMapper {
-  payment: ICommerceToolsPayment;
-  webhookUrl: string;
-  savedPaymentMethod?: IDatatransPaymentMethodInfo;
-}
+import {
+  type Transaction
+} from '@commercetools/platform-sdk';
 
 const prepareSavedPaymentMethodData = (savedPaymentMethod?: IDatatransPaymentMethodInfo): Record<string, unknown> => {
   const paymentMethod = savedPaymentMethod?.paymentMethod;
@@ -44,7 +43,12 @@ const prepareSavedPaymentMethodData = (savedPaymentMethod?: IDatatransPaymentMet
   return {};
 };
 
-export const prepareInitializeTransactionRequestPayload = (parameters: IInputParametersForMapper): IDatatransInitializeTransaction => {
+interface IInitTransactionOptions {
+  payment: ICommerceToolsPayment;
+  webhookUrl: string;
+  savedPaymentMethod?: IDatatransPaymentMethodInfo;
+}
+export const prepareInitializeTransactionRequestPayload = (parameters: IInitTransactionOptions): IDatatransInitializeTransaction => {
   const result = {
     refno: parameters.payment.key,
     currency: parameters.payment.amountPlanned?.currencyCode,
@@ -78,5 +82,13 @@ export const prepareInitializeTransactionRequestPayload = (parameters: IInputPar
     ...parameters.payment?.custom?.fields?.initRequest,
     ...result,
     ...option
+  };
+};
+
+export const prepareRefundTransactionRequestPayload = (paymentKey: string, refundTransaction: Transaction): IDatatransRefundTransaction=> {
+  return {
+    refno: paymentKey,
+    amount: refundTransaction.amount.centAmount,
+    currency: refundTransaction.amount.currencyCode
   };
 };

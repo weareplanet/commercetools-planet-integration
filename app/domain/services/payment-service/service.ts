@@ -17,7 +17,11 @@ import {
   DatatransPaymentMethod,
   ErrorMessages
 } from '../../../interfaces';
-import { DatatransService, prepareInitializeTransactionRequestPayload } from '../datatrans-service';
+import {
+  DatatransService,
+  prepareInitializeTransactionRequestPayload,
+  prepareRefundTransactionRequestPayload
+} from '../datatrans-service';
 import { CommerceToolsService } from '../commercetools-service';
 import { DatatransToCommerceToolsMapper, PaymentMethodInfoForCommerceTools } from './dt-to-ct-mapper';
 import { CommerceToolsPaymentActionsBuilder } from '../commercetools-service/commerce-tools-payment-actions-builder';
@@ -79,41 +83,6 @@ export class PaymentService extends ServiceWithLogger {
       .getActions();
   }
 
-  async refund(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
-    // TODO
-
-    // const { savedPaymentMethodAlias, savedPaymentMethodsKey, merchantId } = payment.custom.fields;
-
-    // let savedPaymentMethod;
-    // const needToUseSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
-    // if (needToUseSavedPaymentMethod) {
-    //   savedPaymentMethod = await this.validateSavedPaymentMethodExistense(savedPaymentMethodsKey, savedPaymentMethodAlias);
-    // }
-
-    // const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
-    //   payment,
-    //   webhookUrl: new ConfigService().getConfig().datatrans.webhookUrl,
-    //   savedPaymentMethod
-    // });
-
-    // const { transaction, location } = await this.datatransService.createInitializeTransaction(merchantId, initializeTransactionPayload);
-
-    // return this.commerceToolsService.getActionsBuilder()
-    //   .setCustomField('transactionId', transaction.transactionId)
-    //   .setCustomField('redirectUrl', location)
-    //   .addInterfaceInteraction(
-    //     CommerceToolsCustomInteractionType.initRequest,
-    //     { body: initializeTransactionPayload }
-    //   )
-    //   .addInterfaceInteraction(
-    //     CommerceToolsCustomInteractionType.initResponse,
-    //     { body: transaction, headers: { location } }
-    //   )
-    //   .setStatus({ interfaceCode: 'Initial' })
-    //   .getActions();
-    return [];
-  }
-
   async saveAuthorizationInCommerceTools(opts: SaveAuthorizationOptions) {
     const payment = await this.commerceToolsService.getPayment(opts.paymentKey);
 
@@ -165,6 +134,36 @@ export class PaymentService extends ServiceWithLogger {
       default:
       // ignore a transaction of any other type
     }
+  }
+
+  async refund(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
+    const authorizationTransaction: Transaction =
+      (payment as unknown as Payment) // see TODO in app/interfaces/commerce-tools/payment.ts
+        .transactions
+        .find((t) => t.type === 'Authorization');
+    const refundTransaction: Transaction =
+      (payment as unknown as Payment) // see TODO in app/interfaces/commerce-tools/payment.ts
+        .transactions
+        .find((t) => t.state === 'Initial' && !t.interactionId);
+    const refundTransactionPayload = prepareRefundTransactionRequestPayload(payment.key, refundTransaction);
+
+    const { merchantId } = payment.custom.fields;
+    const {
+      transaction: transactionFromDatatrans
+    } = await this.datatransService.createRefundTransaction(merchantId, authorizationTransaction.interactionId, refundTransactionPayload);
+
+    return this.commerceToolsService.getActionsBuilder()
+      .addInterfaceInteraction(
+        CommerceToolsCustomInteractionType.initRequest,
+        { body: refundTransactionPayload }
+      )
+      .addInterfaceInteraction(
+        CommerceToolsCustomInteractionType.initResponse,
+        { body: transactionFromDatatrans }
+      )
+      .changeTransactionState(refundTransaction.id, 'Success')
+      .setTransactionCustomField(refundTransaction.id, 'interactionId', transactionFromDatatrans.transactionId)
+      .getActions();
   }
 
   private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {

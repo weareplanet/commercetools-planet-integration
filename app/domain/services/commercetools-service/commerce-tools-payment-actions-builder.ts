@@ -74,6 +74,17 @@ export class CommerceToolsPaymentActionsBuilder {
     }
   }
 
+  setTransactionCustomField(transactionId: string, field: string, value: unknown) {
+    this.actions.push({
+      action: 'setTransactionCustomField',
+      transactionId,
+      name: field,
+      value: value
+    });
+
+    return this;
+  }
+
   addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | IAnyObjectWithStringKeys) {
     const message = (typeof messageOrObject === 'string') ? messageOrObject : JSON.stringify(messageOrObject);
 

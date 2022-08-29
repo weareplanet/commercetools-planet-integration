@@ -12,7 +12,8 @@ import {
   DatatransURL,
   getHttpHeaderValue,
   DATATRANS_SIGNATURE_HEADER_NAME,
-  IDatatransWebhookRequestBody
+  IDatatransWebhookRequestBody,
+  IDatatransRefundTransaction
 } from '../../../interfaces';
 
 import { CryptoService } from '../crypto-service';
@@ -69,6 +70,29 @@ export class DatatransService extends ServiceWithLogger {
     return {
       transaction,
       location
+    };
+  }
+
+  async createRefundTransaction(merchantId: string, transactionId: string, transactionData: IDatatransRefundTransaction) {
+    this.logger.debug({ body: transactionData }, 'DataTrans refundRequest');
+
+    const merchantConfig = this.getMerchantConfig(merchantId);
+
+    const { data: transaction } = await this.client.post(
+      `${this.getDatatransBaseUrl(merchantConfig)}/transactions/${transactionId}/credit`,
+      transactionData,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        auth: this.prepareDatatransAuth(merchantConfig)
+      }
+    );
+
+    this.logger.debug({ body: transaction }, 'DataTrans refundResponse');
+
+    return {
+      transaction
     };
   }
 
