@@ -72,7 +72,8 @@ describe('All-operations handler', () => {
           {
             paymentMethod: DatatransPaymentMethod.VIS,
             card: {
-              alias: 'Earlier saved VIS card payment alias'
+              alias: 'Earlier saved VIS card payment alias',
+              fingerprint: 'fake-fingerprint'
             }
           }
         ]
@@ -211,7 +212,8 @@ describe('All-operations handler', () => {
               {
                 paymentMethod: DatatransPaymentMethod.VIS,
                 card: {
-                  alias: 'Earlier saved VIS card payment alias'
+                  alias: 'Earlier saved VIS card payment alias',
+                  fingerprint: 'fake-fingerprint'
                 }
               },
               {
@@ -219,6 +221,35 @@ describe('All-operations handler', () => {
                 card: {
                   alias: 'New ECA card payment alias',
                   masked: '520000******0007'
+                }
+              }
+            ]
+          );
+        });
+
+        it('for a regular card payment with the same fingerprint - should replace the payment method to CommerceTools', async () => {
+
+          const req = RedirectAndLightboxWebhookRequestFactory({
+            paymentMethod: DatatransPaymentMethod.VIS,
+            card: {
+              alias: 'New ECA card payment alias',
+              masked: '424242xxxxxx4242',
+              fingerprint: 'fake-fingerprint'
+            }
+          });
+
+          await handler(req);
+
+          expect(CommerceToolsService.prototype.createOrUpdateCustomObject).toBeCalledWith(
+            'savedPaymentMethods',
+            testSavedPaymentMethodsKey,
+            [
+              {
+                paymentMethod: DatatransPaymentMethod.VIS,
+                card: {
+                  alias: 'New ECA card payment alias',
+                  masked: '424242xxxxxx4242',
+                  fingerprint: 'fake-fingerprint'
                 }
               }
             ]

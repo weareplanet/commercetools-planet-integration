@@ -32,7 +32,7 @@ const PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME = 'savedPaymentMethods';
 // - from the higher level - a request handler should use this service to perform business flows.
 // - on a lower level - to communicate with CommerceTools and Datatrans this service uses CommerceToolsService and DatatransService correspondingly.
 // This service can prepare some CT/DT structures (and use the corresponding CT/DT types for that), but it does not know how to pass them to 3-parties.
-export class PaymentService extends ServiceWithLogger  {
+export class PaymentService extends ServiceWithLogger {
   private commerceToolsService: CommerceToolsService;
   private datatransService: DatatransService;
 
@@ -125,13 +125,20 @@ export class PaymentService extends ServiceWithLogger  {
 
   private async findPaymentMethod(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
     const paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, methodKey);
-    return this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, alias);
+    return this.getPaymentMethodByAlias(paymentMethodsObject, alias);
   }
 
-  private findPaymentMethodAmongAlreadySaved(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, alias: string): IDatatransPaymentMethodInfo {
+  private getPaymentMethodByAlias(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, alias: string): IDatatransPaymentMethodInfo {
     return paymentMethodsObject?.value?.find((method) => {
       const currentMethodAlias = DatatransToCommerceToolsMapper.getPaymentMethodDetails(method).details.alias;
       return currentMethodAlias === alias;
+    });
+  }
+
+  private getPaymentMethodsExceptFingerprint(paymentMethodsObject: ICommerceToolsCustomPaymentMethodsObject, fingerprint: string): IDatatransPaymentMethodInfo[] {
+    return paymentMethodsObject?.value?.filter((method) => {
+      const currentFingerprint = DatatransToCommerceToolsMapper.getPaymentMethodDetails(method)?.details?.fingerprint;
+      return currentFingerprint != fingerprint;
     });
   }
 
@@ -158,9 +165,10 @@ export class PaymentService extends ServiceWithLogger  {
 
     const paymentMethodDetailsToBeSaved = DatatransToCommerceToolsMapper.getPaymentMethodDetails(paymentMethodInfo);
 
-    const  paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+    const paymentMethodsObject = await this.commerceToolsService.getCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey);
+
     if (paymentMethodsObject) {
-      const paymentMethod = this.findPaymentMethodAmongAlreadySaved(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
+      const paymentMethod = this.getPaymentMethodByAlias(paymentMethodsObject, paymentMethodDetailsToBeSaved.details.alias);
       if (paymentMethod) { // This payment method is already saved
         return;
       }
@@ -174,7 +182,13 @@ export class PaymentService extends ServiceWithLogger  {
     ];
 
     if (paymentMethodsObject) { // Need to amend already existing Custom Object
-      valueToBeSaved = paymentMethodsObject.value.concat(valueToBeSaved);
+      const fingerprint = paymentMethodDetailsToBeSaved.details?.fingerprint;
+
+      const savedValues = fingerprint
+        ? this.getPaymentMethodsExceptFingerprint(paymentMethodsObject, fingerprint)
+        : paymentMethodsObject.value;
+
+      valueToBeSaved = savedValues.concat(valueToBeSaved);
     }
 
     await this.commerceToolsService.createOrUpdateCustomObject(PAYMENT_METHODS_CUSTOM_OBJECT_CONTAINER_NAME, savedPaymentMethodsKey, valueToBeSaved);
