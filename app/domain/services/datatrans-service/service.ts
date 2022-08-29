@@ -60,10 +60,7 @@ export class DatatransService extends ServiceWithLogger {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8'
         },
-        auth: {
-          username: merchantConfig.id,
-          password: merchantConfig.password
-        }
+        auth: this.prepareDatatransAuth(merchantConfig)
       }
     );
 
@@ -86,10 +83,7 @@ export class DatatransService extends ServiceWithLogger {
         headers: {
           'Content-Type': 'application/json; charset=UTF-8'
         },
-        auth: {
-          username: merchantConfig.id,
-          password: merchantConfig.password
-        }
+        auth: this.prepareDatatransAuth(merchantConfig)
       }
     );
 
@@ -113,5 +107,15 @@ export class DatatransService extends ServiceWithLogger {
     // (particulalry merchant.environment value)
     // was validated on config load, so here we don't care
     return DatatransURL[merchant.environment.toUpperCase() as keyof typeof DatatransURL];
+  }
+
+  private prepareDatatransAuth(merchant: IDatatransMerchantConfig) {
+    // Presence of the merchant configuration
+    // (particulalry merchant.id and password)
+    // was validated on config load, so here we don't care
+    return {
+      username: merchant.id,
+      password: merchant.password
+    };
   }
 }
