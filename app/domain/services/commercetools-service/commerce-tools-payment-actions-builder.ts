@@ -30,7 +30,7 @@ export class CommerceToolsPaymentActionsBuilder {
   }
 
   setCustomField(field: string, value: unknown) {
-    if (!this.payment || this.payment?.custom.fields[field] !== value) {
+    if (!this.payment || this.payment.custom.fields[field] !== value) {
       this.actions.push({
         action: 'setCustomField',
         name: field,
@@ -41,9 +41,10 @@ export class CommerceToolsPaymentActionsBuilder {
   }
 
   setStatus(payload: { interfaceCode: string }) {
+    console.log({ payload, payment: this.payment });
     if (
       payload.interfaceCode &&
-      (!this.payment || this.payment?.paymentStatus.interfaceCode !== payload.interfaceCode)
+      (!this.payment || this.payment.paymentStatus.interfaceCode !== payload.interfaceCode)
     ) {
       this.actions.push({
         action: 'setStatusInterfaceCode',
