@@ -9,7 +9,8 @@ import {
   TypeResourceIdentifier,
   TransactionDraft,
   TransactionState,
-  Payment
+  Payment,
+  Transaction
 } from '@commercetools/platform-sdk';
 
 export class CommerceToolsPaymentActionsBuilder {
@@ -41,7 +42,6 @@ export class CommerceToolsPaymentActionsBuilder {
   }
 
   setStatus(payload: { interfaceCode: string }) {
-    console.log({ payload, payment: this.payment });
     if (
       payload.interfaceCode &&
       (!this.payment || this.payment.paymentStatus.interfaceCode !== payload.interfaceCode)
@@ -64,12 +64,14 @@ export class CommerceToolsPaymentActionsBuilder {
     return this;
   }
 
-  changeTransactionState(transactionId: string, state: TransactionState) {
-    this.actions.push({
-      action: 'changeTransactionState',
-      transactionId,
-      state
-    });
+  changeTransactionState(transaction: Transaction, state: TransactionState) {
+    if (transaction.state !== state) {
+      this.actions.push({
+        action: 'changeTransactionState',
+        transactionId: transaction.id,
+        state
+      });
+    }
   }
 
   addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | IAnyObjectWithStringKeys) {

@@ -115,12 +115,12 @@ export class PaymentService extends ServiceWithLogger {
           payment,
           DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(statusResponseBody).ctCustomPaymentMethod
         );
-        // do not break - fall through - below is a common logic for both Authorization and Refund
+      // do not break - fall through - below is a common logic for both Authorization and Refund
       case 'Refund':
-        actionsBuilder.changeTransactionState(transaction.id, DatatransToCommerceToolsMapper.inferCtTransactionState(statusResponseBody.status));
+        actionsBuilder.changeTransactionState(transaction, DatatransToCommerceToolsMapper.inferCtTransactionState(statusResponseBody.status));
         break;
       default:
-        // ignore a transaction of any other type
+      // ignore a transaction of any other type
     }
   }
 
