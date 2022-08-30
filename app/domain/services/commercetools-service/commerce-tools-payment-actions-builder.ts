@@ -8,11 +8,19 @@ import {
   PaymentUpdateAction,
   TypeResourceIdentifier,
   TransactionDraft,
-  TransactionState
+  TransactionState,
+  Payment
 } from '@commercetools/platform-sdk';
 
 export class CommerceToolsPaymentActionsBuilder {
+
+  private payment?: Payment;
   private actions: PaymentUpdateAction[] = [];
+
+  withPayment(payment: Payment) {
+    this.payment = payment;
+    return this;
+  }
 
   makeCustomTypeReference(typeKey: CommerceToolsCustomTypeKey): TypeResourceIdentifier {
     return {
@@ -22,17 +30,21 @@ export class CommerceToolsPaymentActionsBuilder {
   }
 
   setCustomField(field: string, value: unknown) {
-    this.actions.push({
-      action: 'setCustomField',
-      name: field,
-      value: value
-    });
-
+    if (!this.payment || this.payment?.custom.fields[field] !== value) {
+      this.actions.push({
+        action: 'setCustomField',
+        name: field,
+        value: value
+      });
+    }
     return this;
   }
 
   setStatus(payload: { interfaceCode: string }) {
-    if (payload.interfaceCode) {
+    if (
+      payload.interfaceCode &&
+      (!this.payment || this.payment?.paymentStatus.interfaceCode !== payload.interfaceCode)
+    ) {
       this.actions.push({
         action: 'setStatusInterfaceCode',
         interfaceCode: payload.interfaceCode

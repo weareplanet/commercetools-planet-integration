@@ -94,7 +94,7 @@ export class PaymentService extends ServiceWithLogger {
       return ['Authorization', 'Refund'].includes(t.type);
     });
 
-    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder().withPayment(payment);
     const getActionsByTransaction = (t: Transaction) => {
       return this.handleTransactionStatusUpdate(payment, t, actionsBuilder);
     };
@@ -125,7 +125,7 @@ export class PaymentService extends ServiceWithLogger {
   }
 
   private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {
-    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder().withPayment(payment);
 
     actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
 
