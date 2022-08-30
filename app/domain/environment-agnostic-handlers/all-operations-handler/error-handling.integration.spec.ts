@@ -1,4 +1,4 @@
-import { LogService }  from '../../services/log-service';
+import { LogService } from '../../services/log-service';
 import { abstractRequestFactory } from '../../../../test/test-utils';
 import handler from '.';
 import * as handlerMock from '.';
@@ -28,22 +28,22 @@ describe('Errors Service Integration', () => {
     });
   });
 
-  // describe('When the request is recognized as a request from Datatrans', () => {
+  describe('When the request is recognized as a request from Datatrans', () => {
 
-  //   beforeEach(() => {
-  //     jest.spyOn(OperationDetector, 'isDatatransRequest').mockReturnValue(true);
-  //   });
+    beforeEach(() => {
+      jest.spyOn(OperationDetector, 'isDatatransRequest').mockReturnValue(true);
+    });
 
-  //   it('should return Datatrans error', async () => {
-  //     const req = abstractRequestFactory({});
-  //     const result = await handler(req);
+    it('should return Datatrans error', async () => {
+      const req = abstractRequestFactory({});
+      const result = await handler(req);
 
-  //     expect(result).toHaveProperty('statusCode');
-  //     expect(result).toHaveProperty('body');
-  //     expect(result.statusCode).toEqual(500);
-  //     expect(result.body).toHaveProperty('message');
-  //   });
-  // });
+      expect(result).toHaveProperty('statusCode');
+      expect(result).toHaveProperty('body');
+      expect(result.statusCode).toEqual(500);
+      expect(result.body).toHaveProperty('message');
+    });
+  });
 
   describe('When the request is not recognized as a request from either CommerceTools or Datanrans', () => {
 

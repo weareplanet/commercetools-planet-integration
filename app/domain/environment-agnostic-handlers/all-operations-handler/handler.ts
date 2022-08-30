@@ -9,7 +9,7 @@ import {
 } from '../../../interfaces';
 
 import createPaymentHandler from '../per-operation-handlers/create-payment';
-// import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
+import createPaymentWebhookHandler from '../per-operation-handlers/webhook-notification';
 import statusCheckHandler from '../per-operation-handlers/status-check';
 
 // Load the app configuration in COLD START phase
@@ -36,9 +36,9 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
       return statusCheckHandler(req);
     }
 
-    // case Operation.RedirectAndLightboxWebhook: {
-    //   return createPaymentWebhookHandler(req);
-    // }
+    case Operation.RedirectAndLightboxWebhook: {
+      return createPaymentWebhookHandler(req);
+    }
 
     default: {
       const details: Record<string, unknown> = {
