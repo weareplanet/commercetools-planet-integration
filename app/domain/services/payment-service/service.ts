@@ -161,8 +161,8 @@ export class PaymentService extends ServiceWithLogger {
         CommerceToolsCustomInteractionType.initResponse,
         { body: transactionFromDatatrans }
       )
-      .changeTransactionState(refundTransaction.id, 'Success')
-      .setTransactionCustomField(refundTransaction.id, 'interactionId', transactionFromDatatrans.transactionId)
+      .changeTransactionState(refundTransaction, 'Success')
+      .setTransactionCustomField(refundTransaction, 'interactionId', transactionFromDatatrans.transactionId)
       .getActions();
   }
 

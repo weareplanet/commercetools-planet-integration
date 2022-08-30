@@ -72,12 +72,14 @@ export class CommerceToolsPaymentActionsBuilder {
         state
       });
     }
+
+    return this;
   }
 
-  setTransactionCustomField(transactionId: string, field: string, value: unknown) {
+  setTransactionCustomField(transaction: Transaction, field: string, value: unknown) {
     this.actions.push({
       action: 'setTransactionCustomField',
-      transactionId,
+      transactionId: transaction.id,
       name: field,
       value: value
     });
