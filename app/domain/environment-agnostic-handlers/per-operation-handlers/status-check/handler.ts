@@ -15,6 +15,8 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const payment = req.body.resource?.obj as unknown as Payment; // see TODO in app/interfaces/commerce-tools/payment.ts
   const actions = await paymentService.checkStatus(payment);
 
+  console.log({ actions }, 'checkStatus results');
+
   logger.debug({ actions }, 'checkStatus results');
 
   return {

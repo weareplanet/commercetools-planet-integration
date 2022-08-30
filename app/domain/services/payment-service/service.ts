@@ -99,7 +99,9 @@ export class PaymentService extends ServiceWithLogger {
       return this.handleTransactionStatusUpdate(payment, t, actionsBuilder);
     };
 
-    await Promise.all(transactionsToBeChecked.map(getActionsByTransaction));
+    await Promise.all(
+      transactionsToBeChecked.map((t: Transaction) => getActionsByTransaction(t))
+    );
 
     return actionsBuilder.getActions();
   }
