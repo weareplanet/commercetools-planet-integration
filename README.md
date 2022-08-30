@@ -58,6 +58,10 @@ All payment methods supported by Datatrans are listed [here](https://docs.datatr
 
 The connector provides a notification module that is asynchronously fed by the Datatrans gateway. You won't need to do manual actions - the connector picks up important payment information and adds it automatically to commercetools objects.
 
+### After The Payment
+
+You can still process more actions with your transactions after customers have completed them. Refund transactions directly through the connector and sync the payment information from Datatrans in commercetools.
+
 ## Open Source Contribution
 
 We deeply believe in the importance of the open source model. With our connector, we want to allow our merchants and their developers to bring ideas to this repo. Use the issues tab to file issues and feel free to add pull requests for missing features!

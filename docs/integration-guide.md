@@ -222,6 +222,50 @@ You can submit one or more payment methods in `paymentMethodInfo.method`. If you
 
 No additional configuration is necessary for receiving asynchronous callbacks from Datatrans when the payment state changes. The connector stores the received information from Datatrans in commercetools' objects. The data is available as soon as the user's browser is redirected to one of the redirect pages (success, error, or cancel).
 
+### Updating the Payment Information Manually
+
+To synchronize the payment information from Datatrans to commercetools, you need to set the custom field `action` with the value `syncPaymentInformation` when calling commercetools' `Update Payment` API. The connector will call the Datatrans Status API and check if new data is available. If new data is retrieved, the commercetools payment information will be updated.
+
+This action is helpful when the webhook communication fails, or you refunded a transaction via the Datatrans dashboard, and you wish to update the payment information in commercetools.
+
+```json
+{
+    "version": {currentPaymentVersion},
+    "actions": [ 
+        {
+            "action": "setCustomField",
+            "name": "action",
+            "value": "syncPaymentInformation"
+        } 
+    ]
+}
+```
+
+### Refunding a Payment
+
+To refund a payment, you need to add a transaction of type `Refund` when calling commercetools' `Update Payment` API. The connector will call the Datatrans Credit API.
+
+You can only create a refund with an amount lower or equal to the transaction amount. You need to specify the same currency as the original transaction. To process multiple partial refunds, you must place additional requests to the `Update Payment` API.
+
+```json
+{
+    "version": {currentPaymentVersion},
+    "actions": [ 
+        {
+            "action": "addTransaction",
+            "transaction": {
+                "type": "Refund",
+                "state": "Initial",
+                "amount": {
+                    "currencyCode": "EUR",
+                    "centAmount": 50
+                }
+            }
+        }
+    ]
+}
+```
+
 ### Custom Init for Advanced Flows
 
 You can also submit a custom init payload that may be required for advanced flows only. You can submit this by using the custom field `initRequest`. Please get in touch if you need an advanced flow to ensure you implement this flow correctly.
