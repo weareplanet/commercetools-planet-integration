@@ -5,7 +5,7 @@ import { ConfigService } from '../../domain/services/config-service';
 import { ErrorMessages } from './error-messages';
 
 export enum ActionRequestedOnPayment {
-  status = 'syncPaymentInformation' // status check should be performed
+  syncPaymentInformation = 'syncPaymentInformation' // status check should be performed
 }
 
 export const CommerceToolsPaymentSchema = yup.object({
