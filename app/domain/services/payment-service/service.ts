@@ -108,7 +108,13 @@ export class PaymentService extends ServiceWithLogger {
 
   private async handleTransactionStatusUpdate(payment: Payment, transaction: Transaction, actionsBuilder: CommerceToolsPaymentActionsBuilder): Promise<void> {
     const { merchantId } = payment.custom.fields;
+
     const statusResponseBody = await this.datatransService.getTransactionStatus(merchantId, transaction.interactionId);
+
+    actionsBuilder.addInterfaceInteraction(
+      CommerceToolsCustomInteractionType.statusResponse,
+      { body: statusResponseBody }
+    );
 
     switch (transaction.type) {
       case 'Authorization':
