@@ -23,9 +23,9 @@ describe('All-operations handler', () => {
 
   describe('When a request matches Redirect&Lightbox Webhook operation criteria', () => {
     describe('and Datatrans Signature validation passes', () => {
-      beforeEach(/* Suppose the signature validation passes */ () => {
+      beforeEach(/* Suppose the signature validation passes */() => {
         /* eslint-disable @typescript-eslint/no-empty-function */
-        const noop = () => {};
+        const noop = () => { };
         jest.spyOn(DatatransService.prototype, 'validateIncomingRequestSignature').mockImplementation(noop);
       });
 
@@ -57,11 +57,11 @@ describe('All-operations handler', () => {
           }
         }
       } as unknown as Payment);
-      beforeEach(/* Stub CommerceToolsService.prototype.getPayment */ () => {
+      beforeEach(/* Stub CommerceToolsService.prototype.getPayment */() => {
         jest.spyOn(CommerceToolsService.prototype, 'getPayment').mockResolvedValue(paymentFetchedFromCT as unknown as Payment);
       });
 
-      beforeEach(/* Mock CommerceToolsService.prototype.updatePayment */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.updatePayment */() => {
         jest.spyOn(CommerceToolsService.prototype, 'updatePayment').mockResolvedValue(); // does not matter what it returns
       });
 
@@ -78,12 +78,12 @@ describe('All-operations handler', () => {
           }
         ]
       };
-      beforeEach(/* Stub CommerceToolsService.prototype.getCustomObject */ () => {
+      beforeEach(/* Stub CommerceToolsService.prototype.getCustomObject */() => {
         jest.spyOn(CommerceToolsService.prototype, 'getCustomObject')
           .mockResolvedValue(paymentMethodCustomObjectFetchedFromCT as ICommerceToolsCustomPaymentMethodsObject);
       });
 
-      beforeEach(/* Mock CommerceToolsService.prototype.createOrUpdateCustomObject */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.createOrUpdateCustomObject */() => {
         jest.spyOn(CommerceToolsService.prototype, 'createOrUpdateCustomObject').mockResolvedValue(); // does not matter what it returns
       });
 
@@ -381,19 +381,19 @@ describe('All-operations handler', () => {
     });
 
     describe('and Datatrans Signature validation fails', () => {
-      beforeEach(/* Mock CommerceToolsService.prototype.getPayment */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.getPayment */() => {
         jest.spyOn(CommerceToolsService.prototype, 'getPayment').mockResolvedValue({} as Payment);
       });
 
-      beforeEach(/* Mock CommerceToolsService.prototype.updatePayment */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.updatePayment */() => {
         jest.spyOn(CommerceToolsService.prototype, 'updatePayment').mockResolvedValue();
       });
 
-      beforeEach(/* Mock CommerceToolsService.prototype.getCustomObject */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.getCustomObject */() => {
         jest.spyOn(CommerceToolsService.prototype, 'getCustomObject').mockResolvedValue({} as ICommerceToolsCustomPaymentMethodsObject);
       });
 
-      beforeEach(/* Mock CommerceToolsService.prototype.createOrUpdateCustomObject */ () => {
+      beforeEach(/* Mock CommerceToolsService.prototype.createOrUpdateCustomObject */() => {
         jest.spyOn(CommerceToolsService.prototype, 'createOrUpdateCustomObject').mockResolvedValue();
       });
 

@@ -8,7 +8,7 @@ export enum CommerceToolsCustomInteractionType {
   initResponse = 'initResponse',
   authorizeSplitRequest = 'authorizeSplitRequest',
   authorizeSplitResponse = 'authorizeSplitResponse',
-  statusResponse = 'authorizeSplitResponse',
+  statusResponse = 'statusResponse',
   webhook = 'webhook',
   refundRequest = 'refundRequest',
   refundResponse = 'refundResponse',

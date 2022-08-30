@@ -1,4 +1,4 @@
-import { LogService }  from '../../services/log-service';
+import { LogService } from '../../services/log-service';
 import { abstractRequestFactory } from '../../../../test/test-utils';
 import handler from '.';
 import * as handlerMock from '.';

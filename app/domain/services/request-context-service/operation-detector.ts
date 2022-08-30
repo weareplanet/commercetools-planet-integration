@@ -66,6 +66,6 @@ export class OperationDetector {
     const payment = reqBody.resource.obj;
 
     return reqBody.action === 'Update'
-      && payment?.custom?.fields.action == ActionRequestedOnPayment.status;
+      && payment?.custom?.fields.action == ActionRequestedOnPayment.syncPaymentInformation;
   }
 }

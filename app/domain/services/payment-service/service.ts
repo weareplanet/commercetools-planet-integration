@@ -94,19 +94,27 @@ export class PaymentService extends ServiceWithLogger {
       return ['Authorization', 'Refund'].includes(t.type);
     });
 
-    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder().withPayment(payment);
     const getActionsByTransaction = (t: Transaction) => {
       return this.handleTransactionStatusUpdate(payment, t, actionsBuilder);
     };
 
-    await Promise.all(transactionsToBeChecked.map(getActionsByTransaction));
+    await Promise.all(
+      transactionsToBeChecked.map((t: Transaction) => getActionsByTransaction(t))
+    );
 
     return actionsBuilder.getActions();
   }
 
   private async handleTransactionStatusUpdate(payment: Payment, transaction: Transaction, actionsBuilder: CommerceToolsPaymentActionsBuilder): Promise<void> {
     const { merchantId } = payment.custom.fields;
+
     const statusResponseBody = await this.datatransService.getTransactionStatus(merchantId, transaction.interactionId);
+
+    actionsBuilder.addInterfaceInteraction(
+      CommerceToolsCustomInteractionType.statusResponse,
+      { body: statusResponseBody }
+    );
 
     switch (transaction.type) {
       case 'Authorization':
@@ -115,17 +123,17 @@ export class PaymentService extends ServiceWithLogger {
           payment,
           DatatransToCommerceToolsMapper.inferCtPaymentMethodInfo(statusResponseBody).ctCustomPaymentMethod
         );
-        // do not break - fall through - below is a common logic for both Authorization and Refund
+      // do not break - fall through - below is a common logic for both Authorization and Refund
       case 'Refund':
-        actionsBuilder.changeTransactionState(transaction.id, DatatransToCommerceToolsMapper.inferCtTransactionState(statusResponseBody.status));
+        actionsBuilder.changeTransactionState(transaction, DatatransToCommerceToolsMapper.inferCtTransactionState(statusResponseBody.status));
         break;
       default:
-        // ignore a transaction of any other type
+      // ignore a transaction of any other type
     }
   }
 
   private async saveAuthorizationToPayment(payment: Payment, opts: SaveAuthorizationOptions) {
-    const actionsBuilder = this.commerceToolsService.getActionsBuilder();
+    const actionsBuilder = this.commerceToolsService.getActionsBuilder().withPayment(payment);
 
     actionsBuilder.setStatus({ interfaceCode: opts.paymentStatus });
 

@@ -99,7 +99,7 @@
       "type": {
         "name": "Enum",
         "values": [
-          {"key": "status", "label": "status"}
+          {"key": "syncPaymentInformation", "label": "syncPaymentInformation"}
         ]
       },
       "name": "action",
