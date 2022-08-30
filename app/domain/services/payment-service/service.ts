@@ -154,11 +154,11 @@ export class PaymentService extends ServiceWithLogger {
 
     return this.commerceToolsService.getActionsBuilder()
       .addInterfaceInteraction(
-        CommerceToolsCustomInteractionType.initRequest,
+        CommerceToolsCustomInteractionType.refundRequest,
         { body: refundTransactionPayload }
       )
       .addInterfaceInteraction(
-        CommerceToolsCustomInteractionType.initResponse,
+        CommerceToolsCustomInteractionType.refundResponse,
         { body: transactionFromDatatrans }
       )
       .changeTransactionState(refundTransaction, 'Success')

@@ -91,7 +91,7 @@ describe('All-operations handler', () => {
             {
               action: 'addInterfaceInteraction',
               fields: {
-                interactionType: 'initRequest',
+                interactionType: 'refundRequest',
                 message: '{"body":{"refno":"12345318909876543216","amount":500,"currency":"EUR"}}',
                 timeStamp: expect.any(String)
               },
@@ -103,7 +103,7 @@ describe('All-operations handler', () => {
             {
               action: 'addInterfaceInteraction',
               fields: {
-                interactionType: 'initResponse',
+                interactionType: 'refundResponse',
                 message: '{"body":{"transactionId":"dt-Refund-transactionId--just-received-from-Datatrans"}}',
                 timeStamp: expect.any(String)
               },
