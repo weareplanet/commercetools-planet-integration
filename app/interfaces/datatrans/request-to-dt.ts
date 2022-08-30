@@ -1,9 +1,12 @@
 import { DatatransPaymentMethod } from './entities';
 
-export interface IDatatransInitializeTransaction {
+export interface IDatatransTransactionBase {
   currency: string; // 3 letter ISO-4217
   refno: string; // [1...20]
   amount?: number;
+}
+
+export interface IDatatransInitializeTransaction extends IDatatransTransactionBase {
   paymentMethods?: DatatransPaymentMethod[];
   language?: string;
   option?: {
@@ -25,3 +28,5 @@ export interface IDatatransInitializeTransaction {
   };
   [key: string]: unknown;
 }
+
+export type IDatatransRefundTransaction = IDatatransTransactionBase

@@ -7,13 +7,16 @@ import {
   ActionRequestedOnPayment
 } from '../../../interfaces';
 
+import { type Payment } from '@commercetools/platform-sdk';
+
 // eslint-disable-next-line no-prototype-builtins
 const hasProperties = (obj: object, fields: string[]) => obj && fields.every((field) => obj.hasOwnProperty(field));
 
 export enum Operation {
   RedirectAndLightboxInit = 'Redirect And Lightbox Init',
   RedirectAndLightboxWebhook = 'Redirect And Lightbox Webhook',
-  StatusCheck = 'Status Check'
+  StatusCheck = 'Status Check',
+  Refund = 'Refund'
 }
 
 enum PaymentInterface {
@@ -44,6 +47,9 @@ export class OperationDetector {
       if (this.isStatusCheck(req)) {
         return Operation.StatusCheck;
       }
+      if (this.isRefundOperation(req)) {
+        return Operation.Refund;
+      }
     } else if (this.isDatatransRequest(req)) {
       return Operation.RedirectAndLightboxWebhook;
     }
@@ -67,5 +73,17 @@ export class OperationDetector {
 
     return reqBody.action === 'Update'
       && payment?.custom?.fields.action == ActionRequestedOnPayment.syncPaymentInformation;
+  }
+
+  private static isRefundOperation(req: ICommerceToolsExtensionRequest): boolean {
+    const reqBody = req.body;
+    const payment = reqBody.resource.obj as unknown as Payment; // see TODO in app/interfaces/commerce-tools/payment.ts
+
+    const refundTransaction = payment.transactions.find((t) => {
+      return t.state === 'Initial' && !t.interactionId;
+    });
+
+    return reqBody.action === 'Update'
+      && !!refundTransaction;
   }
 }

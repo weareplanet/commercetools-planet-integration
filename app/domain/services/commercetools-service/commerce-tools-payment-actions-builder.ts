@@ -72,6 +72,19 @@ export class CommerceToolsPaymentActionsBuilder {
         state
       });
     }
+
+    return this;
+  }
+
+  setTransactionCustomField(transaction: Transaction, field: string, value: unknown) {
+    this.actions.push({
+      action: 'setTransactionCustomField',
+      transactionId: transaction.id,
+      name: field,
+      value: value
+    });
+
+    return this;
   }
 
   addInterfaceInteraction(interactionType: CommerceToolsCustomInteractionType, messageOrObject: string | IAnyObjectWithStringKeys) {
