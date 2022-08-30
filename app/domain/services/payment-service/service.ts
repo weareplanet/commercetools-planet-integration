@@ -107,6 +107,9 @@ export class PaymentService extends ServiceWithLogger {
       transactionsToBeChecked.map((t: Transaction) => getActionsByTransaction(t))
     );
 
+    // Prevent an excess status check processing (on a next Payment update even if the merchant did not request that).
+    actionsBuilder.setCustomField('action', null);
+
     return actionsBuilder.getActions();
   }
 
