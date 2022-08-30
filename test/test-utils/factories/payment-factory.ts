@@ -5,7 +5,12 @@ import {
   ICommerceToolsPayment
 } from '../../../app/interfaces';
 
-export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceToolsPayment> = {}): ICommerceToolsPayment =>  {
+import {
+  type Payment,
+} from '@commercetools/platform-sdk';
+
+export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceToolsPayment | Payment> = {}): ICommerceToolsPayment =>  {
+
   const defaultStuff = {
     key: '12345318909876543216',
     amountPlanned: {
