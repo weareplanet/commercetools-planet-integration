@@ -162,7 +162,7 @@ export class PaymentService extends ServiceWithLogger {
         { body: transactionFromDatatrans }
       )
       .changeTransactionState(refundTransaction, 'Success')
-      .setTransactionCustomField(refundTransaction, 'interactionId', transactionFromDatatrans.transactionId)
+      .changeTransactionInteractionId(refundTransaction, transactionFromDatatrans.transactionId)
       .getActions();
   }
 

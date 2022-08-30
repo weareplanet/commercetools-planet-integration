@@ -118,10 +118,9 @@ describe('All-operations handler', () => {
               transactionId: 'ct-Refund-transaction-id'
             },
             {
-              action: 'setTransactionCustomField',
-              name: 'interactionId',
+              action: 'changeTransactionInteractionId',
               transactionId: 'ct-Refund-transaction-id',
-              value: 'dt-Refund-transactionId--just-received-from-Datatrans'
+              interactionId: 'dt-Refund-transactionId--just-received-from-Datatrans'
             }
           ]
         }
