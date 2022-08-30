@@ -53,7 +53,7 @@ describe('OperationDetector', () => {
             obj: {
               custom: {
                 fields: {
-                  action: 'status'
+                  action: 'syncPaymentInformation'
                 }
               }
             }
