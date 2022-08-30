@@ -92,8 +92,6 @@ export class PaymentService extends ServiceWithLogger {
   }
 
   async checkStatus(payment: Payment): Promise<PaymentUpdateAction[]> {
-    this.logger.debug(payment.transactions, '--- Transactions');
-
     const transactionsToBeChecked = payment.transactions.filter((t) => {
       return ['Authorization', 'Refund'].includes(t.type);
     });
