@@ -69,5 +69,5 @@ We deeply believe in the importance of the open source model. With our connector
 ## Next Steps
 
 Now that you know how the integration will work and its available features, you may proceed with the integration.
-
+ 
 [➝ Link to the Integration Guide](docs/integration-guide.md)
