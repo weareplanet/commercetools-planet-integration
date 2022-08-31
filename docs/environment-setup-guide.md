@@ -35,15 +35,15 @@ Environment Variable | Format | Description
 To quickly set up everything, run the command below. Check the following chapters if you need details about the individual deployment steps. Only proceed with this command after defining your [environment variables](#environment-variables).
 
 ```shell
-sh ./deploy/deploy.sh --target-cloud-environment AWS --commercetools-extension-type HTTP
+bash ./deploy/deploy.sh -e AWS -t HTTP
 ```
 
 The master script supports the arguments below.
 
 Argument | Accepted Values | Description
 :-----------|:-----------|:-----------
-`--target-cloud-environment` | `AWS` | The environment you will deploy the connector to.
-`--commercetools-extension-type` | `HTTP`, `AWSLAMBDA` | The commercetools API extension type you would like to use. We recommend HTTP.
+`-e` | `AWS` | The environment you will deploy the connector to.
+`-t` | `HTTP`, `AWSLAMBDA` | The commercetools API extension type you would like to use. We recommend HTTP.
 
 ## Manual Deployment
 
@@ -62,7 +62,7 @@ source ./deploy/env
 Run the following script to create the custom types required by the connector.
 
 ```shell
-sh ./deploy/commercetools/custom-types-setup.sh
+bash ./deploy/commercetools/custom-types-setup.sh
 ```
 
 This script will take the various required types defined in `deploy/commercetools/types`.
@@ -73,7 +73,7 @@ Run the script below to create the AWS CloudFormation Stack. This script will us
 
 ```shell
 
-sh ./deploy/cloud/aws/aws-deploy.sh STACKID REGION
+bash ./deploy/cloud/aws/aws-deploy.sh STACKID REGION
 
 ```
 
@@ -84,7 +84,7 @@ After a few minutes, AWS CloudFormation should show your newly created stack. Th
 After deploying the connector successfully to AWS or an on-premise environment, you can proceed with creating commercetools' API extension with the script below.
 
 ```shell
-sh ./deploy/commercetools/api-extension-setup.sh
+bash ./deploy/commercetools/api-extension-setup.sh
 ```
 
 ### Creating the Package Build
@@ -92,7 +92,7 @@ sh ./deploy/commercetools/api-extension-setup.sh
 To build the Node.js package, you can now run the script below. The script will create a lean .zip package to avoid size constraints when updating the Lambda function. Don't forget that Node.js 16 is required.
 
 ```shell
-sh ./deploy/make-deploy-package.sh
+bash ./deploy/make-deploy-package.sh
 ```
 
 After a few minutes, a .zip file will be available that you can use for the next and final step.
