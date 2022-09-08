@@ -90,7 +90,7 @@ echo -e "   ## (this file will be kept after stack creation)"
 OUTPUT_YAML="${SCRIPT_DIR}/${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
 cp ${SCRIPT_DIR}/planetpaymentconnector-stack-template.yaml ${OUTPUT_YAML}
 
-echo -e "\n   ## personalizing the template file"
+echo -e "\n   ## personalizing the template file: ${OUTPUT_YAML}"
 sed -i -e "s/STACKNAME/$STACKNAME/g" ${OUTPUT_YAML}
 sed -i -e "s/STACKID/$STACKID/g" ${OUTPUT_YAML}
 sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${OUTPUT_YAML}
@@ -100,7 +100,8 @@ for var in "${!CT@}"; do
     sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
 for var in "${!DT@}"; do
-    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
+	value=$(echo "${!var}" | sed -z "s/\n/ /g") # compacting potential multi-line json to single line
+    sed -i -e "s~${var}_PLACEHOLDER~${value}~g" ${OUTPUT_YAML}
 done
 echo -e "   ## done.\n"
 
