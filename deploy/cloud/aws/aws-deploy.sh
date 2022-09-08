@@ -66,8 +66,8 @@ source <(cat ${ENVFILE} | sed -e '/^#/d;/^\s*$/d;')
 set +a
 
 echo -e "\n##### Checking ENV vars"
-REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS DT_CONNECTOR_WEBHOOK_URL)
 for var in "${REQUIRED_CT_VARS[@]}"; do
+REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS)
     if [ -z "${!var}" ] ; then
         echo -e "\tMissed the required environmebt variable $var"
         exit 1
