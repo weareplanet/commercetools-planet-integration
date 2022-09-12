@@ -34,3 +34,7 @@ coverage/
 
 # OS quirks
 .DS_Store
+
+# Test reports
+lint-result.json
+coverage/

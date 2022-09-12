@@ -12,6 +12,7 @@ module.exports = {
     '!**/*specs.ts',
     '!app/interfaces/*.ts'
   ],
+  coverageDirectory: 'coverage',
   coverageReporters: [
     'json', 'html', 'text'
   ],

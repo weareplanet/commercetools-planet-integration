@@ -1,0 +1,53 @@
+name: CI Pipeline
+on: [push]
+
+jobs:
+  build-test-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the codebase from the git repo
+        uses: actions/checkout@v3
+        
+      - name: Install nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check code quality (ESLint)
+        run: npm run lint
+        
+      - name: Run tests
+        run: npm run test
+        
+      #- name: Test Report
+      #  uses: phoenix-actions/test-reporting@v8
+      #  id: test-report               # Set ID reference for step
+      #  if: success() || failure()    # run this step even if previous step failed
+      #  with:
+      #    name: JEST Tests            # Name of the check run which will be created
+      #    path: coverage/coverage-final.json    # Path to test results
+          
+      - name: Run build
+        run: npm run build
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.organization=planet 
+            -Dsonar.projectKey=commerceTools 
+            -Dsonar.sources=. 
+            -Dsonar.javascript.lcov.reportPaths=coverage/index.html
+            -Dsonar.test.exclusions=test/**
+            -Dsonar.tests=test/
+            -Dsonar.typescript.tsconfigPath=tsconfig.json
+            -Dsonar.eslint.reportPaths=lint-result.json
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      
+      - name: Look at the build result
+        run: find ./dist -name "*.js" -print
