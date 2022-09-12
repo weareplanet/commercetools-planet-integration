@@ -22,13 +22,11 @@ jobs:
       - name: Run tests
         run: npm run test
         
-      #- name: Test Report
-      #  uses: phoenix-actions/test-reporting@v8
-      #  id: test-report               # Set ID reference for step
-      #  if: success() || failure()    # run this step even if previous step failed
-      #  with:
-      #    name: JEST Tests            # Name of the check run which will be created
-      #    path: coverage/coverage-final.json    # Path to test results
+      - name: Test Reporter
+        uses: vebr/jest-lcov-reporter@v0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
           
       - name: Run build
         run: npm run build
@@ -40,11 +38,13 @@ jobs:
             -Dsonar.organization=planet 
             -Dsonar.projectKey=commerceTools 
             -Dsonar.sources=. 
-            -Dsonar.javascript.lcov.reportPaths=coverage/index.html
+            -Dsonar.testExecutionReportPaths=coverage/index.html
             -Dsonar.test.exclusions=test/**
             -Dsonar.tests=test/
             -Dsonar.typescript.tsconfigPath=tsconfig.json
             -Dsonar.eslint.reportPaths=lint-result.json
+            -Dsonar.language=js
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
