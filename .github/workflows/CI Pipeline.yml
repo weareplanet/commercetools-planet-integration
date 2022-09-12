@@ -35,16 +35,16 @@ jobs:
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.organization=planet 
-            -Dsonar.projectKey=commerceTools 
-            -Dsonar.sources=. 
-            -Dsonar.javascript.lcov.reportPaths=coverage/index.html
-            -Dsonar.test.exclusions=test/**
-            -Dsonar.tests=test/
-            -Dsonar.typescript.tsconfigPath=tsconfig.json
-            -Dsonar.eslint.reportPaths=lint-result.json
+#        with:
+#          args: >
+#            -Dsonar.organization=planet 
+#            -Dsonar.projectKey=commerceTools 
+#            -Dsonar.sources=. 
+#            -Dsonar.javascript.lcov.reportPaths=coverage/index.html
+#            -Dsonar.test.exclusions=test/**
+#            -Dsonar.tests=test/
+#            -Dsonar.typescript.tsconfigPath=tsconfig.json
+#            -Dsonar.eslint.reportPaths=lint-result.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
