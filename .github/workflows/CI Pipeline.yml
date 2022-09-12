@@ -22,11 +22,11 @@ jobs:
       - name: Run tests
         run: npm run test
         
-      - name: Test Reporter
-        uses: vebr/jest-lcov-reporter@v0.2.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/lcov.info
+ #     - name: Test Reporter
+ #       uses: vebr/jest-lcov-reporter@v0.2.0
+ #       with:
+ #         github-token: ${{ secrets.GITHUB_TOKEN }}
+ #         lcov-file: coverage/lcov.info
           
       - name: Run build
         run: npm run build
