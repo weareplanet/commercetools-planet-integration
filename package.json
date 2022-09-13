@@ -48,6 +48,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.17.0",
     "jest": "^28.1.0",
+    "jest-sonar-reporter": "^2.0.0",
     "jest-when": "^3.5.1",
     "lint-staged": "^13.0.1",
     "lodash.merge": "^4.6.2",
@@ -58,5 +59,8 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint"
+  },
+  "jest":{
+    "testResultsProcessor": "jest-sonar-reporter"
   }
 }

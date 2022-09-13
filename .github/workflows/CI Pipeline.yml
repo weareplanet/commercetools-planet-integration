@@ -38,13 +38,14 @@ jobs:
             -Dsonar.organization=planet 
             -Dsonar.projectKey=commerceTools 
             -Dsonar.sources=. 
-            -Dsonar.testExecutionReportPaths=coverage/index.html
+            -Dsonar.testExecutionReportPaths=coverage/test-report.xml
             -Dsonar.test.exclusions=test/**
             -Dsonar.tests=test/
             -Dsonar.typescript.tsconfigPath=tsconfig.json
             -Dsonar.eslint.reportPaths=lint-result.json
             -Dsonar.language=js
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.sourceEncoding=UTF-8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
