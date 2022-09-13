@@ -38,7 +38,7 @@ jobs:
             -Dsonar.organization=planet 
             -Dsonar.projectKey=commerceTools 
             -Dsonar.sources=. 
-            -Dsonar.testExecutionReportPaths=coverage/test-report.xml
+            -Dsonar.testExecutionReportPaths=coverage/coverage-final.json
             -Dsonar.test.exclusions=test/**
             -Dsonar.tests=test/
             -Dsonar.typescript.tsconfigPath=tsconfig.json
