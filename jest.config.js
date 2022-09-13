@@ -14,7 +14,7 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: [
-    'xml', 'json', 'html', 'text', 'text-summary'
+    'json', 'html', 'text'
   ],
   rootDir: '.',
   setupFilesAfterEnv: [
