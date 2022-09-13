@@ -59,8 +59,5 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint"
-  },
-  "jest":{
-    "testResultsProcessor": "jest-sonar-reporter"
   }
 }
