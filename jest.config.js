@@ -14,7 +14,7 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: [
-    'json', 'html', 'text', 'lcov'
+    'xml', 'json', 'html', 'text', 'text-summary'
   ],
   rootDir: '.',
   setupFilesAfterEnv: [
@@ -29,6 +29,5 @@ module.exports = {
       functions: 80,
       lines: 85
     }
-  },
-  testResultsProcessor: "jest-sonar-reporter"
+  }
 };

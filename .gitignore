@@ -38,3 +38,4 @@ coverage/
 # Test reports
 lint-result.json
 coverage/
+test-report.xml

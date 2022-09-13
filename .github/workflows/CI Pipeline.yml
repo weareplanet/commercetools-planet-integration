@@ -20,32 +20,25 @@ jobs:
         run: npm run lint
         
       - name: Run tests
-        run: npm run test
-        
- #     - name: Test Reporter
- #       uses: vebr/jest-lcov-reporter@v0.2.0
- #       with:
- #         github-token: ${{ secrets.GITHUB_TOKEN }}
- #         lcov-file: coverage/lcov.info
+        run: npm run test:ci:sonar
           
       - name: Run build
         run: npm run build
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        #with:
-        #  args: >
-        #    -Dsonar.organization=planet 
-        #    -Dsonar.projectKey=commerceTools 
-        #    -Dsonar.sources=. 
-        #    -Dsonar.testExecutionReportPaths=coverage/coverage-final.json
-        #    -Dsonar.test.exclusions=test/**
-        #    -Dsonar.tests=test/
-        #    -Dsonar.typescript.tsconfigPath=tsconfig.json
-        #    -Dsonar.eslint.reportPaths=lint-result.json
-        #    -Dsonar.language=js
-        #    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-        #    -Dsonar.sourceEncoding=UTF-8
+        with:
+          args: >
+            -Dsonar.organization=planet 
+            -Dsonar.projectKey=commerceTools 
+            -Dsonar.sources=. 
+            -Dsonar.testExecutionReportPaths=coverage/test-report.xml
+            -Dsonar.test.exclusions=test/**
+            -Dsonar.tests=test/
+            -Dsonar.typescript.tsconfigPath=tsconfig.json
+            -Dsonar.eslint.reportPaths=coverage/lint-result.json
+            -Dsonar.language=js
+            -Dsonar.sourceEncoding=UTF-8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
