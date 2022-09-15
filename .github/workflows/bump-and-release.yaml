@@ -8,8 +8,9 @@ name: Bump and Release
 #   - main
 =======
 on:
-  workflow_run:
-    branches-ignore: main
+  [ workflow_dispatch ] 
+     
+    
 
 #on:
 #  pull_request:
