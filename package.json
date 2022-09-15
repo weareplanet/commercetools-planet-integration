@@ -60,5 +60,10 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint"
+  },
+  "jestSonar": {
+    "reportPath": "coverage",
+    "reportFile": "test-report.xml",
+    "indent": 4
   }
 }
