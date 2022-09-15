@@ -8,6 +8,7 @@ name: Bump and Release
 #   - main
 =======
 on:
+<<<<<<< HEAD
   workflow_run
      
     
@@ -18,6 +19,12 @@ on:
 #    branches:
 #      - main
 >>>>>>> 8b0e492 (Test manually bump and release)
+=======
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+>>>>>>> 39f1b68 (Update bump-and-release.yaml)
 
 jobs:
   bump-and-release:
