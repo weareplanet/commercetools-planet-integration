@@ -5,7 +5,7 @@ set -euo pipefail
 DEPLOY_SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 SUPPORTED_ENVS="aws"
-SUPPORTED_EXTENSION_TYPES="HTTP|AwsLambda"
+SUPPORTED_EXTENSION_TYPES="AwsLambda"
 DEFAULT_STACK_ID="connector"
 
 ENV="${ENV:-""}"
@@ -27,7 +27,7 @@ function deploy_aws {
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/make-deploy-package.sh
   aws lambda update-function-code --region=${AWS_REGION} \
-    --function-name=planetpaymentcommtool-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
+    --function-name=commercetools-planet-connector-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
 }
 
 function usage {

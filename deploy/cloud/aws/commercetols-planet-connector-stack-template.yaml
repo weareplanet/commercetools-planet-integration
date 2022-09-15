@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Planet Payment Connector - Lambda and extras for stack 'STACKNAME-STACKID'.
+Description: commercetools Planet Connector - Lambda and extras for stack 'STACKNAME-STACKID'.
 
 Parameters:
   lambdaFunctionName:
@@ -43,7 +43,7 @@ Resources:
           exports.handler = async function(event, context) {
             return { statusCode: 200, body: 'Hello World, from STACKNAME-STACKID.' };
           };
-      Description: Lambda function of Planet Payment Connector for STACKID.
+      Description: Lambda function of commercetools Planet connector for STACKID.
       FunctionName: !Ref "lambdaFunctionName"
       Handler: "app/environment-specific-handlers/aws-lambda-via-http/index.allOperationsHandler"
       MemorySize: 128
