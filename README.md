@@ -2,7 +2,7 @@
 [![Version](https://img.shields.io/github/v/tag/weareplanet/commercetools-planet-integration?label=commercetools-planet-integration&color=%23000000)](https://github.com/weareplanet/commercetools-planet-integration/releases)
 [![License](https://img.shields.io/badge/license-MIT-%23000000)](https://github.com/weareplanet/commercetools-planet-integration/blob/main/LICENSE)
 [![Node Requirement](https://img.shields.io/badge/node-%2016.0.0-%2343853D)](https://nodejs.org/en/download/)
-[![GitHub Actions CI](https://github.com/microsoft/TypeScript/workflows/CI/badge.svg)](https://github.com/weareplanet/commercetools-planet-integration/actions/workflows/CI%20Pipeline.yml)
+[![CI Pipeline](https://github.com/weareplanet/commercetools-planet-integration/actions/workflows/CI%20Pipeline.yml/badge.svg)](https://github.com/weareplanet/commercetools-planet-integration/actions/workflows/CI%20Pipeline.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=commerceTools&metric=alert_status&token=b732ef55fba8cc0c4757d72928be8f66c8ccc2ce)](https://sonarcloud.io/summary/new_code?id=commerceTools)
 
 Need a modern approach for your online payments? Look no further. With our connector, your commercetools projects will get instant access to dozens of payment methods, acquirers, and currencies. Offer your customers a state-of-the-art user experience for online payments.
