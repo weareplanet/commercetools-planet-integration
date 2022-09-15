@@ -1,10 +1,10 @@
 {
   "name": "planet-commercetools-connector",
-  "version": "0.0.0",
+  "version": "0.0.0-semantic-release",
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint \"app/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"app/**/*.ts\" \"test/**/*.ts\" --format json --output-file coverage/lint-result.json",
     "transpile": "tsc",
     "clean": "rm -rf dist",
     "build": "npm run clean && npm run transpile",
@@ -12,6 +12,7 @@
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
+    "test:ci:sonar": "cross-env NODE_ENV=test STAGE=local-dev jest --verbose --runInBand --coverage --reportPath=coverage  --reportFile=text-report.xml --indent=4 --testResultsProcessor jest-sonar-reporter",
     "prepare": "husky install"
   },
   "keywords": [
@@ -48,6 +49,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.17.0",
     "jest": "^28.1.0",
+    "jest-sonar-reporter": "^2.0.0",
     "jest-when": "^3.5.1",
     "lint-staged": "^13.0.1",
     "lodash.merge": "^4.6.2",
@@ -58,5 +60,10 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint"
+  },
+  "jestSonar": {
+    "reportPath": "coverage",
+    "reportFile": "test-report.xml",
+    "indent": 4
   }
 }

@@ -1,0 +1,48 @@
+name: CI Pipeline
+on: [push]
+
+jobs:
+  build-test-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the codebase from the git repo
+        uses: actions/checkout@v3
+        
+      - name: Install nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check code quality (ESLint)
+        run: npm run lint
+        
+      - name: Run tests
+        run: npm run test:ci:sonar
+          
+      - name: Run build
+        run: npm run build
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.organization=planet 
+            -Dsonar.projectKey=commerceTools 
+            -Dsonar.sources=. 
+            -Dsonar.testExecutionReportPaths=coverage/test-report.xml
+            -Dsonar.tests=test
+            -Dsonar.test.inclusions=test/**
+            -Dsonar.typescript.tsconfigPath=tsconfig.json
+            -Dsonar.eslint.reportPaths=coverage/lint-result.json
+            -Dsonar.language=js
+            -Dsonar.sourceEncoding=UTF-8
+  # -Dsonar.test.exclusions=test/**
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      
+      - name: Look at the build result
+        run: find ./dist -name "*.js" -print

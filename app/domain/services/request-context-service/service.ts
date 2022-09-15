@@ -34,7 +34,7 @@ export class RequestContextService extends ServiceWithLogger {
   }
 
   private calculateCorrelationId(req: IAbstractRequest): string {
-    let correlationId = getHttpHeaderValue(req.headers, COMMERCETOOLS_CORRELATION_ID_HEADER_NAME);
+    let correlationId = getHttpHeaderValue(COMMERCETOOLS_CORRELATION_ID_HEADER_NAME, req.headers);
     if (!correlationId) {
       // https://docs.commercetools.com/api/general-concepts#correlation-id
       // correlation IDs are strings that may only contain alphanumeric characters, underscores, and hyphens and have a length of 8 to 256 characters.
