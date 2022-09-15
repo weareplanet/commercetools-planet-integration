@@ -1,14 +1,26 @@
 name: Bump and Release
 
+<<<<<<< HEAD
 #on:
 #  pull_request:
 #   types: [ closed ]
 #   branches:
 #   - main
+=======
+on:
+  workflow_run:
+    branches-ignore: main
+
+#on:
+#  pull_request:
+#    types: [ closed ]
+#    branches:
+#      - main
+>>>>>>> 8b0e492 (Test manually bump and release)
 
 jobs:
   bump-and-release:
-    if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
+    # if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
     name: Bump version and Release tag
     runs-on: ubuntu-latest
 
