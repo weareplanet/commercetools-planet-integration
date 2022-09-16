@@ -1,13 +1,10 @@
 name: Bump and Release
 
 on:
-  [workflow_dispatch]
-
-#on:
-#  pull_request:
- #   types: [ closed ]
-  #  branches:
-   #   - main
+  pull_request:
+   types: [ closed ]
+   branches:
+   - main
 
 jobs:
   bump-and-release:
