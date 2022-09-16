@@ -35,7 +35,7 @@ if [ -z "${ACCESS_TOKEN}" ] ; then
     echo -e "\tAccess token could not be obtained from CommerceTools."
     exit 1
 fi
-echo -e "\n##### Got an access token from CommerceTools"
+echo -e "\n##### ken from CommerceTools"
 
 #####
 # Create a new API-Extension
@@ -71,7 +71,7 @@ if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
 DATA
 )
 elif [[ ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ARN" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_SECRET" ]]; then
-  echo -e "\n##### Creating new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'AWSLambda'..."
+  echo -e "\n##### Creating new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'AwsLambda'..."
   # TODO(pbourke): the following is not idempotent, add a check
   statusCode=$(curl --write-out '%{http_code}' --silent -o ${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
   -X POST ${CT_API_URL}/${CT_PROJECT_ID}/extensions \
@@ -104,7 +104,7 @@ if [[ $statusCode -eq 201 ]]
 	then
 		echo -e "\t## New api-extension '${CT_API_EXTENSION_NAME}' successfully created!"
 	else
-		echo -e "\terror: got HTTP status '${statusCode}' when creating the api-extension"
+		echo -e "\terror: HTTP status '${statusCode}' when creating the api-extension"
 		exit 1
 fi
 

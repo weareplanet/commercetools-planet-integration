@@ -35,7 +35,7 @@ export class OperationDetector {
   // Type guard for IDatatransWebhookRequest
   public static isDatatransRequest(req: IAbstractRequest | IDatatransWebhookRequest): req is IDatatransWebhookRequest {
     const request = req as IDatatransWebhookRequest;
-    return !!getHttpHeaderValue(request.headers, DATATRANS_SIGNATURE_HEADER_NAME);
+    return !!getHttpHeaderValue(DATATRANS_SIGNATURE_HEADER_NAME, request.headers);
   }
 
   public static detectOperation = (req: IAbstractRequest) => {

@@ -7,7 +7,7 @@
 # placeholders to customize stack contents
 #
 # The CloudFormation stack contains the Lambda function and accessory objects needed within AWS. It
-# has the prefix "planetpaymentcommtool-" (can be changed within the STACKNAME variable below)
+# has the prefix "commercetools-planet-connector-" (can be changed within the STACKNAME variable below)
 #
 # The Lambda function will be created with a single code snippet that will be modified after the
 # first package deployment.
@@ -31,14 +31,14 @@
 # created and delete the stack (can use AWS CLI too).
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-STACKNAME="planetpaymentcommtool"
+STACKNAME="commercetools-planet"
 STACKID=$(echo $1 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
 AWSREGION=$(echo $2 | tr '[:upper:]' '[:lower:]') # make it lowercase
 ENVFILE="${SCRIPT_DIR}/../../env"
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
-echo -e "##### performing parameter input checks ..."
+echo -e "##### Performing parameter input checks..."
 if [ $# -ne 2 ]; then
    echo -e "   !! Provided parameters aren't correct. Need just 2: a name for the stack and an AWS region, no spaces within them."
    echo -e "   !! Usage: aws-deploy.sh STACKID AWSREGION"
@@ -51,46 +51,46 @@ if [[ ${#STACKID} -gt 25 ]]; then
    echo -e "   !!  like: aws-deploy.sh lessThan25characters eu-west-1"
    exit 3
 fi
-echo -e "   ## done.\n"
+echo -e "   ## Done.\n"
 
-echo -e "##### performing file checks ..."
+echo -e "##### Performing file checks..."
 if [ ! -f ${ENVFILE} ]; then
    echo -e "   !! 'env' file was not found - it must be filled and present under ${ENVFILE}."
    exit 3
 fi
-echo -e "   ## done.\n"
+echo -e "   ## Done.\n"
 
-echo -e "\n##### Setting ENV vars"
+echo -e "##### Setting ENV vars"
 set -a
 source <(cat ${ENVFILE} | sed -e '/^#/d;/^\s*$/d;')
 set +a
 
 echo -e "\n##### Checking ENV vars"
-REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS DT_CONNECTOR_WEBHOOK_URL)
-for var in "${REQUIRED_CT_VARS[@]}"; do
+REQUIRED_ENV_VARS=(CT_AUTH_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_PROJECT_ID DT_MERCHANTS)
+for var in "${REQUIRED_ENV_VARS[@]}"; do
     if [ -z "${!var}" ] ; then
-        echo -e "\tMissed the required environmebt variable $var"
+        echo -e "\tMissed the required environment variable $var"
         exit 1
     fi
 done
 
 # checks if the AWS credentials are ok
-echo -e "##### getting AWS credentials"
+echo -e "##### Getting AWS credentials..."
 CHECKAWS=$(aws sts get-caller-identity)
 if [ $? != 0 ]; then
     echo -e "   !! error: something went wrong with your AWS credentials."
     echo -e "   !! If using SSO, try to refresh then copy the NEW env vars from the account SSO landing page."
     exit 0
 fi
-echo -e "   ## done.\n"
+echo -e "   ## Done.\n"
 
-echo -e "########## deploying $STACKNAME-$STACKID in AWS region $AWSREGION"
-echo -e "\n##### Creating CF template file: ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
+echo -e "########## Deploying $STACKNAME-$STACKID in AWS region $AWSREGION..."
+echo -e "\n##### Creating CF template file: ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml..."
 echo -e "   ## (this file will be kept after stack creation)"
 OUTPUT_YAML="${SCRIPT_DIR}/${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
-cp ${SCRIPT_DIR}/planetpaymentconnector-stack-template.yaml ${OUTPUT_YAML}
+cp ${SCRIPT_DIR}/commercetols-planet-connector-stack-template.yaml ${OUTPUT_YAML}
 
-echo -e "\n   ## personalizing the template file"
+echo -e "\n   ## personalizing the template file: ${OUTPUT_YAML}"
 sed -i -e "s/STACKNAME/$STACKNAME/g" ${OUTPUT_YAML}
 sed -i -e "s/STACKID/$STACKID/g" ${OUTPUT_YAML}
 sed -i "1s/^/# stack name on $NOW: $STACKNAME-$STACKID\n/" ${OUTPUT_YAML}
@@ -100,7 +100,8 @@ for var in "${!CT@}"; do
     sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
 done
 for var in "${!DT@}"; do
-    sed -i -e "s~${var}_PLACEHOLDER~${!var}~g" ${OUTPUT_YAML}
+    value=$(echo "${!var}" | sed -z "s/\n/ /g") # compacting potential multi-line json to single line
+    sed -i -e "s~${var}_PLACEHOLDER~${value}~g" ${OUTPUT_YAML}
 done
 echo -e "   ## done.\n"
 

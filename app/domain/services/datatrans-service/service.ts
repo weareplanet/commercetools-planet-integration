@@ -34,7 +34,7 @@ export class DatatransService extends ServiceWithLogger {
 
   public validateIncomingRequestSignature(merchantId: string, reqHeaders: IAbstractHeaders, requestBody: string) {
     // datatrans-signature: t=1559303131511,s0=33819a1220fd8e38fc5bad3f57ef31095fac0deb38c001ba347e694f48ffe2fc
-    const headerValue = getHttpHeaderValue(reqHeaders, DATATRANS_SIGNATURE_HEADER_NAME);
+    const headerValue = getHttpHeaderValue(DATATRANS_SIGNATURE_HEADER_NAME, reqHeaders);
     const matchResult = headerValue.match(/t=(?<timestamp>\d+),s0=(?<actualSignature>.+)$/);
     if (!matchResult) {
       this.logger.error({ headerValue }, `Missed expected ${DATATRANS_SIGNATURE_HEADER_NAME} header`);

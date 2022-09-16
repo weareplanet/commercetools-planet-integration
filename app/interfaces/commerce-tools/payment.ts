@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-// import { type Payment } from '@commercetools/platform-sdk';
 
 import { ConfigService } from '../../domain/services/config-service';
 import { ErrorMessages } from './error-messages';

@@ -18,7 +18,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
 
-echo -e "\n##### Checking ENV vars"
+echo -e "\n##### Checking ENV vars..."
 REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID)
 for var in "${REQUIRED_ENV_VARS[@]}"; do
     if [ -z "${!var}" ] ; then
@@ -33,7 +33,7 @@ ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
      -d "grant_type=client_credentials&scope=${CT_SCOPES}" |\
      jq -r '.access_token')
 
-echo -e "##### Got an access token from CommerceTools"
+echo -e "   ## Got an access token from CommerceTools."
 
 for filename in ${SCRIPT_DIR}/types/*.json; do
 	typeKey=$(basename "$filename" .json)

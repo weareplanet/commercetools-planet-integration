@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Planet Payment Connector - Lambda and extras for stack 'STACKNAME-STACKID'.
+Description: commercetools Planet Connector - Lambda and extras for stack 'STACKNAME-STACKID'.
 
 Parameters:
   lambdaFunctionName:
@@ -43,7 +43,7 @@ Resources:
           exports.handler = async function(event, context) {
             return { statusCode: 200, body: 'Hello World, from STACKNAME-STACKID.' };
           };
-      Description: Lambda function of Planet Payment Connector for STACKID.
+      Description: Lambda function of commercetools Planet connector for STACKID.
       FunctionName: !Ref "lambdaFunctionName"
       Handler: "app/environment-specific-handlers/aws-lambda-via-http/index.allOperationsHandler"
       MemorySize: 128
@@ -54,8 +54,8 @@ Resources:
         Variables:
           CT_API_URL: "CT_API_URL_PLACEHOLDER" # as an URL from the CommerceTools project
           CT_AUTH_URL: "CT_AUTH_URL_PLACEHOLDER" # as an URL from the CommerceTools project
-          CT_CLIENT_ID: "CT_NEW_CLIENT_ID_PLACEHOLDER" # as a String from the CommerceTools project
-          CT_CLIENT_SECRET: "CT_NEW_CLIENT_SECRET_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_CLIENT_ID: "CT_CLIENT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_CLIENT_SECRET: "CT_CLIENT_SECRET_PLACEHOLDER" # as a String from the CommerceTools project
           CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the CommerceTools project
           DT_CONNECTOR_WEBHOOK_URL: "DT_CONNECTOR_WEBHOOK_URL_PLACEHOLDER" # as an URL from AWS Lambda function itself
           DT_MERCHANTS: 'DT_MERCHANTS_PLACEHOLDER' # as a stringified JSON containing id, password, environment and HMAC key, using single quotes to avoid issues with double-quotes within the JSON

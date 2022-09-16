@@ -5,7 +5,7 @@ set -euo pipefail
 DEPLOY_SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 SUPPORTED_ENVS="aws"
-SUPPORTED_EXTENSION_TYPES="HTTP|AwsLambda"
+SUPPORTED_EXTENSION_TYPES="AwsLambda"
 DEFAULT_STACK_ID="connector"
 
 ENV="${ENV:-""}"
@@ -16,18 +16,18 @@ AWS_REGION="${AWS_REGION:-eu-west-1}"
 function deploy_aws {
   source ${ENV_FILE}
 
-  CT_API_EXTENSION_URL=${CT_API_EXTENSION_URL:-""}
-  if [[ ${EXTENSION_TYPE} == "HTTP" && -z ${CT_API_EXTENSION_URL} ]]; then
-    echo "error: -t HTTP requires CT_API_EXTENSION_URL to be set in env"
-    exit 1
-  fi
+#  CT_API_EXTENSION_URL=${CT_API_EXTENSION_URL:-""}
+#  if [[ ${EXTENSION_TYPE} == "HTTP" && -z ${CT_API_EXTENSION_URL} ]]; then
+#    echo "error: -t HTTP requires CT_API_EXTENSION_URL to be set in env"
+#    exit 1
+#  fi
 
   source ${DEPLOY_SCRIPT_DIR}/commercetools/custom-types-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/cloud/aws/aws-deploy.sh ${STACK_ID} ${AWS_REGION}
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/make-deploy-package.sh
   aws lambda update-function-code --region=${AWS_REGION} \
-    --function-name=planetpaymentcommtool-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
+    --function-name=commercetools-planet-connector-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
 }
 
 function usage {
