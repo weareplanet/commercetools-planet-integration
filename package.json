@@ -1,6 +1,6 @@
 {
   "name": "planet-commercetools-connector",
-  "version": "0.0.1",
+  "version": "0.0.0-semantic-release",
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "CommerceTools",
     "Planet Payment"
   ],
-  "author": "",
+  "author": "Planet",
   "license": "ISC",
   "dependencies": {
     "@commercetools/platform-sdk": "^2.8.0",
