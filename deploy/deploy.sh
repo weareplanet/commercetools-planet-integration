@@ -27,7 +27,7 @@ function deploy_aws {
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/make-deploy-package.sh
   aws lambda update-function-code --region=${AWS_REGION} \
-    --function-name=commercetools-planet-connector-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
+    --function-name=commercetools-planet-${STACK_ID} --zip-file=fileb://${PKGFILENAME}.zip
 }
 
 function usage {

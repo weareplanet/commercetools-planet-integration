@@ -88,7 +88,7 @@ echo -e "########## Deploying $STACKNAME-$STACKID in AWS region $AWSREGION..."
 echo -e "\n##### Creating CF template file: ${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml..."
 echo -e "   ## (this file will be kept after stack creation)"
 OUTPUT_YAML="${SCRIPT_DIR}/${STACKNAME}-${STACKID}_${AWSREGION}_${NOW}.yaml"
-cp ${SCRIPT_DIR}/commercetols-planet-connector-stack-template.yaml ${OUTPUT_YAML}
+cp ${SCRIPT_DIR}/commercetools-planet-connector-stack-template.yaml ${OUTPUT_YAML}
 
 echo -e "\n   ## personalizing the template file: ${OUTPUT_YAML}"
 sed -i -e "s/STACKNAME/$STACKNAME/g" ${OUTPUT_YAML}

@@ -1,4 +1,5 @@
 # Commercetools Connector for Planet (Datatrans)
+
 [![Version](https://img.shields.io/github/v/tag/weareplanet/commercetools-planet-integration?label=commercetools-planet-integration&color=%23000000)](https://github.com/weareplanet/commercetools-planet-integration/releases)
 [![License](https://img.shields.io/badge/license-MIT-%23000000)](https://github.com/weareplanet/commercetools-planet-integration/blob/main/LICENSE)
 [![Node Requirement](https://img.shields.io/badge/node-%2016.0.0-%2343853D)](https://nodejs.org/en/download/)
