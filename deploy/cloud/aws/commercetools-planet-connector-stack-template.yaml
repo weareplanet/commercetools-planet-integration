@@ -248,7 +248,7 @@ Resources:
           Statement:
           - Effect: Allow
             Action:
-            - lambda:InvokeFunctionUrl
+            - lambda:InvokeFunction
             Resource:
             #- !Sub "arn:aws:lambda:*:${AWS::AccountId}:function:*"
             #- !Ref "apiextensionIAMUser"
