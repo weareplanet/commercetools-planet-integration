@@ -58,12 +58,13 @@ jobs:
           npm version ${{ env.VERSION }}
       - name: Commit and push changes
         run: |
-          git add "package.json"
-          git add "package-lock.json"
-          git commit -m "Bump the package version to ${{ env.VERSION }}"
           git push origin
+        
       #  git status
       # if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
+      # git add "package.json"
+      # git add "package-lock.json"
+      # git commit -m "Bump the package version to ${{ env.VERSION }}"
           
       - name: Create Release
         uses: actions/create-release@v1
