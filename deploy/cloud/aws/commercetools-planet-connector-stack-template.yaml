@@ -64,7 +64,7 @@ Resources:
   LambdaFunctionURL:
     Type: AWS::Lambda::Url
     Properties:
-      AuthType: "AWS_IAM"
+      AuthType: "NONE"
       TargetFunctionArn: !GetAtt LambdaFunction.Arn
 
   LambdaIamRole:
@@ -93,14 +93,13 @@ Resources:
                   - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionName}:*"
           PolicyName: !Join ["", [{"Ref": "AWS::StackName"}, "-lambda-log"]]
 
-  LambdaPermissionNoAPI:
+  LambdaPermissionPublic:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !GetAtt LambdaFunction.Arn
-      Action: lambda:InvokeFunctionURL
-      Principal: !GetAtt APIExtensionIAMUser.Arn
-      FunctionUrlAuthType: "AWS_IAM"
-    DependsOn: APIExtensionIAMUserAccessKey
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: "NONE"
 
 # LambdaPermission:
 #   Type: AWS::Lambda::Permission
