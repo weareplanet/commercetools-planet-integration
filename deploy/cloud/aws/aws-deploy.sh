@@ -133,18 +133,22 @@ echo -e "   ## changing Lambda ENV var..."
 UPDATELAMBDA=$(aws lambda update-function-configuration --region ${AWSREGION} --function-name ${LAMBDAFUNCTIONNAME} --environment="${ALLLAMBDAENVVARS}")
 echo -e "   ## done with this ENV var.\n"
 
-echo -e "##### Updating .env file with needed Access Key, Secret and Lambda ARN for CommerceTools API-Extension ..."
-echo -e "   ## getting info..."
-AKID=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
-                     --query "Stacks[0].Outputs[?OutputKey=='AccessKeyforAPIExtensionIAMUserAccessKey'].OutputValue" --output text)
-AKSEC=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
-                    --query "Stacks[0].Outputs[?OutputKey=='SecretKeyforAPIExtensionIAMUserAccessKey'].OutputValue" --output text)
-LAMBDAARN=$(aws lambda get-function --region ${AWSREGION} --function-name ${STACKNAME}-${STACKID} | jq -r .Configuration.FunctionArn)
-echo -e "   ## changing .env file..."
-sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY/cexport CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY=\"${AKID}\"" ${ENVFILE}
-sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_SECRET/cexport CT_API_EXTENSION_AWS_LAMBDA_SECRET=\"${AKSEC}\"" ${ENVFILE}
-sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_ARN/cexport CT_API_EXTENSION_AWS_LAMBDA_ARN=\"${LAMBDAARN}\"" ${ENVFILE}
-echo -e "   ## done with this .env file.\n"
+if [[ ${EXTENSION_TYPE} = "AwsLambda" ]]; then
+   echo -e "##### Updating .env file with needed Access Key, Secret and Lambda ARN for CommerceTools API-Extension ..."
+   echo -e "   ## getting info..."
+   AKID=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
+                        --query "Stacks[0].Outputs[?OutputKey=='AccessKeyforAPIExtensionIAMUserAccessKey'].OutputValue" --output text)
+   AKSEC=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
+                       --query "Stacks[0].Outputs[?OutputKey=='SecretKeyforAPIExtensionIAMUserAccessKey'].OutputValue" --output text)
+   LAMBDAARN=$(aws lambda get-function --region ${AWSREGION} --function-name ${STACKNAME}-${STACKID} | jq -r .Configuration.FunctionArn)
+   echo -e "   ## changing .env file..."
+   sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY/cexport CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY=\"${AKID}\"" ${ENVFILE}
+   sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_SECRET/cexport CT_API_EXTENSION_AWS_LAMBDA_SECRET=\"${AKSEC}\"" ${ENVFILE}
+   sed -i "/^export CT_API_EXTENSION_AWS_LAMBDA_ARN/cexport CT_API_EXTENSION_AWS_LAMBDA_ARN=\"${LAMBDAARN}\"" ${ENVFILE}
+   echo -e "   ## done with this .env file.\n"
+else
+   echo -e "##### Automatic configuration only supports ARN-based access at this time. env file must be manually configured for HTTP-based setup, i.e. for API Gateway."
+fi
 
 echo -e "##### Done"
 echo -e "##### check the cli output here and CloudFormation stack Events output in $AWSREGION\n"
