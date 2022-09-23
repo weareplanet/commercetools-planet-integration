@@ -47,9 +47,14 @@ echo -e "\n##### ken from CommerceTools"
 # will be created.  Otherwise - if  CT_API_EXTENSION_AWS_LAMBDA_ARN and
 # CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY and CT_API_EXTENSION_AWS_LAMBDA_SECRET environment
 # variables are provided - the extension of AwsLambda destination type will be created.
+
+# Remove existing extension (best effort)
+statusCode=$(curl --write-out '%{http_code}' --silent -o "${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json" \
+ -X DELETE "${CT_API_URL}/${CT_PROJECT_ID}/extensions/key=${CT_API_EXTENSION_NAME}?version=1" \
+ --header "Authorization: Bearer ${ACCESS_TOKEN}")
+
 if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
-  echo -e "\n##### Creating new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
-  # TODO(pbourke): the following is not idempotent, add a check
+  echo -e "\n##### Creating/Replacing API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
   if [[ ! -z "$CT_API_EXTENSION_AUTH_HEADER" ]]; then
     AUTH=', "authentication" : { "type" : "AuthorizationHeader", "headerValue" : "'${CT_API_EXTENSION_AUTH_HEADER}'" }'
   else
@@ -77,8 +82,8 @@ if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
 DATA
 )
 elif [[ ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ARN" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_ACCESS_KEY" && ! -z "$CT_API_EXTENSION_AWS_LAMBDA_SECRET" ]]; then
-  echo -e "\n##### Creating new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'AwsLambda'..."
-  # TODO(pbourke): the following is not idempotent, add a check
+  echo -e "\n##### Creating/Replacing API Extension '${CT_API_EXTENSION_NAME}' with destination type 'AwsLambda'..."
+  # Add new extension
   statusCode=$(curl --write-out '%{http_code}' --silent -o ${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
   -X POST ${CT_API_URL}/${CT_PROJECT_ID}/extensions \
   --header "Authorization: Bearer ${ACCESS_TOKEN}" \
