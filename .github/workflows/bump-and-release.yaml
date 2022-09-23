@@ -1,10 +1,10 @@
 name: Bump and Release
 
-#on:
-#  pull_request:
-#   types: [ closed ]
-#   branches:
-#   - main
+on:
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
 
 jobs:
   bump-and-release:
@@ -50,17 +50,11 @@ jobs:
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on package.json and package-lock.json
         run: |
-          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package.json
-          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${{ env.VERSION }}\"|" package-lock.json
-          grep "version" package.json
+          npm version ${{ env.VERSION }}
       - name: Commit and push changes
         run: |
-          git status
-          if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
-          git add package.json
-          git add package-lock.json
-          git commit -m "Bump the package version to ${{ env.VERSION }}"
-          git push
+          git push origin
+          
       - name: Create Release
         uses: actions/create-release@v1
         env:
