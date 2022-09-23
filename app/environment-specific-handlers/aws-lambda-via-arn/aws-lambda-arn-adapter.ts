@@ -6,6 +6,8 @@ import {
   ITraceContext,
   IAbstractBody,
 } from '../../interfaces';
+import { APIGatewayEvent } from 'aws-lambda';
+import { OperationDetector } from '../../domain/services/request-context-service/operation-detector';
 import { RequestContextService } from '../../domain/services/request-context-service';
 import { ErrorsService } from '../../domain/services/errors-service';
 import { LogService } from '../../domain/services/log-service';
@@ -21,7 +23,16 @@ export class AwsArnGatewayAdapter implements IAbstractToEnvHandlerAdapter<unknow
     return async (event: unknown) => {
       let abstractRequest;
       try {
-        abstractRequest = this.cloudRequestToAbstract(event);
+        const gatewayEvent = event as APIGatewayEvent;
+        if (gatewayEvent.body) {
+          abstractRequest = this.cloudRequestToAbstractHTTP(gatewayEvent);
+          if (!OperationDetector.isDatatransRequest(abstractRequest)) {
+            throw new Error('Insecure URL invocation not allowed.');
+          }
+        } else {
+          abstractRequest = this.cloudRequestToAbstractARN(event);
+        }
+        this.setupLogger(abstractRequest.traceContext);
         const abstractResponse = await handler(abstractRequest);
         return this.abstractResponseToCloud(abstractResponse);
       } catch (err) {
@@ -30,17 +41,22 @@ export class AwsArnGatewayAdapter implements IAbstractToEnvHandlerAdapter<unknow
     };
   }
 
-  private cloudRequestToAbstract(event: unknown): IAbstractRequest {
+  private cloudRequestToAbstractARN(event: unknown): IAbstractRequest {
     const abstractRequestDraft = {
       headers: {},
       rawBody: JSON.stringify(event),
       body: event as IAbstractBody
     };
-    const abstractRequest = new RequestContextService().addTraceContextToRequest(abstractRequestDraft);
+    return new RequestContextService().addTraceContextToRequest(abstractRequestDraft);
+  }
 
-    this.setupLogger(abstractRequest.traceContext);
-
-    return abstractRequest;
+  private cloudRequestToAbstractHTTP(event: APIGatewayEvent): IAbstractRequest {
+    const abstractRequestDraft = {
+      headers: event.headers,
+      rawBody: event.body,
+      body: JSON.parse(event.body)
+    };
+    return new RequestContextService().addTraceContextToRequest(abstractRequestDraft);
   }
 
   private abstractResponseToCloud(abstractResponse: IAbstractResponse) {
