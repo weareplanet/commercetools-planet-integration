@@ -16,12 +16,6 @@ AWS_REGION="${AWS_REGION:-eu-west-1}"
 function deploy_aws {
   source ${ENV_FILE}
 
-#  CT_API_EXTENSION_URL=${CT_API_EXTENSION_URL:-""}
-#  if [[ ${EXTENSION_TYPE} == "HTTP" && -z ${CT_API_EXTENSION_URL} ]]; then
-#    echo "error: -t HTTP requires CT_API_EXTENSION_URL to be set in env"
-#    exit 1
-#  fi
-
   source ${DEPLOY_SCRIPT_DIR}/commercetools/custom-types-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/cloud/aws/aws-deploy.sh ${EXTENSION_TYPE} ${STACK_ID} ${AWS_REGION}
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
