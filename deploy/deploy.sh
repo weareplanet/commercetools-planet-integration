@@ -23,7 +23,7 @@ function deploy_aws {
 #  fi
 
   source ${DEPLOY_SCRIPT_DIR}/commercetools/custom-types-setup.sh
-  source ${DEPLOY_SCRIPT_DIR}/cloud/aws/aws-deploy.sh ${STACK_ID} ${AWS_REGION}
+  source ${DEPLOY_SCRIPT_DIR}/cloud/aws/aws-deploy.sh ${EXTENSION_TYPE} ${STACK_ID} ${AWS_REGION}
   source ${DEPLOY_SCRIPT_DIR}/commercetools/api-extension-setup.sh
   source ${DEPLOY_SCRIPT_DIR}/make-deploy-package.sh
   aws lambda update-function-code --region=${AWS_REGION} \

@@ -32,17 +32,17 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 STACKNAME="commercetools-planet"
-STACKID=$(echo $1 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
-AWSREGION=$(echo $2 | tr '[:upper:]' '[:lower:]') # make it lowercase
+EXTENSION_TYPE=$1
+STACKID=$(echo $2 | tr -dc '[:alnum:]\n\r')  # removes spaces and special characters... looks overkill
+AWSREGION=$(echo $3 | tr '[:upper:]' '[:lower:]') # make it lowercase
 ENVFILE="${SCRIPT_DIR}/../../env"
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 echo -e "\n########## Planet Payment CommerceTools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
 echo -e "##### Performing parameter input checks..."
-if [ $# -ne 2 ]; then
-   echo -e "   !! Provided parameters aren't correct. Need just 2: a name for the stack and an AWS region, no spaces within them."
-   echo -e "   !! Usage: aws-deploy.sh STACKID AWSREGION"
-   echo -e "   !!  like: aws-deploy.sh Prod-01 eu-west-1"
+if [ $# -ne 3 ]; then
+   echo -e "   !! Usage: aws-deploy.sh CONNECTOR_TYPE STACKID AWSREGION"
+   echo -e "   !!  like: aws-deploy.sh AwsLambda Prod-01 eu-west-1"
    exit 3
 fi
 if [[ ${#STACKID} -gt 25 ]]; then
@@ -103,6 +103,11 @@ for var in "${!DT@}"; do
     value=$(echo "${!var}" | sed -z "s/\n/ /g") # compacting potential multi-line json to single line
     sed -i -e "s~${var}_PLACEHOLDER~${value}~g" ${OUTPUT_YAML}
 done
+if [[ ${EXTENSION_TYPE} = 'AwsLambda' ]]; then
+   sed -i -e "s/CT_HANDLER_PLACEHOLDER/aws-lambda-via-arn/g" ${OUTPUT_YAML}
+else
+   sed -i -e "s/CT_HANDLER_PLACEHOLDER/aws-lambda-via-http/g" ${OUTPUT_YAML}
+fi
 echo -e "   ## done.\n"
 
 echo -e "##### Starting CF deploy for $STACKNAME-$STACKID stack in $AWSREGION region...."
