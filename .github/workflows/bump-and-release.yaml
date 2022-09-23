@@ -1,9 +1,9 @@
 name: Bump and Release
 
 on:
-  workflow_run:
+  push:
     branches: 
-    - production-rediness
+      - production-rediness
 
 #on:
 #  pull_request:
