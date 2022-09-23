@@ -50,6 +50,11 @@ echo -e "\n##### ken from CommerceTools"
 if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
   echo -e "\n##### Creating new API Extension '${CT_API_EXTENSION_NAME}' with destination type 'HTTP'..."
   # TODO(pbourke): the following is not idempotent, add a check
+  if [[ ! -z "$CT_API_EXTENSION_AUTH_HEADER" ]]; then
+    AUTH=', "authentication" : { "type" : "AuthorizationHeader", "headerValue" : "'${CT_API_EXTENSION_AUTH_HEADER}'" }'
+  else
+    AUTH=''
+  fi
   statusCode=$(curl --write-out '%{http_code}' --silent -o ${SCRIPT_DIR}/commercetools-api-extension_${CT_API_EXTENSION_NAME}_${NOW}.json \
   -X POST ${CT_API_URL}/${CT_PROJECT_ID}/extensions \
   --header "Authorization: Bearer ${ACCESS_TOKEN}" \
@@ -59,6 +64,7 @@ if [[ ! -z "$CT_API_EXTENSION_URL" ]]; then
     "destination": {
       "type": "HTTP",
       "url": "${CT_API_EXTENSION_URL}"
+      ${AUTH}
     },
     "triggers" : [
       {
