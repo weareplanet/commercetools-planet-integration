@@ -1,19 +1,14 @@
 name: Bump and Release
 
 on:
-  push:
-    branches: 
-      - production-rediness
-
-#on:
-#  pull_request:
-#    types: [ closed ]
-#    branches:
-#      - main
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
 
 jobs:
   bump-and-release:
-    # if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
+    if: github.event.pull_request.merged == true  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
     name: Bump version and Release tag
     runs-on: ubuntu-latest
 
@@ -59,12 +54,6 @@ jobs:
       - name: Commit and push changes
         run: |
           git push origin
-        
-      #  git status
-      # if [ -f "CHANGELOG.md" ]; then git add CHANGELOG.md; fi
-      # git add "package.json"
-      # git add "package-lock.json"
-      # git commit -m "Bump the package version to ${{ env.VERSION }}"
           
       - name: Create Release
         uses: actions/create-release@v1
