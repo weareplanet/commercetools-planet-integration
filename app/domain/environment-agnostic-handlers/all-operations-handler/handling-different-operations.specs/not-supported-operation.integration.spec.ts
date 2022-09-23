@@ -7,7 +7,7 @@ import handler from '..';
 describe('All-operations handler', () => {
 
   describe('When CommerceTools sends a request with body which doesn\'t match any operation criteria', () => {
-    it('should return 200 response with empty body', async () => {
+    it('should return 200 response with an empty list of actions', async () => {
       const notSupportedOperationRequest = {
         body: {
           resource: {
@@ -22,11 +22,9 @@ describe('All-operations handler', () => {
       expect(result).toEqual(
         {
           statusCode: HttpStatusCode.OK,
-          body: ''
+          body: { 'actions': [] }
         }
       );
-
-      // TODO: check that no any per-operation handler was called
     });
   });
 

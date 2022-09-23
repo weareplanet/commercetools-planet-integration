@@ -57,7 +57,7 @@ export default async (req: IAbstractRequest): Promise<IAbstractResponse> => {
 
       return {
         statusCode: HttpStatusCode.OK,
-        body: '', // For CT it's OK: https://docs.commercetools.com/api/projects/api-extensions#validation-successful--no-updates-requested
+        body: { 'actions': [] } // For some handlers (e.g. ARN/AwsLambda) this MUST be valid JSON (HTTP extensions are allowed to return an empty body)
       };
     }
   }
