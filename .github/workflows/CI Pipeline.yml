@@ -17,7 +17,7 @@ jobs:
         run: npm ci
         
       - name: Check code quality (ESLint)
-        run: 
+        run: |
           npm run lint
           npm run ci:lint
         
