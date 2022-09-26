@@ -20,7 +20,7 @@ export const RefundRequestBodyFactory = (explicitPayment?: RecursivePartial<ICom
         explicitPayment
       )
     }
-  } as unknown as ICommerceToolsExtensionRequestBody; // TODO: provide all required fields
+  } as unknown as ICommerceToolsExtensionRequestBody;
 };
 
 export const RefundTransactionRequestFactory = (): IDatatransRefundTransaction => {

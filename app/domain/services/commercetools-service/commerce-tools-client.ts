@@ -19,8 +19,7 @@ import { ConfigService } from '../config-service';
 const appConfig = new ConfigService().getConfig();
 const projectKey = appConfig.commerceTools.projectId;
 
-// TODO: in production version must be used only: manage_payments, manage_key_value_documents
-// https://docs.commercetools.com/api/releases/2020-10-14-oauth-scopes-for-custom-objects
+// see: https://planet.atlassian.net/browse/INC-151
 const scopes = [ 'manage_project:' + projectKey ];
 const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: appConfig.commerceTools.authUrl,

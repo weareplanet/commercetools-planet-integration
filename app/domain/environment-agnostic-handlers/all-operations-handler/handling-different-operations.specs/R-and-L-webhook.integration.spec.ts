@@ -371,11 +371,6 @@ describe('All-operations handler', () => {
           expect(logStream.write).toHaveBeenCalledWith(
             expect.stringMatching(/.*"traceContext":{.*"correlationId":"Test Correlation Id","paymentKey":"Test Payment Key".*}.*Operation to be performed: Redirect And Lightbox Webhook.*/)
           );
-
-          // TODO: It would be great to check also the calls of logStream.write with the same traceContext and:
-          // - Updating Payment .* in CommerceTools.*/)
-          // - Requesting CustomObject from CommerceTools
-          // But in order to do that this test should be changed to be "more integration" (see "An attempt to make an END-to-END test..." comment above).
         });
       });
     });

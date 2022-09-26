@@ -113,7 +113,6 @@ echo -e "   ## done.\n"
 echo -e "##### Starting CF deploy for $STACKNAME-$STACKID stack in $AWSREGION region...."
 set +e
 aws cloudformation describe-stacks --region ${AWSREGION} --stack-name ${STACKNAME}-${STACKID} &> /dev/null
-# TODO(pbourke): support stack updates
 if [[ $? != 0 ]]; then
     aws cloudformation deploy --region $AWSREGION --stack-name $STACKNAME-$STACKID --template-file ${OUTPUT_YAML} --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 fi
@@ -126,7 +125,6 @@ LAMBDAFUNCTIONNAME=$(aws cloudformation --region ${AWSREGION} describe-stacks --
                      --query "Stacks[0].Outputs[?OutputKey=='LambdaFunctionName'].OutputValue" --output text)
 LAMBDAFUNCTIONURL=$(aws cloudformation --region ${AWSREGION} describe-stacks --stack-name ${STACKNAME}-${STACKID} \
                     --query "Stacks[0].Outputs[?OutputKey=='LambdaFunctionURL'].OutputValue" --output text)
-# yes, awscli cannot update a SINGLE variable, it changes the entire set, so to add or change one, you must have all others...
 ALLLAMBDAENVVARS=$(aws lambda get-function-configuration --region ${AWSREGION} --function-name ${LAMBDAFUNCTIONNAME} | \
     jq --compact-output ".Environment + {\"Variables\": (.Environment.Variables + {\"DT_CONNECTOR_WEBHOOK_URL\": \"${LAMBDAFUNCTIONURL}v1/dt-webhook\"})}")
 echo -e "   ## changing Lambda ENV var..."

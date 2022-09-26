@@ -1,11 +1,10 @@
-///////////////// RAW Request
-// with NOT PARSED (string) headers/body
+////////////////// RAW Request
+// note that headers and body are not parsed
 interface IRawRequest {
-  // rawHeaders?: // so far we assume this is not needed
   rawBody: string; // sometimes the string which was originally in the HTTP request body is needed for some lower-level modules
 }
 
-///////////////// trace context
+///////////////// Trace context
 
 export type ITraceContext = {
   correlationId: string;
@@ -13,7 +12,7 @@ export type ITraceContext = {
 }
 
 type IRequestWithTraceContext = {
-  traceContext?: ITraceContext // TODO: make it not optional when all the functionality is working (this requires many corrections in tests)
+  traceContext?: ITraceContext // see: https://planet.atlassian.net/browse/INC-156
 }
 
 ///////////////// Abstract Request/Response

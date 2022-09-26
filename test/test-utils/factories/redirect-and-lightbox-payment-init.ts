@@ -15,7 +15,7 @@ export const RedirectAndLightboxPaymentInitRequestBodyFactory = (payment?: Recur
       typeId: 'typeId',
       obj: payment || PaymentFactory()
     }
-  } as unknown as ICommerceToolsExtensionRequestBody; // TODO: provide all required fields
+  } as unknown as ICommerceToolsExtensionRequestBody;
 };
 
 export const RedirectAndLightboxPaymentInitResponseFactory = () => ({

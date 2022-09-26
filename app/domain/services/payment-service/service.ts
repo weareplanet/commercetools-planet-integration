@@ -57,7 +57,7 @@ export class PaymentService extends ServiceWithLogger {
     let savedPaymentMethod;
     const needToUseSavedPaymentMethod = savedPaymentMethodAlias && savedPaymentMethodsKey;
     if (needToUseSavedPaymentMethod) {
-      savedPaymentMethod = await this.validateSavedPaymentMethodExistense(savedPaymentMethodsKey, savedPaymentMethodAlias);
+      savedPaymentMethod = await this.validateSavedPaymentMethodExistence(savedPaymentMethodsKey, savedPaymentMethodAlias);
     }
 
     const initializeTransactionPayload = prepareInitializeTransactionRequestPayload({
@@ -139,11 +139,11 @@ export class PaymentService extends ServiceWithLogger {
 
   async refund(payment: ICommerceToolsPayment): Promise<PaymentUpdateAction[]> {
     const authorizationTransaction: Transaction =
-      (payment as unknown as Payment) // see TODO in app/interfaces/commerce-tools/payment.ts
+      (payment as unknown as Payment)
         .transactions
         .find((t) => t.type === 'Authorization');
     const refundTransaction: Transaction =
-      (payment as unknown as Payment) // see TODO in app/interfaces/commerce-tools/payment.ts
+      (payment as unknown as Payment)
         .transactions
         .find((t) => t.state === 'Initial' && !t.interactionId);
     const refundTransactionPayload = prepareRefundTransactionRequestPayload(payment.key, refundTransaction);
@@ -195,11 +195,8 @@ export class PaymentService extends ServiceWithLogger {
     await this.commerceToolsService.updatePayment(payment, actionsBuilder.getActions());
   }
 
-  // TODO: it's validation and getting in one place,
-  // what at lest does not follow our common design regarding validatiuons -
-  // so consider moving the validation to where all other validations are implemented (in Yup schema):
-  // https://github.com/weareplanet/commercetools-planet-integration/blob/main/app/interfaces/commerce-tools/payment.ts#L66
-  private async validateSavedPaymentMethodExistense(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
+  // see: https://planet.atlassian.net/browse/INC-154
+  private async validateSavedPaymentMethodExistence(methodKey: string, alias: string): Promise<IDatatransPaymentMethodInfo> {
     const paymentMethod = await this.findPaymentMethod(methodKey, alias);
 
     if (!paymentMethod) {

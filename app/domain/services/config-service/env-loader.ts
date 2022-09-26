@@ -10,8 +10,6 @@ const configFromEnv: IAppConfig = {
   },
   datatrans: {
     webhookUrl: process.env.DT_CONNECTOR_WEBHOOK_URL,
-    // TODO: likely it'd be better to not do JSON.parse here, but delegate it to Yup.
-    // Or (less desirable), if here - then add some error handling...
     merchants: process.env.DT_MERCHANTS ? JSON.parse(process.env.DT_MERCHANTS) : undefined,
   }
 };

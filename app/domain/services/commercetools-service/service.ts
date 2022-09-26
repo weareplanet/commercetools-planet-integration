@@ -72,7 +72,7 @@ export class CommerceToolsService extends ServiceWithLogger {
     }
 
     this.logger.debug(res.body, 'Response from CommerceTools to the CustomObject request.');
-    return res.body as TCustomObject; // TODO: this cast is not safe
+    return res.body as TCustomObject;
   }
 
   public async createOrUpdateCustomObject<TValue>(containerName: string, key: string, value: TValue) {

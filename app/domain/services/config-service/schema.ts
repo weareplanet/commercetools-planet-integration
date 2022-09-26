@@ -1,8 +1,6 @@
 import * as yup from 'yup';
 
-// TODO: import from '../../../interfaces' caused a kinda circular dependency
-// which impacted ConfigService#init functionality.
-// Investigate the issue...
+// see: https://planet.atlassian.net/browse/INC-153
 import { DatatransEnvironment } from '../../../interfaces/datatrans';
 
 const CommerceToolsConfigSchema = yup.object({

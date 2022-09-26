@@ -71,7 +71,7 @@ describe('createPayment handler', () => {
             custom: {
               /* eslint-disable @typescript-eslint/ban-ts-comment */
               /* @ts-ignore */
-              fields: { // TODO: if this goes more crazy - use lodash.merge
+              fields: {
                 ...requiredCustomFields(),
                 ...optionalCustomFields()
               }

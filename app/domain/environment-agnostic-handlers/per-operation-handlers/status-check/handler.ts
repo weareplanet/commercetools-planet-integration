@@ -12,7 +12,7 @@ export default async (req: IAbstractRequestWithTypedBody<IRequestBody>): Promise
   const logger = new LogService(req.traceContext);
 
   const paymentService = new PaymentService({ logger });
-  const payment = req.body.resource?.obj as unknown as Payment; // see TODO in app/interfaces/commerce-tools/payment.ts
+  const payment = req.body.resource?.obj as unknown as Payment;
   const actions = await paymentService.checkStatus(payment);
 
   logger.debug({ actions }, 'checkStatus results');
