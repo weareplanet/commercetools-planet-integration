@@ -9,9 +9,9 @@ import {
   type Payment,
 } from '@commercetools/platform-sdk';
 
-export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceToolsPayment | Payment> = {}): ICommerceToolsPayment =>  {
+export const PaymentFactory = (explicitPayment: RecursivePartial<ICommerceToolsPayment | Payment> = {}): ICommerceToolsPayment =>  {
 
-  const defaultStuff = {
+  const defaultPayment = {
     key: '12345318909876543216',
     amountPlanned: {
       type: 'centPrecision',
@@ -39,10 +39,10 @@ export const PaymentFactory = (paymentExplicitStuff: RecursivePartial<ICommerceT
     paymentStatus: {},
     transactions: [],
     interfaceInteractions: []
-  } as unknown as ICommerceToolsPayment; // TODO: provide all required fields
+  } as unknown as ICommerceToolsPayment;
 
   return _merge(
-    defaultStuff,
-    paymentExplicitStuff
+    defaultPayment,
+    explicitPayment
   );
 };

@@ -7,10 +7,9 @@ import {
   IAbstractHeaders
 } from '../../../app/interfaces';
 
-// TODO: I had to add `| IAnyObjectWithStringKeys` to the signature, but that's not so good. Investigate and improve.
-export const abstractRequestFactory = (requestExplicitStuff: RecursivePartial<IAbstractRequest> | IAnyObjectWithStringKeys = {}): IAbstractRequest => {
+export const abstractRequestFactory = (explicitRequest: RecursivePartial<IAbstractRequest> | IAnyObjectWithStringKeys = {}): IAbstractRequest => {
   const defaultBody = {};
-  const defaultStuff = {
+  const defaultRequest = {
     headers: {} as IAbstractHeaders,
     body: defaultBody,
     rawBody: JSON.stringify(defaultBody),
@@ -19,12 +18,12 @@ export const abstractRequestFactory = (requestExplicitStuff: RecursivePartial<IA
     }
   };
 
-  if (requestExplicitStuff.body) {
-    requestExplicitStuff.rawBody = JSON.stringify(requestExplicitStuff.body);
+  if (explicitRequest.body) {
+    explicitRequest.rawBody = JSON.stringify(explicitRequest.body);
   }
 
   return _merge(
-    defaultStuff,
-    requestExplicitStuff
+    defaultRequest,
+    explicitRequest
   );
 };

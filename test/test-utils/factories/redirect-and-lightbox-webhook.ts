@@ -11,8 +11,8 @@ import {
 import { abstractRequestFactory } from './abstract-request-factories';
 import { ConfigService } from '../../../app/domain/services/config-service';
 
-export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyExplicitStuff: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody => {
-  const defaultStuff = { // TODO: use PaymentFactory
+export const RedirectAndLightboxWebhookRequestBodyFactory = (explicitWebhookRequestBody: RecursivePartial<IDatatransWebhookRequestBody> = {}): IDatatransWebhookRequestBody => {
+  const defaultDatatransResponse = {
     merchantId: new ConfigService().getConfig().datatrans?.merchants?.[0]?.id,
     refno: 'Test refno',
     transactionId: 'Test transactionId',
@@ -44,8 +44,8 @@ export const RedirectAndLightboxWebhookRequestBodyFactory = (webhookRequestBodyE
   };
 
   return _merge(
-    defaultStuff,
-    webhookRequestBodyExplicitStuff
+    defaultDatatransResponse,
+    explicitWebhookRequestBody
   );
 };
 
