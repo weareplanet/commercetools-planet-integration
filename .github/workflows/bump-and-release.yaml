@@ -48,9 +48,9 @@ jobs:
       - name: Modify CHANGELOG
         run: |
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
+          echo "CHANGELOG=$(git log -1 --pretty=%s)" >> $GITHUB_ENV
       - name: Updating version on package.json and package-lock.json
         run: |
-          echo "CHANGELOG=$(git log -1 --pretty=%s)" >> $GITHUB_ENV
           FINAL_VERSION=$(npm version ${{ env.VERSION }}) && \
           echo "VERSION=$FINAL_VERSION" >> $GITHUB_ENV
       - name: Commit and push changes
