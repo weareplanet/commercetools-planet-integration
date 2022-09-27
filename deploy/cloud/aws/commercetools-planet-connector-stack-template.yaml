@@ -15,7 +15,7 @@ Parameters:
   apiextensionIAMUser:
     Type: "String"
     AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
-    Description: IAM User for CommerceTools API Extension calls on STACKNAME-STACKID.
+    Description: IAM User for commercetools API Extension calls on STACKNAME-STACKID.
     Default: "STACKNAME-STACKID-apiextension-user"
 
 
@@ -40,11 +40,11 @@ Resources:
       Timeout: 150
       Environment:
         Variables:
-          CT_API_URL: "CT_API_URL_PLACEHOLDER" # as an URL from the CommerceTools project
-          CT_AUTH_URL: "CT_AUTH_URL_PLACEHOLDER" # as an URL from the CommerceTools project
-          CT_CLIENT_ID: "CT_CLIENT_ID_PLACEHOLDER" # as a String from the CommerceTools project
-          CT_CLIENT_SECRET: "CT_CLIENT_SECRET_PLACEHOLDER" # as a String from the CommerceTools project
-          CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the CommerceTools project
+          CT_API_URL: "CT_API_URL_PLACEHOLDER" # as an URL from the commercetools project
+          CT_AUTH_URL: "CT_AUTH_URL_PLACEHOLDER" # as an URL from the commercetools project
+          CT_CLIENT_ID: "CT_CLIENT_ID_PLACEHOLDER" # as a String from the commercetools project
+          CT_CLIENT_SECRET: "CT_CLIENT_SECRET_PLACEHOLDER" # as a String from the commercetools project
+          CT_PROJECT_ID: "CT_PROJECT_ID_PLACEHOLDER" # as a String from the commercetools project
           DT_CONNECTOR_WEBHOOK_URL: "DT_CONNECTOR_WEBHOOK_URL_PLACEHOLDER" # as an URL from AWS Lambda function itself
           DT_MERCHANTS: 'DT_MERCHANTS_PLACEHOLDER' # as a stringified JSON containing id, password, environment and HMAC key, using single quotes to avoid issues with double-quotes within the JSON
           LOG_LEVEL: "debug" # change to INFO after debugging whatever is needed

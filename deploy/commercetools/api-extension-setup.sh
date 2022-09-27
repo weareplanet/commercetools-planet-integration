@@ -8,7 +8,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ENVFILE="${SCRIPT_DIR}/../env"
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
-echo -e "\n########## Planet Payment CommerceTools connector - setup API-Extension on CommerceTools, started at ${NOW}."
+echo -e "\n########## Planet Payment commercetools connector - setup API-Extension on CommerceTools, started at ${NOW}."
 
 source ${ENVFILE}
 

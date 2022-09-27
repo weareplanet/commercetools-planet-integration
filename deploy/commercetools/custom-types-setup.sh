@@ -4,7 +4,7 @@
 # 2022-07 - Planet Payments
 
 # It will iterate over JSON files present at script's folder and create custom types to be used in
-# addition to standard types (Payment, Transaction) in CommerceTools.
+# addition to standard types (Payment, Transaction) in commercetools.
 # Each file represents one custom type.
 
 # REQUIREMENTS:
@@ -16,7 +16,7 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
-echo -e "\n########## Planet Payment CommerceTools connector - setup Custom Fields Types in CommerceTools, starting now, at ${NOW}."
+echo -e "\n########## Planet Payment commercetools connector - setup Custom Fields types in commercetools, starting now, at ${NOW}."
 
 echo -e "\n##### Checking ENV vars..."
 REQUIRED_ENV_VARS=(CT_AUTH_URL CT_API_URL CT_CLIENT_ID CT_CLIENT_SECRET CT_SCOPES CT_PROJECT_ID)
@@ -33,11 +33,11 @@ ACCESS_TOKEN=$(curl ${CT_AUTH_URL}/oauth/token --silent \
      -d "grant_type=client_credentials&scope=${CT_SCOPES}" |\
      jq -r '.access_token')
 
-echo -e "   ## Got an access token from CommerceTools."
+echo -e "   ## Got an access token from commercetools."
 
 for filename in ${SCRIPT_DIR}/types/*.json; do
 	typeKey=$(basename "$filename" .json)
-	echo -e "\n##### Checking if '${typeKey}' type exists in CommerceTools..."
+	echo -e "\n##### Checking if '${typeKey}' type exists in commercetools..."
 
 	statusCode=$(curl --write-out '%{http_code}' --silent --output /dev/null \
 		-X GET ${CT_API_URL}/${CT_PROJECT_ID}/types/key=${typeKey} -i \

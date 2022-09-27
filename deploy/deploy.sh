@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
+
 DEPLOY_SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 SUPPORTED_ENVS="aws"
@@ -69,6 +71,7 @@ done
 case $ENV in
   aws)
     deploy_aws
+    echo "########## Planet Payment commercetools connector - deployment finished successfully at ${NOW}."
     ;;
 
   *)

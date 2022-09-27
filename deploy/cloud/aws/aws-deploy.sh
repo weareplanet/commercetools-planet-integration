@@ -38,7 +38,7 @@ AWSREGION=$(echo $3 | tr '[:upper:]' '[:lower:]') # make it lowercase
 ENVFILE="${SCRIPT_DIR}/../../env"
 
 NOW=$(date +%Y-%m-%d_%Hh%Mm%Ss)
-echo -e "\n########## Planet Payment CommerceTools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
+echo -e "\n########## Planet Payment commercetools connector - deployment AWS infrastructure, starting now, at ${NOW}.\n"
 echo -e "##### Performing parameter input checks..."
 if [ $# -ne 3 ]; then
    echo -e "   !! Usage: aws-deploy.sh CONNECTOR_TYPE STACKID AWSREGION"
