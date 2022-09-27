@@ -50,7 +50,7 @@ jobs:
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on package.json and package-lock.json
         run: |
-          echo "CHANGELOG=$(git log --pretty="- %s")" >> $GITHUB_ENV
+          echo "CHANGELOG=$(git log --pretty=\"- %s\")" >> $GITHUB_ENV
           FINAL_VERSION=$(npm version ${{ env.VERSION }}) && \
           echo "VERSION=$FINAL_VERSION" >> $GITHUB_ENV
       - name: Commit and push changes
