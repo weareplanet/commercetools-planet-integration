@@ -1,6 +1,6 @@
 {
   "name": "planet-commercetools-connector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The connector between Datatrans and ConnerceTools to hide Datatrans from the consumer",
   "main": "index.js",
   "scripts": {
