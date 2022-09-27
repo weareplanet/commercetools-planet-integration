@@ -40,7 +40,9 @@ jobs:
           git fetch
       - name: Bump version
         run: |
-          export NEW_VERSION=$(semver bump ${{ env.BUMP }}) && \
+          TAG=$(git tag --sort=-creatordate | head -n 1) && \
+          if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
+          export NEW_VERSION=$(semver bump ${{ env.BUMP }} $TAG) && \
           echo "The calculated new version is $NEW_VERSION"
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
       - name: Modify CHANGELOG
@@ -49,15 +51,9 @@ jobs:
       - name: Updating version on package.json and package-lock.json
         run: |
           npm version ${{ env.VERSION }}
-      - name: Tag
-        run: |
-          TAG=$(git tag --sort=-creatordate | head -n 1) && \
-          if [ -z "$TAG" ]; then TAG=0.0.0; fi && \
-          echo "The branch has been tagged with ${{ env.TAG }}" 
       - name: Commit and push changes
         run: |
-          git push origin
-          git push --tags origin
+          git push origin && git push --tags origin
       - name: Create Release
         uses: actions/create-release@v1
         env:
