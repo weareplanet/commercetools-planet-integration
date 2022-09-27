@@ -66,4 +66,5 @@ jobs:
           release_name: ${{ env.VERSION }}
           commitish: ${{ env.GIT_SHA }}
           body: "Release ${{ env.VERSION }}"
-          
+
+
