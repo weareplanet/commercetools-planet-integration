@@ -54,7 +54,7 @@ jobs:
           echo "VERSION=$FINAL_VERSION" >> $GITHUB_ENV
       - name: Commit and push changes
         run: |
-          git push origin
+          git push origin && git push --tags origin
           git fetch
       - name: Create Release
         uses: actions/create-release@v1
@@ -63,6 +63,6 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: ${{ env.VERSION }}
-          #body_path: CHANGELOG.md
+          body_path: CHANGELOG.md
           #draft: false
           #prerelease: false
