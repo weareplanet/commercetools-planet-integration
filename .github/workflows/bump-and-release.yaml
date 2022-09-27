@@ -50,14 +50,14 @@ jobs:
           if [ -f "CHANGELOG.md" ]; then sed -i -e "1 i \#\#\ ${{ env.VERSION }}"; fi
       - name: Updating version on package.json and package-lock.json
         run: |
+          echo "CHANGELOG=$(git log --pretty="- %s")" >> $GITHUB_ENV
           FINAL_VERSION=$(npm version ${{ env.VERSION }}) && \
           echo "VERSION=$FINAL_VERSION" >> $GITHUB_ENV
       - name: Commit and push changes
         run: |
-          git push origin
+          git push origin 
           git fetch
           echo "GIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "CHANGELOG=$(git log --pretty="- %s")" >> $GITHUB_ENV
       - name: Create Release
         uses: actions/create-release@v1
         env:
@@ -66,6 +66,6 @@ jobs:
           tag_name: ${{ env.VERSION }}
           release_name: ${{ env.VERSION }}
           commitish: ${{ env.GIT_SHA }}
-          body_path:  ${{ env.CHANGELOG }}
+          body:  ${{ env.CHANGELOG }}
           #draft: false
           #prerelease: false
