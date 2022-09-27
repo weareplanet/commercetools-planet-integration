@@ -55,9 +55,9 @@ jobs:
       - name: Commit and push changes
         run: |
           git push origin && git push --tags origin
+          git fetch
       - name: Create Release
         uses: actions/create-release@v1
-        run: git fetch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
