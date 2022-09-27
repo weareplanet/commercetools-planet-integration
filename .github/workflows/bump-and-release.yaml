@@ -57,6 +57,7 @@ jobs:
           git push origin
           git fetch
           echo "GIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "CHANGELOG=$(git log --pretty="- %s")" >> $GITHUB_ENV
       - name: Create Release
         uses: actions/create-release@v1
         env:
@@ -65,6 +66,6 @@ jobs:
           tag_name: ${{ env.VERSION }}
           release_name: ${{ env.VERSION }}
           commitish: ${{ env.GIT_SHA }}
-          #body_path: CHANGELOG.md
+          body_path:  ${{ env.CHANGELOG }}
           #draft: false
           #prerelease: false
