@@ -56,8 +56,8 @@ jobs:
           echo "The branch has been tagged with ${{ env.TAG }}" 
       - name: Commit and push changes
         run: |
-          git push --tags origin
           git push origin
+          git push --tags origin
       - name: Create Release
         uses: actions/create-release@v1
         env:
