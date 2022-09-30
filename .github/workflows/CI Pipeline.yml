@@ -34,7 +34,6 @@ jobs:
             -Dsonar.organization=planet 
             -Dsonar.projectKey=commerceTools 
             -Dsonar.sources=. 
-            -Dsonar.exclusions= docs/**, .github/**
             -Dsonar.testExecutionReportPaths=coverage/test-report.xml
             -Dsonar.tests=test
             -Dsonar.test.inclusions=test/**
