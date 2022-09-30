@@ -13,7 +13,7 @@
     "test": "cross-env LOG_LEVEL=silent npm run test:base -- --verbose",
     "test:local-dev:all": "npm run lint && cross-env npm run test:base -- --silent=false --verbose",
     "test:local-dev:file": "cross-env npm run test:base -- --silent=false --verbose --coverage=false",
-    "test:ci:sonar": "cross-env NODE_ENV=test STAGE=local-dev jest --verbose --runInBand --coverage --reportPath=coverage  --reportFile=text-report.xml --indent=4 --testResultsProcessor jest-sonar-reporter",
+    "test:ci:sonar": "cross-env NODE_ENV=test STAGE=local-dev jest --verbose --runInBand --coverage --reportPath=coverage  --reportFile=test-report.xml --indent=4 --testResultsProcessor jest-sonar-reporter",
     "prepare": "husky install"
   },
   "keywords": [
