@@ -34,11 +34,11 @@ jobs:
             -Dsonar.organization=planet 
             -Dsonar.projectKey=commerceTools 
             -Dsonar.sources=. 
-            -Dsonar.testExecutionReportPaths=coverage/test-report.xml
-            -Dsonar.tests=test
-            -Dsonar.test.inclusions=test/**
-            -Dsonar.typescript.tsconfigPath=tsconfig.json
-            -Dsonar.eslint.reportPaths=coverage/lint-result.json
+            -Dsonar.testExecutionReportPaths=./coverage/test-report.xml
+            -Dsonar.tests=./test
+            -Dsonar.test.inclusions=./test/**
+            -Dsonar.typescript.tsconfigPath=./tsconfig.json
+            -Dsonar.eslint.reportPaths=./coverage/lint-result.json
             -Dsonar.language=js
             -Dsonar.sourceEncoding=UTF-8
         env:
