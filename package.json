@@ -46,7 +46,7 @@
     "@types/yup": "^0.29.14",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
-    "aws-sdk": "^2.1150.0",
+    "aws-sdk": "^2.1692.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.17.0",
     "jest": "^28.1.0",
